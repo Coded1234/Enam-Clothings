@@ -96,6 +96,9 @@ const startServer = async () => {
 // Only start server if not in Vercel serverless environment
 if (process.env.VERCEL !== '1') {
   startServer();
+} else {
+  // Connect to database in serverless mode
+  connectDB().catch(err => console.error('Database connection error:', err));
 }
 
 // Export for Vercel serverless

@@ -9,14 +9,14 @@
       }
     },
     {
-      "src": "api/[...path].js",
+      "src": "server/server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/[...path].js"
+      "dest": "/server/server.js"
     },
     {
       "src": "/(.*)",
