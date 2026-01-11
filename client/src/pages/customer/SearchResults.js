@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import {
   FiSearch,
@@ -43,16 +43,7 @@ const SearchResults = () => {
     { value: "rating", label: "Highest Rated" },
   ];
 
-  useEffect(() => {
-    if (query) {
-      fetchSearchResults();
-    } else {
-      setProducts([]);
-      setLoading(false);
-    }
-  }, [query, filters, pagination.page]);
-
-  const fetchSearchResults = async () => {
+  const fetchSearchResults = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -78,7 +69,16 @@ const SearchResults = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [query, filters, pagination.page]);
+
+  useEffect(() => {
+    if (query) {
+      fetchSearchResults();
+    } else {
+      setProducts([]);
+      setLoading(false);
+    }
+  }, [query, fetchSearchResults]);
 
   const handleFilterChange = (key, value) => {
     const newFilters = { ...filters, [key]: value };
