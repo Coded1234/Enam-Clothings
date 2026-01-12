@@ -32,6 +32,7 @@ const Newsletter = sequelize.define(
   },
   {
     tableName: "newsletters",
+    underscored: true,
   }
 );
 

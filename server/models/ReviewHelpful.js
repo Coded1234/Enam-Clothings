@@ -20,6 +20,7 @@ const ReviewHelpful = sequelize.define(
   },
   {
     tableName: "review_helpfuls",
+    underscored: true,
     indexes: [
       {
         unique: true,

@@ -21,6 +21,7 @@ const Cart = sequelize.define(
   },
   {
     tableName: "carts",
+    underscored: true,
   }
 );
 

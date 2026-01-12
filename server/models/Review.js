@@ -52,6 +52,7 @@ const Review = sequelize.define(
   },
   {
     tableName: "reviews",
+    underscored: true,
     indexes: [
       {
         unique: true,

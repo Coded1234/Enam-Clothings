@@ -90,6 +90,7 @@ const Product = sequelize.define(
   },
   {
     tableName: "products",
+    underscored: true,
     hooks: {
       beforeSave: (product) => {
         // Auto-calculate remainingStock before saving

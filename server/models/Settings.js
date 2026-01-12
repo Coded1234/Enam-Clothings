@@ -25,6 +25,7 @@ const Settings = sequelize.define(
   },
   {
     tableName: "settings",
+    underscored: true,
   }
 );
 

@@ -40,6 +40,7 @@ const CartItem = sequelize.define(
   },
   {
     tableName: "cart_items",
+    underscored: true,
   }
 );
 

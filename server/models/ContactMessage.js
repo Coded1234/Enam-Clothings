@@ -47,6 +47,7 @@ const ContactMessage = sequelize.define(
   },
   {
     tableName: "contact_messages",
+    underscored: true,
   }
 );
 

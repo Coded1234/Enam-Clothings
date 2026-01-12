@@ -20,6 +20,7 @@ const Wishlist = sequelize.define(
   },
   {
     tableName: "wishlists",
+    underscored: true,
     indexes: [
       {
         unique: true,

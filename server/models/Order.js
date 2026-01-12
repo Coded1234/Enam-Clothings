@@ -94,6 +94,7 @@ const Order = sequelize.define(
   },
   {
     tableName: "orders",
+    underscored: true,
     hooks: {
       beforeCreate: (order) => {
         // Generate order number
