@@ -35,6 +35,20 @@ const getProducts = async (req, res) => {
       if (maxPrice) where.price[Op.lte] = Number(maxPrice);
     }
 
+    // Filter by size (sizes is a JSONB array)
+    if (size) {
+      where.sizes = {
+        [Op.contains]: [{ size: size }]
+      };
+    }
+
+    // Filter by color (colors is a JSONB array)
+    if (color) {
+      where.colors = {
+        [Op.contains]: [{ name: color }]
+      };
+    }
+
     if (search) {
       where[Op.or] = [
         { name: { [Op.iLike]: `%${search}%` } },

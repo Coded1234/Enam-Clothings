@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "../redux/slices/authSlice";
+import ScrollToTop from "../components/common/ScrollToTop";
 import {
   FiHome,
   FiShoppingBag,
@@ -16,6 +18,27 @@ import {
   FiSettings,
   FiTag,
 } from "react-icons/fi";
+
+const pageVariants = {
+  initial: {
+    opacity: 0,
+    y: 20,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.3,
+      ease: "easeOut",
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      duration: 0.2,
+    },
+  },
+};
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -177,7 +200,18 @@ const AdminLayout = () => {
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto p-6">
-          <Outlet />
+          <ScrollToTop />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              variants={pageVariants}
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>

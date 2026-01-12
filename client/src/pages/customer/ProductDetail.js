@@ -356,16 +356,16 @@ const ProductDetail = () => {
             {/* Price */}
             <div className="flex items-baseline gap-4">
               <span className="text-3xl font-bold text-gray-900">
-                ₦{Number(product.price).toLocaleString()}
+                GH₵{Number(product.price).toLocaleString()}
               </span>
               {product.comparePrice && (
                 <span className="text-xl text-gray-400 line-through">
-                  ₦{Number(product.comparePrice).toLocaleString()}
+                  GH₵{Number(product.comparePrice).toLocaleString()}
                 </span>
               )}
               {discountPercent > 0 && (
                 <span className="text-green-600 font-medium">
-                  Save ₦
+                  Save GH₵
                   {(
                     Number(product.comparePrice) - Number(product.price)
                   ).toLocaleString()}

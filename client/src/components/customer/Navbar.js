@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "../../redux/slices/authSlice";
 import {
   FiShoppingCart,
@@ -12,12 +13,28 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 
+const promoMessages = [
+  "Free shipping on orders over GH₵50,000",
+  "🔥 New arrivals just dropped!",
+  "💫 Up to 30% off on selected items",
+  "📦 Fast & secure delivery nationwide",
+];
+
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [promoIndex, setPromoIndex] = useState(0);
   const dropdownRef = useRef(null);
+
+  // Rotate promo messages
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPromoIndex((prev) => (prev + 1) % promoMessages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -64,10 +81,23 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       {/* Top Bar */}
-      <div className="bg-gray-900 text-white text-sm py-2">
+      <div className="bg-gray-900 text-white text-sm py-2 overflow-hidden">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <p>Free shipping on orders over GH₵50,000</p>
-          <div className="hidden md:flex gap-4">
+          <div className="relative h-5 flex-1 overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={promoIndex}
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -100, opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="absolute whitespace-nowrap"
+              >
+                {promoMessages[promoIndex]}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+          <div className="hidden md:flex gap-4 flex-shrink-0 ml-4">
             <Link to="/orders" className="hover:text-primary-400">
               Track Order
             </Link>

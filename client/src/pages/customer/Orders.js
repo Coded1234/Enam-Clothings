@@ -274,30 +274,30 @@ const Orders = () => {
                   </div>
 
                   {/* Order Items Preview */}
-                  <div className="p-4 md:p-6 bg-gray-50">
+                  <Link to={`/orders/${order.id}`} className="block p-4 md:p-6 bg-gray-50 hover:bg-gray-100 transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         {/* Product Images */}
-                        <div className="flex -space-x-3">
+                        <div className="flex -space-x-3 flex-shrink-0">
                           {order.items?.slice(0, 4).map((item, index) => (
                             <img
                               key={index}
                               src={getImageUrl(item.productImage)}
                               alt={item.productName}
-                              className="w-12 h-12 rounded-lg border-2 border-white object-cover"
+                              className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg border-2 border-white object-cover"
                             />
                           ))}
                           {order.items?.length > 4 && (
-                            <div className="w-12 h-12 rounded-lg border-2 border-white bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-600">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg border-2 border-white bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-600">
                               +{order.items.length - 4}
                             </div>
                           )}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-sm text-gray-600">
                             {getTotalQuantity(order.items)} item(s)
                           </p>
-                          <p className="text-sm text-gray-500 truncate max-w-[200px]">
+                          <p className="text-sm text-gray-500 truncate max-w-[120px] sm:max-w-[200px]">
                             {order.items?.[0]?.product?.name ||
                               order.items?.[0]?.productName}
                             {order.items?.length > 1 && " and more..."}
@@ -308,23 +308,20 @@ const Orders = () => {
                       <div className="flex items-center gap-2">
                         {order.status === "pending" && (
                           <button
-                            onClick={() => cancelOrder(order.id)}
-                            className="flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors font-medium"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              cancelOrder(order.id);
+                            }}
+                            className="flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors font-medium text-sm"
                           >
                             <FiXCircle size={18} />
-                            Cancel
+                            <span className="hidden sm:inline">Cancel</span>
                           </button>
                         )}
-                        <Link
-                          to={`/orders/${order.id}`}
-                          className="flex items-center gap-2 px-4 py-2 text-primary-500 hover:bg-primary-50 rounded-lg transition-colors font-medium"
-                        >
-                          <FiEye size={18} />
-                          View Details
-                        </Link>
+                        <FiChevronRight className="text-gray-400" size={20} />
                       </div>
                     </div>
-                  </div>
+                  </Link>
 
                   {/* Order Progress */}
                   <div className="px-4 md:px-6 pb-4">
