@@ -2,9 +2,9 @@ import axios from "axios";
 
 // Use relative URL for Vercel deployment (API routes are at /api/*)
 const getBaseURL = () => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     // In browser, use relative path for same-domain API
-    return '/api';
+    return "/api";
   }
   return process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 };

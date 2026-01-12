@@ -89,7 +89,7 @@ const Navbar = () => {
           </button>
 
           {/* Logo */}
-          <Link to="/" className="text-2xl font-bold gradient-text">
+          <Link to="/" className="text-xl sm:text-2xl font-bold gradient-text whitespace-nowrap">
             Enam's Clothings
           </Link>
 
