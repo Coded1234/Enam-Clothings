@@ -36,6 +36,7 @@ const AddressMapPicker = ({ onAddressSelect, currentPosition }) => {
   
   // Detect if user is on mobile
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const [showMobileMap, setShowMobileMap] = useState(false);
   
   // Update position if currentPosition changes
   useEffect(() => {
@@ -120,115 +121,186 @@ const AddressMapPicker = ({ onAddressSelect, currentPosition }) => {
     );
   };
 
-  // Open native map app (for mobile)
-  const openNativeMapApp = () => {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const defaultLat = defaultCenter[0];
-    const defaultLng = defaultCenter[1];
-    
-    // Use current position if available, otherwise default to Accra
-    const lat = position?.lat || defaultLat;
-    const lng = position?.lng || defaultLng;
-    
-    if (isIOS) {
-      // iOS - Open Apple Maps
-      window.location.href = `maps://?q=${lat},${lng}`;
-    } else {
-      // Android - Open Google Maps
-      window.location.href = `geo:${lat},${lng}?q=${lat},${lng}`;
-    }
+  // Open full-screen map for mobile
+  const openMobileMap = () => {
+    setShowMobileMap(true);
+  };
+
+  // Close mobile map
+  const closeMobileMap = () => {
+    setShowMobileMap(false);
   };
 
   return (
-    <div className="space-y-4">
-      {/* Instructions */}
-      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-        <p className="text-sm text-blue-800 flex items-start gap-2">
-          <FiMapPin className="mt-0.5 flex-shrink-0" />
-          <span>
-            {isMobile 
-              ? "Tap the button below to open your map app and select your delivery location."
-              : "Click on the map to select your delivery location, or use the button below to detect your current location automatically."
-            }
-          </span>
-        </p>
-      </div>
+    <>
+      {/* Mobile Full-Screen Map Modal */}
+      {isMobile && showMobileMap && (
+        <div className="fixed inset-0 z-50 bg-white flex flex-col">
+          {/* Header */}
+          <div className="bg-primary-600 text-white p-4 flex items-center justify-between shadow-lg">
+            <h3 className="font-semibold text-lg">Select Delivery Location</h3>
+            <button
+              onClick={closeMobileMap}
+              className="text-white text-2xl font-bold"
+            >
+              ×
+            </button>
+          </div>
 
-      {/* Mobile: Open Map App Button */}
-      {isMobile && (
-        <button
-          type="button"
-          onClick={openNativeMapApp}
-          className="w-full py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
-        >
-          <FiMapPin />
-          Open Map App to Select Location
-        </button>
-      )}
-
-      {/* Get Current Location Button */}
-      <button
-        type="button"
-        onClick={getCurrentLocation}
-        disabled={loading}
-        className="w-full py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 disabled:bg-gray-400 transition-colors flex items-center justify-center gap-2"
-      >
-        {loading ? (
-          <>
-            <FiLoader className="animate-spin" />
-            Getting location...
-          </>
-        ) : (
-          <>
-            <FiMapPin />
-            Use My Current Location
-          </>
-        )}
-      </button>
-
-      {/* Map - Only show on desktop */}
-      {!isMobile && (
-        <div className="border-2 border-gray-300 rounded-xl overflow-hidden relative" style={{ height: "400px", zIndex: 1 }}>
-          <MapContainer
-            center={mapCenter}
-            zoom={13}
-            style={{ height: "100%", width: "100%" }}
-            scrollWheelZoom={false}
-            whenCreated={(map) => {
-              setTimeout(() => {
-                map.invalidateSize();
-              }, 100);
-            }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              maxZoom={19}
-            />
-            <LocationMarker
-              position={position}
-              setPosition={setPosition}
-              onLocationSelect={handleLocationSelect}
-            />
-          </MapContainer>
-        </div>
-      )}
-
-      {/* Selected Address Display */}
-      {address && (
-        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-          <p className="text-sm font-medium text-green-800 mb-1">
-            Selected Location:
-          </p>
-          <p className="text-sm text-green-700">{address}</p>
-          {position && (
-            <p className="text-xs text-green-600 mt-2">
-              Coordinates: {position.lat.toFixed(6)}, {position.lng.toFixed(6)}
+          {/* Instructions */}
+          <div className="bg-blue-50 p-3 border-b border-blue-200">
+            <p className="text-sm text-blue-800 flex items-start gap-2">
+              <FiMapPin className="mt-0.5 flex-shrink-0" />
+              <span>Tap anywhere on the map to select your delivery location</span>
             </p>
+          </div>
+
+          {/* Map */}
+          <div className="flex-1 relative">
+            <MapContainer
+              center={mapCenter}
+              zoom={13}
+              style={{ height: "100%", width: "100%" }}
+              scrollWheelZoom={true}
+              zoomControl={true}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                maxZoom={19}
+              />
+              <LocationMarker
+                position={position}
+                setPosition={setPosition}
+                onLocationSelect={handleLocationSelect}
+              />
+            </MapContainer>
+          </div>
+
+          {/* Selected Address Display */}
+          {address && (
+            <div className="p-4 bg-green-50 border-t border-green-200">
+              <p className="text-sm font-medium text-green-800 mb-1">
+                Selected Location:
+              </p>
+              <p className="text-sm text-green-700">{address}</p>
+              {position && (
+                <p className="text-xs text-green-600 mt-1">
+                  {position.lat.toFixed(6)}, {position.lng.toFixed(6)}
+                </p>
+              )}
+              <button
+                onClick={closeMobileMap}
+                className="mt-3 w-full py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors"
+              >
+                Confirm Location
+              </button>
+            </div>
+          )}
+
+          {/* Loading Indicator */}
+          {loading && (
+            <div className="absolute inset-x-0 top-20 mx-4">
+              <div className="bg-white shadow-lg rounded-lg p-3 flex items-center gap-2">
+                <FiLoader className="animate-spin text-primary-600" />
+                <span className="text-sm">Getting address...</span>
+              </div>
+            </div>
           )}
         </div>
       )}
-    </div>
+
+      {/* Main Content */}
+      <div className="space-y-4">
+        {/* Instructions */}
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <p className="text-sm text-blue-800 flex items-start gap-2">
+            <FiMapPin className="mt-0.5 flex-shrink-0" />
+            <span>
+              {isMobile 
+                ? "Tap the button below to open the map and select your delivery location."
+                : "Click on the map to select your delivery location, or use the button below to detect your current location automatically."
+              }
+            </span>
+          </p>
+        </div>
+
+        {/* Mobile: Open Map Button */}
+        {isMobile && (
+          <button
+            type="button"
+            onClick={openMobileMap}
+            className="w-full py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
+          >
+            <FiMapPin />
+            Open Map to Select Location
+          </button>
+        )}
+
+        {/* Get Current Location Button */}
+        <button
+          type="button"
+          onClick={getCurrentLocation}
+          disabled={loading}
+          className="w-full py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 disabled:bg-gray-400 transition-colors flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <>
+              <FiLoader className="animate-spin" />
+              Getting location...
+            </>
+          ) : (
+            <>
+              <FiMapPin />
+              Use My Current Location
+            </>
+          )}
+        </button>
+
+        {/* Map - Only show on desktop */}
+        {!isMobile && (
+          <div className="border-2 border-gray-300 rounded-xl overflow-hidden relative" style={{ height: "400px", zIndex: 1 }}>
+            <MapContainer
+              center={mapCenter}
+              zoom={13}
+              style={{ height: "100%", width: "100%" }}
+              scrollWheelZoom={false}
+              whenCreated={(map) => {
+                setTimeout(() => {
+                  map.invalidateSize();
+                }, 100);
+              }}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                maxZoom={19}
+              />
+              <LocationMarker
+                position={position}
+                setPosition={setPosition}
+                onLocationSelect={handleLocationSelect}
+              />
+            </MapContainer>
+          </div>
+        )}
+
+        {/* Selected Address Display */}
+        {address && !showMobileMap && (
+          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+            <p className="text-sm font-medium text-green-800 mb-1">
+              Selected Location:
+            </p>
+            <p className="text-sm text-green-700">{address}</p>
+            {position && (
+              <p className="text-xs text-green-600 mt-2">
+                Coordinates: {position.lat.toFixed(6)}, {position.lng.toFixed(6)}
+              </p>
+            )}
+          </div>
+        )}
+        </div>
+    </>
   );
 };
 

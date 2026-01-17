@@ -295,7 +295,7 @@ const OrderDetail = () => {
             </div>
             <div className="flex justify-between text-xs md:text-sm text-gray-600">
               <span>Shipping</span>
-              <span>{formatCurrency(order.shippingCost || 0)}</span>
+              <span>{formatCurrency(order.shippingFee || order.shippingCost || 0)}</span>
             </div>
             {order.discount > 0 && (
               <div className="flex justify-between text-xs md:text-sm text-green-600">
