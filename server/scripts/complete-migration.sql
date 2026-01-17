@@ -25,7 +25,11 @@ ADD COLUMN IF NOT EXISTS total_items INTEGER DEFAULT 0;
 ALTER TABLE products 
 ADD COLUMN IF NOT EXISTS remaining_stock INTEGER DEFAULT 0;
 
--- 6. Update remaining_stock for existing products
+-- 6. Make subcategory nullable (if column exists from old schema)
+ALTER TABLE products 
+ALTER COLUMN subcategory DROP NOT NULL;
+
+-- 7. Update remaining_stock for existing products
 UPDATE products 
 SET remaining_stock = total_stock - sold_count
 WHERE remaining_stock = 0 OR remaining_stock IS NULL;

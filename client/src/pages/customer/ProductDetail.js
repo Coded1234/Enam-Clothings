@@ -122,7 +122,7 @@ const ProductDetail = () => {
         addToCart({
           productId: id,
           quantity,
-          size: selectedSize,
+          size: typeof selectedSize === 'string' ? selectedSize : selectedSize?.size,
           color: selectedColor,
         })
       ).unwrap();
@@ -209,6 +209,17 @@ const ProductDetail = () => {
   };
 
   const getStockForSize = (size) => {
+    if (!size || !product?.sizes) return 0;
+    
+    // Handle both string and object size formats
+    const sizeValue = typeof size === 'string' ? size : size.size;
+    const sizeObj = product.sizes.find(s => (typeof s === 'string' ? s : s.size) === sizeValue);
+    
+    if (sizeObj && typeof sizeObj === 'object' && sizeObj.stock !== undefined) {
+      return sizeObj.stock;
+    }
+    
+    // Fallback to total stock
     return product?.remainingStock ?? product?.totalStock ?? 0;
   };
 
@@ -414,7 +425,7 @@ const ProductDetail = () => {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <p className="font-medium text-gray-800">
-                    Size: <span className="text-gray-600">{selectedSize}</span>
+                    Size: <span className="text-gray-600">{typeof selectedSize === 'string' ? selectedSize : selectedSize?.size}</span>
                   </p>
                   <button
                     onClick={() => setShowSizeGuide(true)}
@@ -424,24 +435,29 @@ const ProductDetail = () => {
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  {product.sizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      disabled={
-                        (product.remainingStock ?? product.totalStock) === 0
-                      }
-                      className={`min-w-[48px] h-12 px-4 rounded-lg border font-medium transition-colors ${
-                        selectedSize === size
-                          ? "bg-primary-500 text-white border-primary-500"
-                          : (product.remainingStock ?? product.totalStock) === 0
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "hover:border-primary-500 hover:text-primary-500"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
+                  {product.sizes.map((size, index) => {
+                    const sizeValue = typeof size === 'string' ? size : size.size;
+                    const sizeStock = typeof size === 'object' && size.stock !== undefined ? size.stock : (product.remainingStock ?? product.totalStock);
+                    const selectedSizeValue = typeof selectedSize === 'string' ? selectedSize : selectedSize?.size;
+                    const isSelected = selectedSizeValue === sizeValue;
+                    
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedSize(size)}
+                        disabled={sizeStock === 0}
+                        className={`min-w-[48px] h-12 px-4 rounded-lg border font-medium transition-colors ${
+                          isSelected
+                            ? "bg-primary-500 text-white border-primary-500"
+                            : sizeStock === 0
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "hover:border-primary-500 hover:text-primary-500"
+                        }`}
+                      >
+                        {sizeValue}
+                      </button>
+                    );
+                  })}
                 </div>
                 {selectedSizeStock > 0 && selectedSizeStock <= 10 && (
                   <p className="text-orange-500 text-sm mt-2">
