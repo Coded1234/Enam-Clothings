@@ -158,7 +158,7 @@ const AddressMapPicker = ({ onAddressSelect, currentPosition }) => {
           headers: {
             "User-Agent": "EcommerceWebsite/1.0",
           },
-        }
+        },
       );
       const data = await response.json();
       setSearchResults(data);
@@ -362,7 +362,7 @@ const AddressMapPicker = ({ onAddressSelect, currentPosition }) => {
                     <FiMapPin className="text-primary-600 mt-1 flex-shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-800">
-                        {result.display_name.split(',')[0]}
+                        {result.display_name.split(",")[0]}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
                         {result.display_name}

@@ -1,15 +1,16 @@
 const axios = require("axios");
 
 // Yango Delivery API Configuration
-const YANGO_API_URL = process.env.YANGO_API_URL || "https://b2b.yango.com/api/b2b";
+const YANGO_API_URL =
+  process.env.YANGO_API_URL || "https://b2b.yango.com/api/b2b";
 const YANGO_API_KEY = process.env.YANGO_API_KEY;
 const YANGO_CLIENT_ID = process.env.YANGO_CLIENT_ID;
 
 // Store coordinates (your warehouse/store location)
 const STORE_LOCATION = {
   latitude: parseFloat(process.env.STORE_LATITUDE) || 5.6037,
-  longitude: parseFloat(process.env.STORE_LONGITUDE) || -0.1870,
-  address: process.env.STORE_ADDRESS || "Accra, Ghana"
+  longitude: parseFloat(process.env.STORE_LONGITUDE) || -0.187,
+  address: process.env.STORE_ADDRESS || "Accra, Ghana",
 };
 
 /**
@@ -27,12 +28,17 @@ exports.calculateShippingRate = async (req, res) => {
     }
 
     // Geocode the destination address
-    const destinationCoords = await geocodeAddress({ address, city, postalCode });
+    const destinationCoords = await geocodeAddress({
+      address,
+      city,
+      postalCode,
+    });
 
     if (!destinationCoords) {
       return res.status(400).json({
         success: false,
-        message: "Could not locate the provided address. Please enter a valid address in Ghana.",
+        message:
+          "Could not locate the provided address. Please enter a valid address in Ghana.",
       });
     }
 
@@ -40,7 +46,7 @@ exports.calculateShippingRate = async (req, res) => {
     const shippingRate = await getYangoShippingRate(
       STORE_LOCATION,
       destinationCoords,
-      { address, city, postalCode, phone }
+      { address, city, postalCode, phone },
     );
 
     res.json({
@@ -56,10 +62,10 @@ exports.calculateShippingRate = async (req, res) => {
     });
   } catch (error) {
     console.error("Shipping calculation error:", error);
-    
+
     // Fallback to static rates if API fails
     const fallbackRate = calculateFallbackRate(req.body);
-    
+
     res.json({
       success: true,
       data: {
@@ -70,7 +76,8 @@ exports.calculateShippingRate = async (req, res) => {
         serviceType: "standard",
         fallback: true,
       },
-      warning: "Using estimated shipping rate. Actual rate will be calculated during delivery.",
+      warning:
+        "Using estimated shipping rate. Actual rate will be calculated during delivery.",
     });
   }
 };
@@ -90,7 +97,11 @@ exports.getDeliveryOptions = async (req, res) => {
     }
 
     // Geocode destination
-    const destinationCoords = await geocodeAddress({ address, city, postalCode });
+    const destinationCoords = await geocodeAddress({
+      address,
+      city,
+      postalCode,
+    });
 
     if (!destinationCoords) {
       return res.status(400).json({
@@ -100,7 +111,10 @@ exports.getDeliveryOptions = async (req, res) => {
     }
 
     // Get multiple delivery options from Yango
-    const options = await getYangoDeliveryOptions(STORE_LOCATION, destinationCoords);
+    const options = await getYangoDeliveryOptions(
+      STORE_LOCATION,
+      destinationCoords,
+    );
 
     res.json({
       success: true,
@@ -111,7 +125,7 @@ exports.getDeliveryOptions = async (req, res) => {
     });
   } catch (error) {
     console.error("Get delivery options error:", error);
-    
+
     // Return fallback options
     res.json({
       success: true,
@@ -139,7 +153,7 @@ async function geocodeAddress({ address, city, postalCode }) {
     // Try Nominatim (OpenStreetMap) first - free and reliable
     const query = `${address}, ${city}, Ghana`;
     const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=gh&limit=1`;
-    
+
     const response = await axios.get(nominatimUrl, {
       headers: {
         "User-Agent": "EcommerceWebsite/1.0",
@@ -162,7 +176,7 @@ async function geocodeAddress({ address, city, postalCode }) {
       {
         headers: { "User-Agent": "EcommerceWebsite/1.0" },
         timeout: 5000,
-      }
+      },
     );
 
     if (cityResponse.data && cityResponse.data.length > 0) {
@@ -206,13 +220,17 @@ async function calculateRoadDistance(lat1, lon1, lat2, lon2) {
   try {
     // Use OSRM (Open Source Routing Machine) for road distance
     const url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=false`;
-    
+
     const response = await axios.get(url, {
       timeout: 5000,
-      headers: { "User-Agent": "EcommerceWebsite/1.0" }
+      headers: { "User-Agent": "EcommerceWebsite/1.0" },
     });
 
-    if (response.data && response.data.routes && response.data.routes.length > 0) {
+    if (
+      response.data &&
+      response.data.routes &&
+      response.data.routes.length > 0
+    ) {
       // Distance is in meters, convert to km
       const distanceKm = response.data.routes[0].distance / 1000;
       console.log(`Road distance calculated: ${distanceKm.toFixed(2)} km`);
@@ -248,7 +266,7 @@ async function getYangoShippingRate(origin, destination, deliveryInfo) {
       origin.latitude,
       origin.longitude,
       destination.latitude,
-      destination.longitude
+      destination.longitude,
     );
 
     // Yango API request for delivery cost estimate
@@ -286,13 +304,18 @@ async function getYangoShippingRate(origin, destination, deliveryInfo) {
           Authorization: `Bearer ${YANGO_API_KEY}`,
         },
         timeout: 10000,
-      }
+      },
     );
 
-    if (response.data && response.data.offers && response.data.offers.length > 0) {
+    if (
+      response.data &&
+      response.data.offers &&
+      response.data.offers.length > 0
+    ) {
       const offer = response.data.offers[0];
       return {
-        price: parseFloat(offer.price_total) || calculatePriceByDistance(distance),
+        price:
+          parseFloat(offer.price_total) || calculatePriceByDistance(distance),
         estimatedTime: offer.eta || "2-5 business days",
         distance: Math.round(distance * 10) / 10,
         serviceType: offer.taxi_class || "express",
@@ -309,13 +332,13 @@ async function getYangoShippingRate(origin, destination, deliveryInfo) {
     };
   } catch (error) {
     console.error("Yango API error:", error.message);
-    
+
     // Fallback to distance-based calculation with road distance
     const distance = await calculateRoadDistance(
       origin.latitude,
       origin.longitude,
       destination.latitude,
-      destination.longitude
+      destination.longitude,
     );
 
     return {
@@ -336,7 +359,7 @@ async function getYangoDeliveryOptions(origin, destination) {
       origin.latitude,
       origin.longitude,
       destination.latitude,
-      destination.longitude
+      destination.longitude,
     );
 
     // Return different service levels based on distance
