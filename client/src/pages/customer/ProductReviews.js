@@ -3,15 +3,17 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { reviewsAPI } from "../../utils/api";
 import { FiStar, FiChevronLeft, FiThumbsUp, FiCheck } from "react-icons/fi";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchProductById } from "../../redux/slices/productSlice";
 
 const ProductReviews = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const { product } = useSelector((state) => state.products);
 
   const [reviews, setReviews] = useState([]);
-  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("newest");
   const [ratingFilter, setRatingFilter] = useState(null);
@@ -32,20 +34,10 @@ const ProductReviews = () => {
     }
   }, [id, sortBy]);
 
-  const fetchProduct = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/products/${id}`);
-      const data = await response.json();
-      setProduct(data);
-    } catch (error) {
-      console.error("Error fetching product:", error);
-    }
-  }, [id]);
-
   useEffect(() => {
+    dispatch(fetchProductById(id));
     fetchReviews();
-    fetchProduct();
-  }, [fetchReviews, fetchProduct]);
+  }, [dispatch, id, fetchReviews]);
 
   const handleMarkHelpful = async (reviewId) => {
     if (!isAuthenticated) {
