@@ -48,7 +48,7 @@ const ProductReviews = () => {
 
     try {
       await reviewsAPI.markReviewHelpful(reviewId);
-      
+
       // Update the review in the list
       setReviews((prevReviews) =>
         prevReviews.map((review) =>
@@ -60,8 +60,8 @@ const ProductReviews = () => {
                   : review.helpful + 1,
                 isHelpfulByUser: !review.isHelpfulByUser,
               }
-            : review
-        )
+            : review,
+        ),
       );
     } catch (error) {
       toast.error("Failed to mark review as helpful");
@@ -224,10 +224,7 @@ const ProductReviews = () => {
           ) : (
             <div className="space-y-6">
               {filteredReviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="pb-6 border-b last:border-0"
-                >
+                <div key={review.id} className="pb-6 border-b last:border-0">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <div className="flex items-center gap-3">
