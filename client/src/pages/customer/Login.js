@@ -18,7 +18,7 @@ const Login = () => {
   const location = useLocation();
 
   const { user, isAuthenticated, loading, error } = useSelector(
-    (state) => state.auth
+    (state) => state.auth,
   );
 
   const from = location.state?.from || "/";
@@ -69,7 +69,7 @@ const Login = () => {
               Resend verification email
             </Link>
           </div>,
-          { duration: 6000 }
+          { duration: 6000 },
         );
       }
       // Other errors handled by useEffect
@@ -253,18 +253,6 @@ const Login = () => {
               </svg>
               <span className="font-medium text-gray-700">Facebook</span>
             </button>
-          </div>
-
-          {/* Demo Credentials */}
-          <div className="mt-8 p-4 bg-blue-50 rounded-xl">
-            <p className="text-sm text-blue-800 font-medium mb-2">
-              Demo Credentials:
-            </p>
-            <p className="text-sm text-blue-600">
-              Admin: admin@enamsclothings.com / admin123
-              <br />
-              Customer: user@enamsclothings.com / user123
-            </p>
           </div>
         </div>
       </div>
