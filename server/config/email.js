@@ -279,6 +279,46 @@ const emailTemplates = {
       </div>
     `,
   }),
+
+  emailVerification: (user, token) => ({
+    subject: "Verify Your Email Address - StyleStore",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0;">Welcome to StyleStore!</h1>
+        </div>
+        <div style="padding: 30px; background: #f9f9f9;">
+          <h2 style="color: #333;">Hi ${user.firstName},</h2>
+          <p style="color: #666;">Thank you for registering with StyleStore. To complete your registration, please verify your email address by clicking the button below.</p>
+          
+          <div style="margin: 30px 0; text-align: center;">
+            <a href="${process.env.CLIENT_URL}/verify-email/${token}" 
+               style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                      color: white; padding: 15px 40px; text-decoration: none; 
+                      border-radius: 25px; display: inline-block; font-weight: bold;">
+              Verify Email Address
+            </a>
+          </div>
+          
+          <p style="color: #666; font-size: 14px;">Or copy and paste this link into your browser:</p>
+          <p style="color: #764ba2; word-break: break-all; font-size: 12px;">
+            ${process.env.CLIENT_URL}/verify-email/${token}
+          </p>
+          
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+          <p style="color: #999; font-size: 12px;">
+            If you didn't create an account with StyleStore, you can safely ignore this email.
+          </p>
+          <p style="color: #999; font-size: 12px;">
+            This verification link will expire in 24 hours.
+          </p>
+        </div>
+        <div style="padding: 20px; text-align: center; color: #999;">
+          <p>© 2026 StyleStore. All rights reserved.</p>
+        </div>
+      </div>
+    `,
+  }),
 };
 
 module.exports = { sendEmail, emailTemplates };

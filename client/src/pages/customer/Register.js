@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { register, clearError } from "../../redux/slices/authSlice";
+import { clearError } from "../../redux/slices/authSlice";
 import IMAGES from "../../config/images";
 import toast from "react-hot-toast";
+import axios from "axios";
 import {
   FiUser,
   FiMail,
@@ -13,6 +14,7 @@ import {
   FiEyeOff,
   FiArrowRight,
   FiCheck,
+  FiCheckCircle,
 } from "react-icons/fi";
 
 const Register = () => {
@@ -27,11 +29,13 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { user, isAuthenticated, loading, error } = useSelector(
+  const { user, isAuthenticated, error } = useSelector(
     (state) => state.auth
   );
 
@@ -108,18 +112,19 @@ const Register = () => {
     }
 
     try {
-      await dispatch(
-        register({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          password: formData.password,
-        })
-      ).unwrap();
-      toast.success("Account created successfully!");
+      const { data } = await axios.post("/api/auth/register", {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+      });
+      
+      setRegisteredEmail(formData.email);
+      setRegistrationSuccess(true);
+      toast.success("Registration successful! Please check your email.");
     } catch (err) {
-      // Error handled by useEffect
+      toast.error(err.response?.data?.message || "Registration failed");
     }
   };
 
@@ -135,24 +140,60 @@ const Register = () => {
             </h1>
           </Link>
 
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              Create Account
-            </h2>
-            <p className="text-gray-600">
-              Already have an account?{" "}
-              <Link
-                to="/login"
-                className="text-primary-500 hover:text-primary-600 font-medium"
-              >
-                Sign In
-              </Link>
-            </p>
-          </div>
+          {registrationSuccess ? (
+            /* Success Message */
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="text-center">
+                <div className="mb-6">
+                  <FiCheckCircle className="mx-auto text-green-500" size={64} />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  Check Your Email!
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  We've sent a verification link to{" "}
+                  <strong>{registeredEmail}</strong>
+                </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <p className="text-sm text-blue-800">
+                    Please check your inbox and click the verification link to
+                    activate your account. You won't be able to log in until
+                    your email is verified.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-500">
+                    Didn't receive the email? Check your spam folder or
+                  </p>
+                  <Link
+                    to="/resend-verification"
+                    className="text-primary-600 hover:underline text-sm font-medium"
+                  >
+                    Resend Verification Email
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Header */}
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  Create Account
+                </h2>
+                <p className="text-gray-600">
+                  Already have an account?{" "}
+                  <Link
+                    to="/login"
+                    className="text-primary-500 hover:text-primary-600 font-medium"
+                  >
+                    Sign In
+                  </Link>
+                </p>
+              </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name Row */}
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -428,6 +469,9 @@ const Register = () => {
               <span className="font-medium text-gray-700">Facebook</span>
             </button>
           </div>
+        </div>
+            </>
+          )}
         </div>
       </div>
 

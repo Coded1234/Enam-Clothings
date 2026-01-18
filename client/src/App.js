@@ -27,6 +27,8 @@ import SizeGuidePage from "./pages/customer/SizeGuide";
 import ForgotPassword from "./pages/customer/ForgotPassword";
 import ResetPassword from "./pages/customer/ResetPassword";
 import Contact from "./pages/customer/Contact";
+import VerifyEmail from "./pages/customer/VerifyEmail";
+import ResendVerification from "./pages/customer/ResendVerification";
 
 // Admin Pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -65,6 +67,8 @@ function App() {
         <Route path="cart" element={<Cart />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="verify-email/:token" element={<VerifyEmail />} />
+        <Route path="resend-verification" element={<ResendVerification />} />
         <Route path="faq" element={<FAQ />} />
         <Route path="size-guide" element={<SizeGuidePage />} />
         <Route path="forgot-password" element={<ForgotPassword />} />

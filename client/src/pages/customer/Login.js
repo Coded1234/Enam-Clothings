@@ -57,7 +57,22 @@ const Login = () => {
       await dispatch(login(formData)).unwrap();
       toast.success("Welcome back!");
     } catch (err) {
-      // Error handled by useEffect
+      // Check if it's an email verification error
+      if (err?.includes("verify your email") || err?.includes("verification")) {
+        toast.error(
+          <div>
+            <p>{err}</p>
+            <Link
+              to="/resend-verification"
+              className="underline text-white hover:text-gray-200"
+            >
+              Resend verification email
+            </Link>
+          </div>,
+          { duration: 6000 }
+        );
+      }
+      // Other errors handled by useEffect
     }
   };
 

@@ -64,6 +64,18 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE,
     allowNull: true,
   },
+  emailVerificationToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  emailVerified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  emailVerifiedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 }, {
   tableName: 'users',
   underscored: true,
@@ -91,6 +103,14 @@ User.prototype.comparePassword = async function (candidatePassword) {
 // Instance method to get full name
 User.prototype.getFullName = function () {
   return `${this.firstName} ${this.lastName}`;
+};
+
+// Instance method to generate email verification token
+User.prototype.generateEmailVerificationToken = function () {
+  const crypto = require('crypto');
+  const token = crypto.randomBytes(32).toString('hex');
+  this.emailVerificationToken = token;
+  return token;
 };
 
 module.exports = User;

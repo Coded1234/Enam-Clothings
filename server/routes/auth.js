@@ -12,6 +12,8 @@ const {
   deleteAvatar,
   forgotPassword,
   resetPassword,
+  verifyEmail,
+  resendVerificationEmail,
 } = require("../controllers/authController");
 const { protect } = require("../middleware/auth");
 const { avatarUpload } = require("../config/cloudinary");
@@ -21,6 +23,8 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
+router.get("/verify-email/:token", verifyEmail);
+router.post("/resend-verification", resendVerificationEmail);
 
 // Protected routes
 router.get("/profile", protect, getProfile);
