@@ -130,7 +130,10 @@ const ProductReviews = () => {
                     ))}
                   </div>
                   <span className="text-sm text-gray-600">
-                    {product.averageRating?.toFixed(1)} ({reviews.length}{" "}
+                    {product.averageRating
+                      ? Number(product.averageRating).toFixed(1)
+                      : "0.0"}{" "}
+                    ({reviews.length}{" "}
                     {reviews.length === 1 ? "review" : "reviews"})
                   </span>
                 </div>
