@@ -469,7 +469,6 @@ const Register = () => {
               <span className="font-medium text-gray-700">Facebook</span>
             </button>
           </div>
-        </div>
             </>
           )}
         </div>
