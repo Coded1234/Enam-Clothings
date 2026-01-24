@@ -443,7 +443,7 @@ const Orders = () => {
 
         {/* Order Stats */}
         {orders.length > 0 && (
-          <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="mt-8 grid grid-cols-2 gap-4">
             {[
               {
                 label: "Total Orders",
@@ -451,23 +451,14 @@ const Orders = () => {
                 color: "bg-blue-500",
               },
               {
-                label: "Delivered",
-                value: orders.filter((o) => o.status === "delivered").length,
-                color: "bg-green-500",
-              },
-              {
-                label: "In Progress",
-                value: orders.filter((o) =>
-                  ["pending", "confirmed", "shipped"].includes(o.status)
-                ).length,
-                color: "bg-yellow-500",
-              },
-              {
                 label: "Total Spent",
                 value: formatPrice(
                   orders
                     .filter((o) => o.status !== "cancelled")
-                    .reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+                    .reduce(
+                      (sum, o) => sum + (parseFloat(o.totalAmount) || 0),
+                      0
+                    )
                 ),
                 color: "bg-purple-500",
                 isPrice: true,

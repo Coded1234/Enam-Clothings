@@ -102,7 +102,7 @@ const Home = () => {
                 Shop Now <FiArrowRight />
               </Link>
               <Link
-                to="/shop?featured=true"
+                to="/shop"
                 className="px-8 py-4 border-2 border-white text-white rounded-full font-semibold text-lg hover:bg-white hover:text-gray-900 transition-colors"
               >
                 View Collection
@@ -222,7 +222,7 @@ const Home = () => {
 
           <div className="text-center mt-8 md:hidden">
             <Link
-              to="/shop?featured=true"
+              to="/shop"
               className="inline-flex items-center gap-2 text-primary-500 font-medium"
             >
               View All Products <FiArrowRight />
@@ -321,7 +321,7 @@ const Home = () => {
                   Best Sellers
                 </h3>
                 <Link
-                  to="/shop?sort=popular"
+                  to="/shop?sort=rating"
                   className="px-3 py-1.5 md:px-6 md:py-3 text-xs md:text-base border-2 border-white rounded-full font-medium hover:bg-white hover:text-gray-900 transition-colors"
                 >
                   Shop Now

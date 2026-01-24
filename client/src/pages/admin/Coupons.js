@@ -200,6 +200,31 @@ const Coupons = () => {
     return { label: "Active", color: "bg-green-100 text-green-800" };
   };
 
+  const formatDateShort = (date) => {
+    if (!date) return "—";
+    try {
+      return new Date(date).toLocaleDateString();
+    } catch {
+      return "—";
+    }
+  };
+
+  // Summary tables (based on currently loaded coupons list)
+  const statusCounts = coupons.reduce((acc, c) => {
+    const s = getCouponStatus(c).label;
+    acc[s] = (acc[s] || 0) + 1;
+    return acc;
+  }, {});
+
+  const topUsedCoupons = [...coupons]
+    .sort((a, b) => (b.used_count || 0) - (a.used_count || 0))
+    .slice(0, 5);
+
+  const expiringSoon = [...coupons]
+    .filter((c) => c.end_date)
+    .sort((a, b) => new Date(a.end_date) - new Date(b.end_date))
+    .slice(0, 5);
+
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Notification */}
@@ -268,6 +293,123 @@ const Coupons = () => {
           </select>
         </div>
       </div>
+
+      {/* Summary Tables */}
+      {!loading && coupons.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Usage */}
+          <div className="bg-white rounded-lg md:rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-4 py-3 border-b bg-gray-50">
+              <h3 className="text-sm font-semibold text-gray-800">Usage</h3>
+              <p className="text-xs text-gray-500">Top used (this page)</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[360px]">
+                <thead className="bg-white">
+                  <tr className="text-xs text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-left">Code</th>
+                    <th className="px-4 py-2 text-right">Used</th>
+                    <th className="px-4 py-2 text-right">Limit</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {topUsedCoupons.map((c) => (
+                    <tr key={`usage-${c.id}`} className="text-sm">
+                      <td className="px-4 py-2 font-mono font-semibold text-gray-900">
+                        {c.code}
+                      </td>
+                      <td className="px-4 py-2 text-right text-gray-800">
+                        {c.used_count || 0}
+                      </td>
+                      <td className="px-4 py-2 text-right text-gray-600">
+                        {c.usage_limit || "∞"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Validity */}
+          <div className="bg-white rounded-lg md:rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-4 py-3 border-b bg-gray-50">
+              <h3 className="text-sm font-semibold text-gray-800">Validity</h3>
+              <p className="text-xs text-gray-500">Expiring soon (this page)</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[420px]">
+                <thead className="bg-white">
+                  <tr className="text-xs text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-left">Code</th>
+                    <th className="px-4 py-2 text-left">Start</th>
+                    <th className="px-4 py-2 text-left">End</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {expiringSoon.length > 0 ? (
+                    expiringSoon.map((c) => (
+                      <tr key={`validity-${c.id}`} className="text-sm">
+                        <td className="px-4 py-2 font-mono font-semibold text-gray-900">
+                          {c.code}
+                        </td>
+                        <td className="px-4 py-2 text-gray-700">
+                          {formatDateShort(c.start_date)}
+                        </td>
+                        <td className="px-4 py-2 text-gray-700">
+                          {formatDateShort(c.end_date)}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td className="px-4 py-4 text-sm text-gray-500" colSpan={3}>
+                        No coupons with an end date on this page
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Status */}
+          <div className="bg-white rounded-lg md:rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-4 py-3 border-b bg-gray-50">
+              <h3 className="text-sm font-semibold text-gray-800">Status</h3>
+              <p className="text-xs text-gray-500">Counts (this page)</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[320px]">
+                <thead className="bg-white">
+                  <tr className="text-xs text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-left">Status</th>
+                    <th className="px-4 py-2 text-right">Count</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {Object.keys(statusCounts).length > 0 ? (
+                    Object.entries(statusCounts).map(([label, count]) => (
+                      <tr key={`status-${label}`} className="text-sm">
+                        <td className="px-4 py-2 text-gray-800">{label}</td>
+                        <td className="px-4 py-2 text-right font-semibold text-gray-900">
+                          {count}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td className="px-4 py-4 text-sm text-gray-500" colSpan={2}>
+                        No data
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Coupons Table */}
       <div className="bg-white rounded-lg md:rounded-xl shadow-sm border border-gray-200 overflow-hidden">

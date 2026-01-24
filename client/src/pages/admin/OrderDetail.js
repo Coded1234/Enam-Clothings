@@ -347,6 +347,9 @@ const OrderDetail = () => {
             </h2>
             <div className="space-y-2 text-gray-600 text-xs md:text-sm">
               <p>{order.shippingAddress?.address}</p>
+              {order.shippingAddress?.addressDetails && (
+                <p className="text-gray-700">{order.shippingAddress.addressDetails}</p>
+              )}
               {order.shippingAddress?.phone && (
                 <p>Phone: {order.shippingAddress?.phone}</p>
               )}

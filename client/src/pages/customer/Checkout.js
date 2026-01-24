@@ -39,6 +39,7 @@ const Checkout = () => {
     email: user?.email || "",
     phone: user?.phone || "",
     address: "",
+    addressDetails: "",
   });
   const [paymentMethod, setPaymentMethod] = useState("paystack");
   const [saveAddress, setSaveAddress] = useState(true);
@@ -386,7 +387,7 @@ const Checkout = () => {
                   {/* Manual Address Override (Optional) */}
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Additional Address Details (Optional)
+                      Delivery Address *
                     </label>
                     <div className="relative">
                       <FiMapPin className="absolute left-4 top-4 text-gray-400" />
@@ -396,12 +397,30 @@ const Checkout = () => {
                         onChange={handleInputChange}
                         rows="2"
                         className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="Add apartment, floor, building name, or landmarks"
+                        placeholder="Street address (auto-filled from map)"
                       />
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      The address above was detected from the map. You can add more details here.
+                      Auto-filled from map selection. You can edit it if needed.
                     </p>
+                  </div>
+
+                  {/* Additional Address Details (Optional) */}
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Additional Address Details (Optional)
+                    </label>
+                    <div className="relative">
+                      <FiMapPin className="absolute left-4 top-4 text-gray-400" />
+                      <textarea
+                        name="addressDetails"
+                        value={shippingInfo.addressDetails}
+                        onChange={handleInputChange}
+                        rows="2"
+                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="Apartment, floor, building name, nearest landmark, directions, etc."
+                      />
+                    </div>
                   </div>
 
                   {/* City (Auto-filled from map) */}
@@ -609,8 +628,12 @@ const Checkout = () => {
                     {shippingInfo.firstName} {shippingInfo.lastName}
                   </p>
                   <p className="text-gray-600">{shippingInfo.address}</p>
+                  {shippingInfo.addressDetails && (
+                    <p className="text-gray-600">{shippingInfo.addressDetails}</p>
+                  )}
                   <p className="text-gray-600">
-                    {shippingInfo.city}, {shippingInfo.state}
+                    {city}
+                    {postalCode ? `, ${postalCode}` : ""}
                   </p>
                   <p className="text-gray-600">{shippingInfo.phone}</p>
                   <button

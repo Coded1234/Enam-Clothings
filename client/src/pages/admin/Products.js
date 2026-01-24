@@ -146,7 +146,7 @@ const Products = () => {
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[900px]">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -158,13 +158,13 @@ const Products = () => {
                     <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Price
                     </th>
-                    <th className="hidden lg:table-cell px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Stock
                     </th>
-                    <th className="hidden md:table-cell px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 md:px-6 pr-1 md:pr-3 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-2 md:px-6 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 md:px-6 pl-1 md:pl-3 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -225,7 +225,7 @@ const Products = () => {
                               </div>
                             )}
                         </td>
-                        <td className="hidden lg:table-cell px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
+                        <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
                           <span
                             className={`text-sm font-medium ${
                               (product.remainingStock ??
@@ -245,7 +245,7 @@ const Products = () => {
                               0}
                           </span>
                         </td>
-                        <td className="hidden md:table-cell px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
+                        <td className="px-2 md:px-6 pr-1 md:pr-3 py-2 md:py-4 whitespace-nowrap">
                           {product.isActive ? (
                             <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
                               <FiEye size={12} /> Active
@@ -256,7 +256,7 @@ const Products = () => {
                             </span>
                           )}
                         </td>
-                        <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td className="px-2 md:px-6 pl-1 md:pl-3 py-2 md:py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex items-center justify-end gap-1 md:gap-2">
                             <Link
                               to={`/admin/products/${product.id}/edit`}

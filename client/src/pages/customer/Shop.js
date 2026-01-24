@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProducts,
@@ -19,6 +19,7 @@ import {
 const Shop = () => {
   const { category } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { products, loading, pagination, filters } = useSelector(
@@ -71,10 +72,26 @@ const Shop = () => {
     { value: "popular", label: "Most Popular" },
   ];
 
+  // Keep redux "category" filter in sync with the route category.
+  // This prevents stale category filters sticking around when navigating to /shop (all products)
+  // and allows switching between men/women reliably.
   useEffect(() => {
+    dispatch(setFilters({ category: category || "" }));
+
+    // Ensure query-string category doesn't conflict with route category
+    const newParams = new URLSearchParams(searchParams);
+    if (newParams.has("category")) newParams.delete("category");
+    if (newParams.get("page") !== "1") newParams.set("page", "1");
+    setSearchParams(newParams, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category, dispatch]);
+
+  useEffect(() => {
+    const effectiveCategory = category || searchParams.get("category") || "";
     const params = {
       page: searchParams.get("page") || 1,
-      category: category || searchParams.get("category") || filters.category,
+      // category must come from the URL (route param or query), not from stale redux state
+      category: effectiveCategory,
       minPrice: searchParams.get("minPrice") || filters.minPrice,
       maxPrice: searchParams.get("maxPrice") || filters.maxPrice,
       size: searchParams.get("size") || filters.size,
@@ -98,6 +115,21 @@ const Shop = () => {
   }, [filters.minPrice, filters.maxPrice]);
 
   const handleFilterChange = (key, value) => {
+    // Category is driven by the route (/shop, /shop/men, /shop/women)
+    if (key === "category") {
+      dispatch(setFilters({ category: value }));
+
+      const newParams = new URLSearchParams(searchParams);
+      // category comes from route; keep query clean
+      newParams.delete("category");
+      newParams.set("page", "1");
+
+      const targetPath = value ? `/shop/${value}` : "/shop";
+      const qs = newParams.toString();
+      navigate(qs ? `${targetPath}?${qs}` : targetPath);
+      return;
+    }
+
     dispatch(setFilters({ [key]: value }));
 
     const newParams = new URLSearchParams(searchParams);

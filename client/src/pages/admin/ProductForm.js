@@ -78,7 +78,8 @@ const ProductForm = () => {
         price: data.price || "",
         comparePrice: data.comparePrice || "",
         category: data.category || "",
-        totalStock: data.totalStock || "",
+        // Treat the "Total Stock" field as current/remaining stock for editing
+        totalStock: (data.remainingStock ?? data.totalStock) ?? "",
         sizes: data.sizes || [],
         colors: data.colors || [],
         images: data.images || [],
@@ -107,6 +108,25 @@ const ProductForm = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+  };
+
+  const handleStockChange = (e) => {
+    const value = e.target.value;
+    const stock = parseInt(value, 10);
+    setFormData((prev) => {
+      const next = { ...prev, totalStock: value };
+
+      // Keep size variant stocks in sync with the main stock field,
+      // since the app uses a single inventory value per product in admin.
+      if (Array.isArray(prev.sizes) && prev.sizes.length > 0 && !Number.isNaN(stock)) {
+        next.sizes = prev.sizes.map((s) => {
+          if (typeof s === "string") return { size: s, stock };
+          return { ...s, stock };
+        });
+      }
+
+      return next;
+    });
   };
 
   const handleFileSelect = (e) => {
@@ -361,7 +381,7 @@ const ProductForm = () => {
                 type="number"
                 name="totalStock"
                 value={formData.totalStock}
-                onChange={handleChange}
+                onChange={handleStockChange}
                 min="0"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />

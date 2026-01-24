@@ -303,6 +303,46 @@ const updateProduct = async (req, res) => {
       } catch (e) {}
     }
 
+    // Parse boolean fields from FormData (they come as strings)
+    if (typeof updateData.isActive === "string") {
+      updateData.isActive = updateData.isActive === "true";
+    }
+    if (typeof updateData.featured === "string") {
+      updateData.featured = updateData.featured === "true";
+    }
+
+    // Parse numeric fields
+    if (updateData.price !== undefined) {
+      updateData.price = parseFloat(updateData.price);
+    }
+    if (updateData.comparePrice !== undefined && updateData.comparePrice !== "") {
+      updateData.comparePrice = parseFloat(updateData.comparePrice);
+    }
+
+    // In the admin UI, the "Total Stock" input is treated as CURRENT/REMAINING stock.
+    // Keep invariants:
+    //   remainingStock = adminInput
+    //   totalStock = soldCount + remainingStock
+    if (updateData.totalStock !== undefined) {
+      const desiredRemaining = parseInt(updateData.totalStock, 10);
+      if (!Number.isNaN(desiredRemaining)) {
+        updateData.remainingStock = Math.max(0, desiredRemaining);
+        updateData.totalStock = (product.soldCount || 0) + updateData.remainingStock;
+
+        // If sizes exist and are provided, keep their stock values in sync when missing.
+        if (Array.isArray(updateData.sizes) && updateData.sizes.length > 0) {
+          updateData.sizes = updateData.sizes.map((s) => {
+            if (typeof s === "string") return { size: s, stock: updateData.remainingStock };
+            if (s && typeof s === "object" && s.stock !== undefined) return s;
+            return { ...(s || {}), stock: updateData.remainingStock };
+          });
+        }
+      } else {
+        // If it's empty/invalid, do not update stock fields
+        delete updateData.totalStock;
+      }
+    }
+
     // Remove existingImages from updateData (it's not a model field)
     delete updateData.existingImages;
 

@@ -158,6 +158,11 @@ const OrderSummary = () => {
                     <p className="text-gray-900">
                       {orderData.shippingAddress.address}
                     </p>
+                    {orderData.shippingAddress.addressDetails && (
+                      <p className="text-gray-700 text-sm mt-1">
+                        {orderData.shippingAddress.addressDetails}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
