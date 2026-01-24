@@ -359,6 +359,52 @@ const emailTemplates = {
     `,
   }),
 
+  // Newsletter notifications for new product
+  newsletterNewProduct: (product) => ({
+    subject: `New Arrival: ${product.title || product.name} — Now Available!`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0;">New Arrival at Enam's Clothings</h1>
+        </div>
+        <div style="padding: 30px; background: #f9f9f9;">
+          <h2 style="color: #333;">${product.title || product.name}</h2>
+          <p style="color: #666;">${product.description || ""}</p>
+          <p style="color: #764ba2; font-weight: bold;">Price: GH₵${Number(product.price || 0).toLocaleString()}</p>
+          <div style="margin-top: 20px; text-align: center;">
+            <a href="${process.env.CLIENT_URL}/product/${product.id}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 20px;">Shop Now</a>
+          </div>
+        </div>
+        <div style="padding: 20px; text-align: center; color: #999;">
+          <p>© ${new Date().getFullYear()} Enam's Clothings. All rights reserved.</p>
+        </div>
+      </div>
+    `,
+  }),
+
+  // Newsletter notifications for new coupon
+  newsletterNewCoupon: (coupon) => ({
+    subject: `New Coupon: ${coupon.code} — Save on Your Next Order!`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #FF9966 0%, #FF5E62 100%); padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0;">New Coupon Available</h1>
+        </div>
+        <div style="padding: 30px; background: #f9f9f9;">
+          <h2 style="color: #333;">Use code <strong style="color:#764ba2;">${coupon.code}</strong></h2>
+          <p style="color: #666;">${coupon.description || "Save on your next purchase with this limited-time offer."}</p>
+          <p style="color: #666;">Discount: ${coupon.discount_value}${coupon.discount_type === "percentage" ? "%" : "GH₵"}</p>
+          <div style="margin-top: 20px; text-align: center;">
+            <a href="${process.env.CLIENT_URL}/shop" style="background: linear-gradient(135deg, #FF9966 0%, #FF5E62 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 20px;">Shop & Apply Code</a>
+          </div>
+        </div>
+        <div style="padding: 20px; text-align: center; color: #999;">
+          <p>© ${new Date().getFullYear()} Enam's Clothings. All rights reserved.</p>
+        </div>
+      </div>
+    `,
+  }),
+
   contactConfirmation: (contact) => ({
     subject: "We Received Your Message - Enam's Clothings",
     html: `

@@ -5,10 +5,11 @@ const {
   OrderItem,
   Review,
   sequelize,
+  Newsletter,
 } = require("../models");
 const { Op } = require("sequelize");
 const { cloudinary, isCloudinaryConfigured } = require("../config/cloudinary");
-const { sendEmail, emailTemplates } = require("../config/email");
+const { sendEmail, sendBulkEmail, emailTemplates } = require("../config/email");
 
 // ============ DASHBOARD ============
 
@@ -21,7 +22,7 @@ const getDashboardStats = async (req, res) => {
     const startOfLastMonth = new Date(
       today.getFullYear(),
       today.getMonth() - 1,
-      1
+      1,
     );
     const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
 
@@ -135,12 +136,10 @@ const getDashboardStats = async (req, res) => {
       lowStockProducts,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error fetching dashboard stats",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error fetching dashboard stats",
+      error: error.message,
+    });
   }
 };
 
@@ -213,7 +212,7 @@ const createProduct = async (req, res) => {
     if (productData.totalStock) {
       productData.totalStock = parseInt(productData.totalStock) || 0;
     }
-    
+
     // Set remainingStock equal to totalStock for new products (soldCount is 0)
     productData.remainingStock = productData.totalStock || 0;
     productData.soldCount = 0;
@@ -246,7 +245,7 @@ const createProduct = async (req, res) => {
       if (subscribers.length > 0) {
         const recipientEmails = subscribers.map((s) => s.email);
         const template = emailTemplates.newsletterNewProduct(product);
-        
+
         // Send asynchronously without awaiting to not block response
         sendBulkEmail(recipientEmails, template.subject, template.html);
       }
@@ -419,7 +418,7 @@ const deleteProductImage = async (req, res) => {
 
     // Remove from product
     product.images = (product.images || []).filter(
-      (img) => img.publicId !== publicId
+      (img) => img.publicId !== publicId,
     );
     await product.save();
 
@@ -543,10 +542,11 @@ const updateOrderStatus = async (req, res) => {
             }
 
             // Update remainingStock
-            product.remainingStock = (product.totalStock || 0) - product.soldCount;
+            product.remainingStock =
+              (product.totalStock || 0) - product.soldCount;
             await product.save();
             console.log(
-              `Updated soldCount for ${product.name}: +${item.quantity}, total: ${product.soldCount}`
+              `Updated soldCount for ${product.name}: +${item.quantity}, total: ${product.soldCount}`,
             );
           }
         }
@@ -563,7 +563,7 @@ const updateOrderStatus = async (req, res) => {
             // Update soldCount regardless of size
             product.soldCount = Math.max(
               0,
-              (product.soldCount || 0) - item.quantity
+              (product.soldCount || 0) - item.quantity,
             );
 
             // Also update size-specific stock if size exists
@@ -577,10 +577,11 @@ const updateOrderStatus = async (req, res) => {
             }
 
             // Update remainingStock
-            product.remainingStock = (product.totalStock || 0) - product.soldCount;
+            product.remainingStock =
+              (product.totalStock || 0) - product.soldCount;
             await product.save();
             console.log(
-              `Restored soldCount for ${product.name}: -${item.quantity}, total: ${product.soldCount}`
+              `Restored soldCount for ${product.name}: -${item.quantity}, total: ${product.soldCount}`,
             );
           }
         }
@@ -608,7 +609,7 @@ const updateOrderStatus = async (req, res) => {
     try {
       const { subject, html } = emailTemplates.orderStatusUpdate(
         order,
-        order.user
+        order.user,
       );
       await sendEmail(order.user.email, subject, html);
     } catch (emailError) {
@@ -711,7 +712,7 @@ const getAllCustomers = async (req, res) => {
           orderCount,
           totalSpent: parseFloat(totalSpentResult[0]?.total) || 0,
         };
-      })
+      }),
     );
 
     res.json({
@@ -745,12 +746,10 @@ const toggleCustomerStatus = async (req, res) => {
       customer,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error updating customer status",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error updating customer status",
+      error: error.message,
+    });
   }
 };
 
@@ -858,7 +857,10 @@ const getSalesReport = async (req, res) => {
       attributes: [
         [sequelize.fn("SUM", sequelize.col("total_amount")), "totalRevenue"],
         [sequelize.fn("COUNT", sequelize.col("id")), "totalOrders"],
-        [sequelize.fn("AVG", sequelize.col("total_amount")), "averageOrderValue"],
+        [
+          sequelize.fn("AVG", sequelize.col("total_amount")),
+          "averageOrderValue",
+        ],
         [sequelize.fn("SUM", sequelize.col("total_items")), "totalItemsSold"],
       ],
       raw: true,
@@ -882,10 +884,7 @@ const getSalesReport = async (req, res) => {
       attributes: [
         "productName",
         [sequelize.fn("SUM", sequelize.col("quantity")), "sold"],
-        [
-          sequelize.fn("SUM", sequelize.literal("quantity * price")),
-          "revenue",
-        ],
+        [sequelize.fn("SUM", sequelize.literal("quantity * price")), "revenue"],
       ],
       include: [
         {
@@ -905,11 +904,17 @@ const getSalesReport = async (req, res) => {
       attributes: [
         [sequelize.col("product.category"), "category"],
         [
-          sequelize.fn("COUNT", sequelize.fn("DISTINCT", sequelize.col("OrderItem.order_id"))),
+          sequelize.fn(
+            "COUNT",
+            sequelize.fn("DISTINCT", sequelize.col("OrderItem.order_id")),
+          ),
           "orders",
         ],
         [
-          sequelize.fn("SUM", sequelize.literal('"OrderItem"."quantity" * "OrderItem"."price"')),
+          sequelize.fn(
+            "SUM",
+            sequelize.literal('"OrderItem"."quantity" * "OrderItem"."price"'),
+          ),
           "revenue",
         ],
       ],
