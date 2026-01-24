@@ -101,6 +101,80 @@ const emailTemplates = {
             </a>
           </div>
         </div>
+        <div style="background: #333; color: white; padding: 20px; text-align: center; font-size: 12px;">
+          <p>&copy; ${new Date().getFullYear()} Enam's Clothings. All rights reserved.</p>
+        </div>
+      </div>
+    `,
+  }),
+
+  payOnDeliveryOrder: (order, user) => ({
+    subject: `Order Placed - #${
+      order.orderNumber || order.id?.slice(-8).toUpperCase()
+    }`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #FF9966 0%, #FF5E62 100%); padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0;">Enam's Clothings</h1>
+        </div>
+        <div style="padding: 30px; background: #f9f9f9;">
+          <h2 style="color: #333;">Order Placed Successfully!</h2>
+          <p style="color: #666;">Hi ${
+            user.firstName
+          }, thank you for your order. We have received your request for Pay on Delivery.</p>
+          
+          <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 5px solid #FF5E62;">
+            <h3 style="margin-top: 0;">Payment Instruction</h3>
+            <p>Please have the exact amount of <strong>GH₵${Number(
+              order.totalAmount,
+            ).toLocaleString()}</strong> ready upon delivery.</p>
+            <p><strong>Order ID:</strong> #${
+              order.orderNumber || order.id?.slice(-8).toUpperCase()
+            }</p>
+          </div>
+          
+          <h3>Items Ordered:</h3>
+          ${
+            order.items
+              ?.map(
+                (item) => `
+            <div style="display: flex; align-items: center; padding: 10px; background: white; margin: 5px 0; border-radius: 4px;">
+              <div>
+                <p style="margin: 0; font-weight: bold;">${
+                  item.productName || item.product?.name
+                }</p>
+                <p style="margin: 5px 0; color: #666;">Size: ${
+                  item.size || "N/A"
+                } | Qty: ${item.quantity}</p>
+                <p style="margin: 0; color: #FF5E62;">GH₵${Number(
+                  item.price,
+                ).toLocaleString()}</p>
+              </div>
+            </div>
+          `,
+              )
+              .join("") || ""
+          }
+          
+          <div style="margin-top: 30px; text-align: center;">
+            <a href="${process.env.CLIENT_URL}/orders/${order.id}" 
+               style="background: linear-gradient(135deg, #FF9966 0%, #FF5E62 100%); 
+                      color: white; padding: 12px 30px; text-decoration: none; 
+                      border-radius: 25px; display: inline-block;">
+              View Order Details
+            </a>
+          </div>
+        </div>
+        <div style="background: #333; color: white; padding: 20px; text-align: center; font-size: 12px;">
+          <p>&copy; ${new Date().getFullYear()} Enam's Clothings. All rights reserved.</p>
+        </div>
+      </div>
+    `,
+  }),
+};
+            </a>
+          </div>
+        </div>
         <div style="padding: 20px; text-align: center; color: #999;">
           <p>© 2026 Enam's Clothings. All rights reserved.</p>
         </div>

@@ -1,4 +1,6 @@
 const https = require("https");
+const { sendEmail, emailTemplates } = require("../config/email");
+const { Order, OrderItem, Product, User } = require("../models");
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
 

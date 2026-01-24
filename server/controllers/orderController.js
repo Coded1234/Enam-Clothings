@@ -113,6 +113,20 @@ const createOrder = async (req, res) => {
       ],
     });
 
+    // Send email notification based on payment method
+    if (paymentMethod === "cod") {
+      try {
+        const template = emailTemplates.payOnDeliveryOrder(
+          populatedOrder,
+          req.user,
+        );
+        await sendEmail(req.user.email, template.subject, template.html);
+      } catch (emailError) {
+        console.error("Error sending POD email:", emailError);
+        // Don't fail the request if email fails
+      }
+    }
+
     res.status(201).json(populatedOrder);
   } catch (error) {
     console.error("Create order error:", error);
