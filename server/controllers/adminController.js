@@ -235,6 +235,25 @@ const createProduct = async (req, res) => {
     }
 
     const product = await Product.create(productData);
+
+    // Notify newsletter subscribers
+    try {
+      const subscribers = await Newsletter.findAll({
+        where: { isSubscribed: true },
+        attributes: ["email"],
+      });
+
+      if (subscribers.length > 0) {
+        const recipientEmails = subscribers.map((s) => s.email);
+        const template = emailTemplates.newsletterNewProduct(product);
+        
+        // Send asynchronously without awaiting to not block response
+        sendBulkEmail(recipientEmails, template.subject, template.html);
+      }
+    } catch (emailError) {
+      console.error("Error sending newsletter:", emailError);
+    }
+
     res.status(201).json(product);
   } catch (error) {
     console.error("Create product error:", error);

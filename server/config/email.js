@@ -500,4 +500,4 @@ const emailTemplates = {
   }),
 };
 
-module.exports = { sendEmail, emailTemplates };
+module.exports = { sendEmail, sendBulkEmail, emailTemplates };

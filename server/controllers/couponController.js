@@ -120,6 +120,27 @@ const createCoupon = async (req, res) => {
       applicable_categories: applicable_categories || [],
     });
 
+    // Notify newsletter subscribers about new coupon
+    try {
+      // Only send if coupon is active
+      if (coupon.is_active) {
+        const subscribers = await Newsletter.findAll({
+          where: { isSubscribed: true },
+          attributes: ["email"],
+        });
+
+        if (subscribers.length > 0) {
+          const recipientEmails = subscribers.map((s) => s.email);
+          const template = emailTemplates.newsletterNewCoupon(coupon);
+
+          // Send asynchronously
+          sendBulkEmail(recipientEmails, template.subject, template.html);
+        }
+      }
+    } catch (emailError) {
+      console.error("Error sending coupon newsletter:", emailError);
+    }
+
     res.status(201).json({
       success: true,
       message: "Coupon created successfully",
