@@ -1,5 +1,6 @@
-const { Coupon, CouponUsage, User, Order } = require("../models");
+const { Coupon, CouponUsage, User, Order, Newsletter } = require("../models");
 const { Op } = require("sequelize");
+const { sendEmail, sendBulkEmail, emailTemplates } = require("../config/email");
 
 // @desc    Get all coupons (Admin)
 // @route   GET /api/coupons
@@ -282,12 +283,10 @@ const validateCoupon = async (req, res) => {
       });
 
       if (userUsageCount >= coupon.usage_limit_per_user) {
-        return res
-          .status(400)
-          .json({
-            message:
-              "You have already used this coupon the maximum number of times",
-          });
+        return res.status(400).json({
+          message:
+            "You have already used this coupon the maximum number of times",
+        });
       }
     }
 
@@ -309,7 +308,7 @@ const validateCoupon = async (req, res) => {
       },
       discount: discountResult.discount,
       message: `Coupon applied! You save GH₵${discountResult.discount.toFixed(
-        2
+        2,
       )}`,
     });
   } catch (error) {
@@ -325,7 +324,7 @@ const applyCouponToOrder = async (
   couponId,
   userId,
   orderId,
-  discountAmount
+  discountAmount,
 ) => {
   try {
     // Record usage
@@ -363,7 +362,7 @@ const recordCouponUsage = async (req, res) => {
       coupon_id,
       userId,
       order_id,
-      discount_amount || 0
+      discount_amount || 0,
     );
 
     if (success) {
@@ -400,7 +399,7 @@ const getActiveCoupons = async (req, res) => {
 
     if (coupons.length > 0) {
       const coupon = coupons[0];
-      
+
       // Generate AI message if not exists
       if (!coupon.ai_message) {
         coupon.ai_message = generateCouponMessage(coupon);
@@ -413,24 +412,29 @@ const getActiveCoupons = async (req, res) => {
     }
   } catch (error) {
     console.error("Error fetching active coupons:", error);
-    res.status(500).json({ message: "Failed to fetch active coupons", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Failed to fetch active coupons",
+        error: error.message,
+      });
   }
 };
 
 // Helper function to generate AI-style coupon messages
 const generateCouponMessage = (coupon) => {
   const { discount_type, discount_value, description, code } = coupon;
-  
+
   // Round the discount value to remove decimals
   const roundedValue = Math.round(Number(discount_value));
-  
+
   const templates = [
-    `Get ${discount_type === 'percentage' ? roundedValue + '%' : 'GH₵' + roundedValue} Off ${description || 'Your Purchase'}!\nUse code ${code} at checkout`,
-    `Save ${discount_type === 'percentage' ? roundedValue + '%' : 'GH₵' + roundedValue} ${description ? 'on ' + description : 'Today'}!\nApply code ${code} at checkout`,
-    `Exclusive Offer: ${discount_type === 'percentage' ? roundedValue + '% Discount' : 'GH₵' + roundedValue + ' Off'} ${description || ''}!\nShop now with code ${code}`,
-    `Limited Time: ${discount_type === 'percentage' ? roundedValue + '%' : 'GH₵' + roundedValue} Off ${description || 'Everything'}!\nDon't miss out! Use ${code}`,
+    `Get ${discount_type === "percentage" ? roundedValue + "%" : "GH₵" + roundedValue} Off ${description || "Your Purchase"}!\nUse code ${code} at checkout`,
+    `Save ${discount_type === "percentage" ? roundedValue + "%" : "GH₵" + roundedValue} ${description ? "on " + description : "Today"}!\nApply code ${code} at checkout`,
+    `Exclusive Offer: ${discount_type === "percentage" ? roundedValue + "% Discount" : "GH₵" + roundedValue + " Off"} ${description || ""}!\nShop now with code ${code}`,
+    `Limited Time: ${discount_type === "percentage" ? roundedValue + "%" : "GH₵" + roundedValue} Off ${description || "Everything"}!\nDon't miss out! Use ${code}`,
   ];
-  
+
   return templates[Math.floor(Math.random() * templates.length)];
 };
 
