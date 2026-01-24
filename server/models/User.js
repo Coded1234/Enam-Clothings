@@ -34,13 +34,18 @@ const User = sequelize.define(
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
         len: {
           args: [6],
           msg: "Password must be at least 6 characters",
         },
       },
+    },
+    googleId: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: true,
     },
     phone: {
       type: DataTypes.STRING(20),

@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   register,
   login,
+  googleLogin,
   getProfile,
   updateProfile,
   changePassword,
@@ -21,6 +22,7 @@ const { avatarUpload } = require("../config/cloudinary");
 // Public routes
 router.post("/register", register);
 router.post("/login", login);
+router.post("/google", googleLogin);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 router.get("/verify-email/:token", verifyEmail);

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { clearError } from "../../redux/slices/authSlice";
+import { clearError, googleLogin } from "../../redux/slices/authSlice";
 import IMAGES from "../../config/images";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { useGoogleLogin } from '@react-oauth/google';
 import {
   FiUser,
   FiMail,
@@ -37,6 +38,21 @@ const Register = () => {
   const navigate = useNavigate();
 
   const { user, isAuthenticated, error } = useSelector((state) => state.auth);
+
+  const signupGoogle = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      dispatch(googleLogin(tokenResponse.access_token)).unwrap()
+        .then(() => {
+             toast.success("Registration successful!");
+        })
+        .catch((err) => {
+             // Error handled by slice or toast
+        });
+    },
+    onError: () => {
+      toast.error("Google signup failed");
+    }
+  });
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -445,6 +461,7 @@ const Register = () => {
               <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
+                  onClick={() => signupGoogle()}
                   className="flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">

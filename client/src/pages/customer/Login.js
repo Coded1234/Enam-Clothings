@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { login, clearError } from "../../redux/slices/authSlice";
+import { login, clearError, googleLogin } from "../../redux/slices/authSlice";
 import IMAGES from "../../config/images";
 import toast from "react-hot-toast";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
+import { useGoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,21 @@ const Login = () => {
   const { user, isAuthenticated, loading, error } = useSelector(
     (state) => state.auth,
   );
+
+  const loginGoogle = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      dispatch(googleLogin(tokenResponse.access_token)).unwrap()
+        .then(() => {
+             toast.success("Welcome back!");
+        })
+        .catch((err) => {
+             // Error handled by slice or toast
+        });
+    },
+    onError: () => {
+      toast.error("Google login failed");
+    }
+  });
 
   const from = location.state?.from || "/";
 
@@ -222,6 +238,7 @@ const Login = () => {
           <div className="grid grid-cols-2 gap-4">
             <button
               type="button"
+              onClick={() => loginGoogle()}
               className="flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">

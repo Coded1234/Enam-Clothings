@@ -4,6 +4,9 @@ const { sendEmail, emailTemplates } = require("../config/email");
 const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
+const axios = require("axios");
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // @desc    Register new user
 // @route   POST /api/auth/register
@@ -562,9 +565,73 @@ const resendVerificationEmail = async (req, res) => {
   }
 };
 
+// @desc    Google Login
+// @route   POST /api/auth/google
+const googleLogin = async (req, res) => {
+  try {
+    const { token } = req.body;
+    
+    // Get user info from Google using access token
+    const googleResponse = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    const { name, email, sub: googleId, picture } = googleResponse.data;
+    
+    // Split name into first and last
+    const [firstName, ...lastNameParts] = name.split(' ');
+    const lastName = lastNameParts.join(' ') || '';
+
+    let user = await User.findOne({ where: { email } });
+
+    if (user) {
+      // User exists, update googleId if not present
+      if (!user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+    } else {
+      // Create new user
+      const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+      
+      user = await User.create({
+        firstName,
+        lastName: lastName || 'User',
+        email,
+        password: randomPassword,
+        googleId,
+        emailVerified: true,
+        isActive: true,
+        role: 'customer'
+      });
+    }
+
+    // Check if active
+    if (!user.isActive) {
+        return res.status(401).json({ message: "Account has been deactivated" });
+    }
+
+    res.json({
+      _id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      phone: user.phone,
+      address: user.address,
+      token: generateToken(user.id),
+    });
+
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({ message: "Google login failed", error: error.message });
+  }
+};
+
 module.exports = {
   register,
   login,
+  googleLogin,
   getProfile,
   updateProfile,
   changePassword,

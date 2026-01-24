@@ -294,122 +294,7 @@ const Coupons = () => {
         </div>
       </div>
 
-      {/* Summary Tables */}
-      {!loading && coupons.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Usage */}
-          <div className="bg-white rounded-lg md:rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-4 py-3 border-b bg-gray-50">
-              <h3 className="text-sm font-semibold text-gray-800">Usage</h3>
-              <p className="text-xs text-gray-500">Top used (this page)</p>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[360px]">
-                <thead className="bg-white">
-                  <tr className="text-xs text-gray-500 uppercase">
-                    <th className="px-4 py-2 text-left">Code</th>
-                    <th className="px-4 py-2 text-right">Used</th>
-                    <th className="px-4 py-2 text-right">Limit</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {topUsedCoupons.map((c) => (
-                    <tr key={`usage-${c.id}`} className="text-sm">
-                      <td className="px-4 py-2 font-mono font-semibold text-gray-900">
-                        {c.code}
-                      </td>
-                      <td className="px-4 py-2 text-right text-gray-800">
-                        {c.used_count || 0}
-                      </td>
-                      <td className="px-4 py-2 text-right text-gray-600">
-                        {c.usage_limit || "∞"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
 
-          {/* Validity */}
-          <div className="bg-white rounded-lg md:rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-4 py-3 border-b bg-gray-50">
-              <h3 className="text-sm font-semibold text-gray-800">Validity</h3>
-              <p className="text-xs text-gray-500">Expiring soon (this page)</p>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[420px]">
-                <thead className="bg-white">
-                  <tr className="text-xs text-gray-500 uppercase">
-                    <th className="px-4 py-2 text-left">Code</th>
-                    <th className="px-4 py-2 text-left">Start</th>
-                    <th className="px-4 py-2 text-left">End</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {expiringSoon.length > 0 ? (
-                    expiringSoon.map((c) => (
-                      <tr key={`validity-${c.id}`} className="text-sm">
-                        <td className="px-4 py-2 font-mono font-semibold text-gray-900">
-                          {c.code}
-                        </td>
-                        <td className="px-4 py-2 text-gray-700">
-                          {formatDateShort(c.start_date)}
-                        </td>
-                        <td className="px-4 py-2 text-gray-700">
-                          {formatDateShort(c.end_date)}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td className="px-4 py-4 text-sm text-gray-500" colSpan={3}>
-                        No coupons with an end date on this page
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Status */}
-          <div className="bg-white rounded-lg md:rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-4 py-3 border-b bg-gray-50">
-              <h3 className="text-sm font-semibold text-gray-800">Status</h3>
-              <p className="text-xs text-gray-500">Counts (this page)</p>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[320px]">
-                <thead className="bg-white">
-                  <tr className="text-xs text-gray-500 uppercase">
-                    <th className="px-4 py-2 text-left">Status</th>
-                    <th className="px-4 py-2 text-right">Count</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {Object.keys(statusCounts).length > 0 ? (
-                    Object.entries(statusCounts).map(([label, count]) => (
-                      <tr key={`status-${label}`} className="text-sm">
-                        <td className="px-4 py-2 text-gray-800">{label}</td>
-                        <td className="px-4 py-2 text-right font-semibold text-gray-900">
-                          {count}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td className="px-4 py-4 text-sm text-gray-500" colSpan={2}>
-                        No data
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Coupons Table */}
       <div className="bg-white rounded-lg md:rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -427,22 +312,22 @@ const Coupons = () => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Code
                   </th>
-                  <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Discount
                   </th>
-                  <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                  <th className="px-4 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Usage
                   </th>
-                  <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                  <th className="px-4 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                     Validity
                   </th>
-                  <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                  <th className="px-4 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-2 md:px-6 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 md:px-6 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -452,7 +337,7 @@ const Coupons = () => {
                   const status = getCouponStatus(coupon);
                   return (
                     <tr key={coupon.id} className="hover:bg-gray-50">
-                      <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
+                      <td className="px-4 md:px-6 py-2 md:py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2 md:gap-3">
                           <div className="p-1.5 md:p-2 bg-primary-100 rounded-lg">
                             <FiTag className="w-4 h-4 md:w-5 md:h-5 text-primary-600" />
@@ -469,7 +354,7 @@ const Coupons = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
+                      <td className="px-4 md:px-6 py-2 md:py-4 whitespace-nowrap">
                         <div className="flex items-center gap-1">
                           {coupon.discount_type === "percentage" ? (
                             <>
@@ -492,7 +377,7 @@ const Coupons = () => {
                           </p>
                         )}
                       </td>
-                      <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap hidden sm:table-cell">
+                      <td className="px-4 md:px-6 py-2 md:py-4 whitespace-nowrap">
                         <p className="text-gray-900 text-xs md:text-sm">
                           {coupon.used_count} / {coupon.usage_limit || "∞"}
                         </p>
@@ -500,7 +385,7 @@ const Coupons = () => {
                           {coupon.usage_limit_per_user} per user
                         </p>
                       </td>
-                      <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap hidden lg:table-cell">
+                      <td className="px-4 md:px-6 py-2 md:py-4 whitespace-nowrap hidden sm:table-cell">
                         {coupon.start_date || coupon.end_date ? (
                           <div className="text-sm">
                             {coupon.start_date && (
@@ -522,14 +407,14 @@ const Coupons = () => {
                           <span className="text-gray-400">No limit</span>
                         )}
                       </td>
-                      <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap hidden md:table-cell">
+                      <td className="px-4 md:px-6 py-2 md:py-4 whitespace-nowrap">
                         <span
                           className={`px-2 py-1 text-xs font-medium rounded-full ${status.color}`}
                         >
                           {status.label}
                         </span>
                       </td>
-                      <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-right">
+                      <td className="px-4 md:px-6 py-2 md:py-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end gap-1 md:gap-2">
                           <button
                             onClick={() => openModal(coupon)}
