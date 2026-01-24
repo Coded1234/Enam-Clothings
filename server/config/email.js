@@ -171,16 +171,6 @@ const emailTemplates = {
       </div>
     `,
   }),
-};
-            </a>
-          </div>
-        </div>
-        <div style="padding: 20px; text-align: center; color: #999;">
-          <p>© 2026 Enam's Clothings. All rights reserved.</p>
-        </div>
-      </div>
-    `,
-  }),
 
   orderStatusUpdate: (order, user) => ({
     subject: `Order Update - #${
