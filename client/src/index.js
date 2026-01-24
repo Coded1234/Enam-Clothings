@@ -11,7 +11,32 @@ import "./index.css";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+    {process.env.REACT_APP_GOOGLE_CLIENT_ID ? (
+      <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+        <Provider store={store}>
+          <BrowserRouter>
+            <App />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 3000,
+                style: {
+                  background: "#333",
+                  color: "#fff",
+                },
+                success: {
+                  iconTheme: {
+                    primary: "#667eea",
+                    secondary: "#fff",
+                  },
+                },
+              }}
+            />
+          </BrowserRouter>
+        </Provider>
+      </GoogleOAuthProvider>
+    ) : (
+      // Fallback when Google client ID is missing to avoid runtime errors
       <Provider store={store}>
         <BrowserRouter>
           <App />
@@ -33,6 +58,6 @@ root.render(
           />
         </BrowserRouter>
       </Provider>
-    </GoogleOAuthProvider>
+    )}
   </React.StrictMode>
 );

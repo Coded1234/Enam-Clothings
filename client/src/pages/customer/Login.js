@@ -6,6 +6,7 @@ import IMAGES from "../../config/images";
 import toast from "react-hot-toast";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import { useGoogleLogin } from "@react-oauth/google";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -21,6 +22,8 @@ const Login = () => {
   const { user, isAuthenticated, loading, error } = useSelector(
     (state) => state.auth,
   );
+
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
@@ -246,8 +249,15 @@ const Login = () => {
           <div className="grid grid-cols-2 gap-4">
             <button
               type="button"
-              onClick={() => loginGoogle()}
-              className="flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+              onClick={() => {
+                if (!googleClientId) {
+                  toast.error("Google login is not configured in this build.");
+                  return;
+                }
+                loginGoogle();
+              }}
+              disabled={!googleClientId}
+              className={`flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors ${!googleClientId ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
