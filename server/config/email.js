@@ -41,6 +41,33 @@ const sendEmail = async (to, subject, html) => {
   }
 };
 
+// Send the same email to multiple recipients. Accepts an array of emails or a comma-separated string.
+const sendBulkEmail = async (recipients, subject, html) => {
+  try {
+    if (!recipients) return;
+
+    // Normalize recipients to comma-separated string
+    const toField = Array.isArray(recipients)
+      ? recipients.filter(Boolean).join(",")
+      : String(recipients);
+
+    // Use BCC to protect recipient list; set `to` to the configured sender
+    const mailOptions = {
+      from: `"Enam's Clothings" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER,
+      bcc: toField,
+      subject,
+      html,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`Bulk email sent to ${toField}`);
+  } catch (error) {
+    console.error("Error sending bulk email:", error);
+    throw error;
+  }
+};
+
 // Email templates
 const emailTemplates = {
   orderConfirmation: (order, user) => ({
@@ -410,8 +437,8 @@ const emailTemplates = {
         </div>
         <div style="padding: 30px; background: #f9f9f9;">
           <p><strong>Customer:</strong> ${user.firstName} ${user.lastName} (${
-      user.email
-    })</p>
+            user.email
+          })</p>
           <p><strong>Payment Method:</strong> ${
             order.paymentMethod === "cod" ? "Pay on Delivery" : "Paystack"
           }</p>
@@ -430,8 +457,8 @@ const emailTemplates = {
                   item.productName || item.product?.name
                 }</p>
                 <p style="margin: 5px 0;">Qty: ${item.quantity} | Size: ${
-                     item.size || "N/A"
-                   }</p>
+                  item.size || "N/A"
+                }</p>
               </div>
             `,
                  )
