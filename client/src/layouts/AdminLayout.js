@@ -84,6 +84,22 @@ const AdminLayout = () => {
     };
   }, [dropdownOpen]);
 
+  // Prevent background scrolling when mobile admin sidebar is open
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.documentElement.classList.add("overflow-hidden");
+      document.body.style.overflow = "hidden";
+    } else {
+      document.documentElement.classList.remove("overflow-hidden");
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.documentElement.classList.remove("overflow-hidden");
+      document.body.style.overflow = "";
+    };
+  }, [sidebarOpen]);
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Mobile Overlay */}
