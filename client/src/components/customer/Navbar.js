@@ -12,7 +12,10 @@ import {
   FiMenu,
   FiX,
   FiChevronDown,
+  FiSun,
+  FiMoon,
 } from "react-icons/fi";
+import { useTheme } from "../../context/ThemeContext";
 
 const defaultPromoMessages = [
   "Free shipping on orders over GH₵1,000",
@@ -22,6 +25,7 @@ const defaultPromoMessages = [
 ];
 
 const Navbar = () => {
+  const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -106,7 +110,7 @@ const Navbar = () => {
   }, [dropdownOpen]);
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-white dark:bg-surface shadow-md sticky top-0 z-50">
       {/* Top Bar */}
       <div className="bg-gray-900 text-white text-sm py-2 overflow-hidden">
         <div className="container mx-auto px-4 flex justify-between items-center">
@@ -160,7 +164,7 @@ const Navbar = () => {
               <Link
                 key={cat.path}
                 to={cat.path}
-                className="text-gray-700 hover:text-primary-500 font-medium transition-colors"
+                className="text-gray-700 dark:text-gray-200 hover:text-primary-500 font-medium transition-colors"
               >
                 {cat.name}
               </Link>
@@ -172,7 +176,7 @@ const Navbar = () => {
             {/* Search */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-opacity-10 rounded-full transition-colors"
               aria-label="Toggle search"
             >
               <FiSearch size={20} />
@@ -181,7 +185,7 @@ const Navbar = () => {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors hidden md:block"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-opacity-10 rounded-full transition-colors hidden md:block"
               aria-label="View wishlist"
             >
               <FiHeart size={20} />
@@ -190,7 +194,7 @@ const Navbar = () => {
             {/* Cart */}
             <Link
               to="/cart"
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-opacity-10 rounded-full transition-colors relative"
               aria-label={`Shopping cart with ${items.length} items`}
             >
               <FiShoppingCart size={20} />
@@ -206,7 +210,7 @@ const Navbar = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-full"
+                  className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-opacity-10 rounded-full"
                   aria-label="User menu"
                   aria-expanded={dropdownOpen}
                 >
@@ -217,14 +221,14 @@ const Navbar = () => {
                 </button>
 
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 animate-slide-down">
-                    <p className="px-4 py-2 text-sm text-gray-500 border-b">
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-surface rounded-lg shadow-lg py-2 z-50 animate-slide-down">
+                    <p className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
                       Hi, {user?.firstName}!
                     </p>
                     {user?.role === "admin" && (
                       <Link
                         to="/admin"
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-opacity-10"
                         onClick={() => setDropdownOpen(false)}
                       >
                         Admin Dashboard
@@ -232,21 +236,21 @@ const Navbar = () => {
                     )}
                     <Link
                       to="/profile"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-opacity-10"
                       onClick={() => setDropdownOpen(false)}
                     >
                       My Profile
                     </Link>
                     <Link
                       to="/orders"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-opacity-10"
                       onClick={() => setDropdownOpen(false)}
                     >
                       My Orders
                     </Link>
                     <Link
                       to="/wishlist"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-opacity-10"
                       onClick={() => setDropdownOpen(false)}
                     >
                       Wishlist
@@ -254,7 +258,7 @@ const Navbar = () => {
                     <hr className="my-2" />
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                      className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-opacity-10"
                     >
                       Logout
                     </button>
@@ -282,7 +286,7 @@ const Navbar = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for products..."
-                className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-surface text-gray-900 dark:text-gray-100"
                 autoFocus
               />
               <button
@@ -308,7 +312,7 @@ const Navbar = () => {
 
         {/* Slide-in Panel */}
         <div
-          className={`fixed top-0 left-0 h-full w-[280px] bg-white z-50 transform transition-transform duration-300 ease-out shadow-2xl ${
+          className={`fixed top-0 left-0 h-full w-[280px] bg-white dark:bg-surface z-50 transform transition-transform duration-300 ease-out shadow-2xl ${
             mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -331,21 +335,23 @@ const Navbar = () => {
 
           {/* User Section */}
           {isAuthenticated ? (
-            <div className="p-4 border-b bg-gray-50">
+            <div className="p-4 border-b bg-white dark:bg-surface">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
                   {user?.firstName?.[0]}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-800">
+                  <p className="font-semibold text-gray-800 dark:text-gray-100">
                     Hi, {user?.firstName}!
                   </p>
-                  <p className="text-sm text-gray-500">{user?.email}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {user?.email}
+                  </p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="p-4 border-b bg-gray-50">
+            <div className="p-4 border-b bg-white dark:bg-surface">
               <Link
                 to="/login"
                 className="flex items-center justify-center gap-2 w-full py-3 bg-primary-500 text-white rounded-lg font-semibold hover:bg-primary-600 transition-colors"
@@ -366,7 +372,7 @@ const Navbar = () => {
               <Link
                 key={cat.path}
                 to={cat.path}
-                className="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 font-medium transition-colors"
+                className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-opacity-10 hover:text-primary-600 font-medium transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {cat.name}
@@ -445,11 +451,20 @@ const Navbar = () => {
           )}
 
           {/* Contact Info */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gray-50 border-t">
-            <p className="text-sm text-gray-500 text-center">
-              📞 +233256810699
-            </p>
-            <p className="text-xs text-gray-400 text-center mt-1">
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-surface border-t dark:border-gray-700">
+            <div className="flex items-center justify-center gap-3 mb-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300">
+                📞 +233256810699
+              </p>
+              <button
+                onClick={toggleTheme}
+                className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? <FiSun size={16} /> : <FiMoon size={16} />}
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 dark:text-gray-400 text-center">
               Free shipping on orders over GH₵1,000
             </p>
           </div>

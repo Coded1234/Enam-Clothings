@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  FiInstagram,
-  FiMail,
-  FiPhone,
-  FiCheck,
-} from "react-icons/fi";
+import { FiInstagram, FiMail, FiPhone, FiCheck } from "react-icons/fi";
 import { SiTiktok } from "react-icons/si";
 import { newsletterAPI } from "../../utils/api";
 import toast from "react-hot-toast";
@@ -63,7 +58,7 @@ const Footer = () => {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-white"
+                className="flex-1 px-4 py-3 rounded-lg text-gray-900 dark:text-gray-100 bg-white dark:bg-surface focus:outline-none focus:ring-2 focus:ring-white"
               />
               <button
                 type="submit"
@@ -221,13 +216,22 @@ const Footer = () => {
             © 2026 Enam's Clothings. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm text-gray-300">
-            <button type="button" className="hover:text-white transition-colors">
+            <button
+              type="button"
+              className="hover:text-white transition-colors"
+            >
               Privacy Policy
             </button>
-            <button type="button" className="hover:text-white transition-colors">
+            <button
+              type="button"
+              className="hover:text-white transition-colors"
+            >
               Terms of Service
             </button>
-            <button type="button" className="hover:text-white transition-colors">
+            <button
+              type="button"
+              className="hover:text-white transition-colors"
+            >
               Cookie Policy
             </button>
           </div>

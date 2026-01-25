@@ -5,7 +5,7 @@ const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
 const axios = require("axios");
-const { OAuth2Client } = require('google-auth-library');
+const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // @desc    Register new user
@@ -570,17 +570,20 @@ const resendVerificationEmail = async (req, res) => {
 const googleLogin = async (req, res) => {
   try {
     const { token } = req.body;
-    
+
     // Get user info from Google using access token
-    const googleResponse = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    
+    const googleResponse = await axios.get(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+
     const { name, email, sub: googleId, picture } = googleResponse.data;
-    
+
     // Split name into first and last
-    const [firstName, ...lastNameParts] = name.split(' ');
-    const lastName = lastNameParts.join(' ') || '';
+    const [firstName, ...lastNameParts] = name.split(" ");
+    const lastName = lastNameParts.join(" ") || "";
 
     let user = await User.findOne({ where: { email } });
 
@@ -592,23 +595,25 @@ const googleLogin = async (req, res) => {
       }
     } else {
       // Create new user
-      const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
-      
+      const randomPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+
       user = await User.create({
         firstName,
-        lastName: lastName || 'User',
+        lastName: lastName || "User",
         email,
         password: randomPassword,
         googleId,
         emailVerified: true,
         isActive: true,
-        role: 'customer'
+        role: "customer",
       });
     }
 
     // Check if active
     if (!user.isActive) {
-        return res.status(401).json({ message: "Account has been deactivated" });
+      return res.status(401).json({ message: "Account has been deactivated" });
     }
 
     res.json({
@@ -621,10 +626,11 @@ const googleLogin = async (req, res) => {
       address: user.address,
       token: generateToken(user.id),
     });
-
   } catch (error) {
     console.error("Google login error:", error);
-    res.status(500).json({ message: "Google login failed", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Google login failed", error: error.message });
   }
 };
 

@@ -29,7 +29,7 @@ const ProductCard = ({
 
   const discountPercent = product.comparePrice
     ? Math.round(
-        ((product.comparePrice - product.price) / product.comparePrice) * 100
+        ((product.comparePrice - product.price) / product.comparePrice) * 100,
       )
     : 0;
 
@@ -55,7 +55,7 @@ const ProductCard = ({
           productId: product.id,
           quantity: 1,
           size: availableSize,
-        })
+        }),
       )
         .unwrap()
         .then(() => {
@@ -85,7 +85,7 @@ const ProductCard = ({
         await authAPI.toggleWishlist(product.id);
         setIsWishlisted(!isWishlisted);
         toast.success(
-          isWishlisted ? "Removed from wishlist" : "Added to wishlist!"
+          isWishlisted ? "Removed from wishlist" : "Added to wishlist!",
         );
       } catch (error) {
         toast.error("Failed to update wishlist");
@@ -96,7 +96,7 @@ const ProductCard = ({
   };
 
   return (
-    <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden card-hover">
+    <div className="group bg-white dark:bg-surface rounded-xl shadow-sm overflow-hidden card-hover">
       {/* Image */}
       <div className="relative img-zoom aspect-[4/5]">
         <Link to={`/product/${product.id}`}>
@@ -129,9 +129,11 @@ const ProductCard = ({
             className={`p-2 rounded-full shadow-md transition-colors ${
               isWishlisted
                 ? "bg-red-500 text-white"
-                : "bg-white text-gray-700 hover:bg-red-500 hover:text-white"
+                : "bg-white dark:bg-surface text-gray-700 dark:text-gray-200 hover:bg-red-500 hover:text-white"
             } ${wishlistLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            aria-label={
+              isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+            }
           >
             <FiHeart size={18} className={isWishlisted ? "fill-current" : ""} />
           </button>
@@ -142,7 +144,7 @@ const ProductCard = ({
           <button
             onClick={handleAddToCart}
             disabled={product.remainingStock === 0}
-            className={`w-full py-2 bg-white text-gray-900 rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-primary-500 hover:text-white transition-colors ${
+            className={`w-full py-2 bg-white dark:bg-surface text-gray-900 dark:text-gray-100 rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-primary-500 hover:text-white transition-colors ${
               product.remainingStock === 0
                 ? "opacity-50 cursor-not-allowed"
                 : ""
@@ -160,10 +162,12 @@ const ProductCard = ({
           <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2 hover:text-primary-500 transition-colors line-clamp-1">
             {product.name}
           </h3>
-          
+
           {/* Description - Desktop Only */}
           {product.description && (
-            <p className={`hidden lg:block text-sm text-gray-600 dark:text-gray-400 mb-2 ${showFullDescription ? '' : 'overflow-hidden text-ellipsis whitespace-nowrap'}`}>
+            <p
+              className={`hidden lg:block text-sm text-gray-600 dark:text-gray-300 mb-2 ${showFullDescription ? "" : "overflow-hidden text-ellipsis whitespace-nowrap"}`}
+            >
               {product.description}
             </p>
           )}

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   FiMail,
   FiPhone,
@@ -22,6 +23,8 @@ const Contact = () => {
     subject: "",
     message: "",
   });
+  const location = useLocation();
+  const { user } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -54,16 +57,59 @@ const Contact = () => {
     }
   };
 
+  useEffect(() => {
+    // Prefill subject from navigation state (FAQ link)
+    if (location?.state?.subject) {
+      const subjectMap = {
+        "Orders & Tracking": "Order Inquiry",
+        "Shipping & Delivery": "Shipping",
+        "Returns & Exchanges": "Returns & Refunds",
+        "Payment & Pricing": "Payment & Pricing",
+        "Account & Profile": "Order Inquiry",
+        "Security & Privacy": "Technical Support",
+        "All Questions": "Other",
+        Support: "Other",
+      };
+
+      const incoming = location.state.subject;
+      const mapped = subjectMap[incoming] || incoming;
+      setFormData((prev) => ({ ...prev, subject: mapped }));
+    }
+
+    // Prefill name/email/phone from logged-in user if available and fields are empty
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name:
+          prev.name && prev.name.trim()
+            ? prev.name
+            : user.firstName || user.lastName
+              ? `${user.firstName || ""} ${user.lastName || ""}`.trim()
+              : prev.name,
+        email:
+          prev.email && prev.email.trim()
+            ? prev.email
+            : user.email || prev.email,
+        phone:
+          prev.phone && prev.phone.trim()
+            ? prev.phone
+            : user.phone || prev.phone,
+      }));
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
   const contactInfo = [
     {
       icon: FiPhone,
       title: "Call Us",
-      details: ["+233 25 681 0699",],
+      details: ["+233 25 681 0699"],
     },
     {
       icon: FiMail,
       title: "Email Us",
-      details: ["enamclothings@gmail.com",],
+      details: ["enamclothings@gmail.com"],
     },
     {
       icon: FiClock,
@@ -78,20 +124,20 @@ const Contact = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 py-16">
+      <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg)] py-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-sm p-8 text-center">
+          <div className="max-w-lg mx-auto bg-white dark:bg-surface rounded-2xl shadow-sm p-8 text-center">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <FiMessageSquare className="text-green-500" size={40} />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
               Message Sent!
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               Thank you for contacting us. We've received your message and will
               get back to you within 24-48 hours.
             </p>
-            <p className="text-sm text-gray-500 mb-8">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
               A confirmation email has been sent to{" "}
               <strong>{formData.email}</strong>
             </p>
@@ -107,7 +153,7 @@ const Contact = () => {
                     message: "",
                   });
                 }}
-                className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-6 py-3 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-opacity-5 transition-colors"
               >
                 Send Another Message
               </button>
@@ -144,7 +190,7 @@ const Contact = () => {
             {contactInfo.map((info, index) => (
               <div
                 key={index}
-                className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white dark:bg-surface rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
                   <info.icon className="text-primary-500" size={24} />
@@ -168,7 +214,7 @@ const Contact = () => {
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
-            <div className="bg-white rounded-2xl shadow-sm p-8">
+            <div className="bg-white dark:bg-surface rounded-2xl shadow-sm p-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-2">
                 Send us a Message
               </h2>
@@ -306,7 +352,7 @@ const Contact = () => {
             {/* Additional Info */}
             <div className="space-y-6">
               {/* FAQ Link */}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="bg-white dark:bg-surface rounded-2xl shadow-sm p-6">
                 <h3 className="font-semibold text-gray-800 mb-2">
                   Looking for Quick Answers?
                 </h3>
@@ -322,8 +368,11 @@ const Contact = () => {
                 </Link>
               </div>
 
+              {/* Prefill subject if navigated with state */}
+              {/* useEffect will have already set the subject on mount */}
+
               {/* Social Links */}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="bg-white dark:bg-surface rounded-2xl shadow-sm p-6">
                 <h3 className="font-semibold text-gray-800 mb-4">Follow Us</h3>
                 <p className="text-gray-600 mb-4">
                   Stay connected with us on social media for updates,

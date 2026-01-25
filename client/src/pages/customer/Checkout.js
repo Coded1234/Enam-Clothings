@@ -65,6 +65,22 @@ const Checkout = () => {
   const tax = (subtotal - couponDiscount) * 0.0; // Tax included in prices
   const finalTotal = subtotal - couponDiscount + shippingCost + tax;
 
+  // Auto-enable free shipping for orders >= GH₵1000
+  React.useEffect(() => {
+    if (subtotal >= 1000) {
+      setShippingCost(0);
+      setShippingCalculated(true);
+      setShippingDetails(
+        (prev) =>
+          prev || {
+            shippingFee: 0,
+            carrier: "Free Shipping",
+            estimatedDeliveryTime: "Varies",
+          },
+      );
+    }
+  }, [subtotal]);
+
   // Nigerian states
   useEffect(() => {
     if (items.length === 0) {
@@ -123,7 +139,7 @@ const Checkout = () => {
     for (const field of required) {
       if (!shippingInfo[field]) {
         toast.error(
-          `Please enter your ${field.replace(/([A-Z])/g, " $1").toLowerCase()}`
+          `Please enter your ${field.replace(/([A-Z])/g, " $1").toLowerCase()}`,
         );
         return false;
       }
@@ -159,6 +175,19 @@ const Checkout = () => {
       return;
     }
 
+    // Free shipping override
+    if (subtotal >= 1000) {
+      setShippingCost(0);
+      setShippingDetails({
+        shippingFee: 0,
+        carrier: "Free Shipping",
+        estimatedDeliveryTime: "Varies",
+      });
+      setShippingCalculated(true);
+      toast.success("Free shipping applied for orders over GH₵1,000");
+      return;
+    }
+
     setShippingLoading(true);
     try {
       const response = await api.post("/shipping/calculate", {
@@ -173,14 +202,14 @@ const Checkout = () => {
         setShippingDetails(response.data.data);
         setShippingCalculated(true);
         toast.success(
-          `Shipping calculated: GH₵${Math.round(response.data.data.shippingFee)}`
+          `Shipping calculated: GH₵${Math.round(response.data.data.shippingFee)}`,
         );
       }
     } catch (error) {
       console.error("Shipping calculation error:", error);
       toast.error(
         error.response?.data?.message ||
-          "Failed to calculate shipping. Using estimated rate."
+          "Failed to calculate shipping. Using estimated rate.",
       );
       // Fallback to estimated rate
       setShippingCost(50);
@@ -246,7 +275,7 @@ const Checkout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg)] py-8">
       <div className="container mx-auto px-4">
         {/* Progress Steps */}
         <div className="max-w-3xl mx-auto mb-8">
@@ -296,8 +325,8 @@ const Checkout = () => {
           <div className="lg:col-span-2">
             {/* Step 1: Shipping Information */}
             {currentStep === 1 && (
-              <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
-                <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <div className="bg-white dark:bg-surface rounded-2xl shadow-sm p-6 md:p-8">
+                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2">
                   <FiMapPin className="text-primary-500" />
                   Shipping Information
                 </h2>
@@ -466,7 +495,9 @@ const Checkout = () => {
                     <button
                       type="button"
                       onClick={calculateShipping}
-                      disabled={shippingLoading || !shippingInfo.address || !city}
+                      disabled={
+                        shippingLoading || !shippingInfo.address || !city
+                      }
                       className="w-full py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 disabled:bg-gray-400 transition-colors flex items-center justify-center gap-2"
                     >
                       {shippingLoading ? (
@@ -486,7 +517,7 @@ const Checkout = () => {
                         </>
                       )}
                     </button>
-                    
+
                     {/* Shipping Details Display */}
                     {shippingDetails && (
                       <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
@@ -514,7 +545,9 @@ const Checkout = () => {
                             <p className="text-2xl font-bold text-green-800">
                               GH₵{Math.round(shippingDetails.shippingFee)}
                             </p>
-                            <p className="text-xs text-green-600">Shipping Fee</p>
+                            <p className="text-xs text-green-600">
+                              Shipping Fee
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -548,8 +581,8 @@ const Checkout = () => {
 
             {/* Step 2: Payment */}
             {currentStep === 2 && (
-              <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
-                <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <div className="bg-white dark:bg-surface rounded-2xl shadow-sm p-6 md:p-8">
+                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2">
                   <FiCreditCard className="text-primary-500" />
                   Payment Method
                 </h2>
@@ -629,7 +662,9 @@ const Checkout = () => {
                   </p>
                   <p className="text-gray-600">{shippingInfo.address}</p>
                   {shippingInfo.addressDetails && (
-                    <p className="text-gray-600">{shippingInfo.addressDetails}</p>
+                    <p className="text-gray-600">
+                      {shippingInfo.addressDetails}
+                    </p>
                   )}
                   <p className="text-gray-600">
                     {city}
@@ -685,7 +720,7 @@ const Checkout = () => {
 
           {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
+            <div className="bg-white dark:bg-surface rounded-2xl shadow-sm p-6 sticky top-24">
               <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <FiShoppingBag className="text-primary-500" />
                 Order Summary
@@ -811,7 +846,9 @@ const Checkout = () => {
                         `GH₵${Math.round(shippingCost)}`
                       )
                     ) : (
-                      <span className="text-amber-600 text-sm">Not calculated</span>
+                      <span className="text-amber-600 text-sm">
+                        Not calculated
+                      </span>
                     )}
                   </span>
                 </div>
@@ -833,7 +870,8 @@ const Checkout = () => {
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                   <p className="text-sm text-blue-800 flex items-center gap-2">
                     <FiTruck className="text-blue-600" />
-                    {shippingDetails.carrier} - {shippingDetails.estimatedDeliveryTime}
+                    {shippingDetails.carrier} -{" "}
+                    {shippingDetails.estimatedDeliveryTime}
                   </p>
                 </div>
               )}

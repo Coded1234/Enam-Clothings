@@ -14,6 +14,49 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Color variables for light/dark modes */
+:root {
+  --bg: #f9fafb; /* page background */
+  --surface: #ffffff; /* cards, panels */
+  --text: #0f1724; /* primary text */
+  --muted: #6b7280; /* secondary text */
+  --muted-2: #9ca3af; /* tertiary text */
+  --border: #e5e7eb; /* borders */
+  --card-shadow: 0 10px 20px rgba(2,6,23,0.04);
+}
+
+.dark {
+  --bg: #071025;
+  --surface: #0f1724;
+  --text: #e6eef8;
+  --muted: #94a3b8;
+  --muted-2: #64748b;
+  --border: #1f2937;
+  --card-shadow: 0 10px 20px rgba(2,6,23,0.6);
+}
+
+/* Apply variables */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Surface backgrounds */
+.bg-white { background-color: var(--surface) !important; }
+.bg-gray-50 { background-color: var(--bg) !important; }
+.bg-gray-100 { background-color: rgba(255,255,255,0.03) !important; }
+
+/* Text colors */
+.text-gray-900, .text-gray-800, .text-gray-700 { color: var(--text) !important; }
+.text-gray-600, .text-gray-500 { color: var(--muted) !important; }
+.text-gray-400, .text-gray-300 { color: var(--muted-2) !important; }
+
+/* Borders */
+.border-gray-200, .border-gray-300 { border-color: var(--border) !important; }
+
+/* Shadows */
+.shadow-sm { box-shadow: var(--card-shadow) !important; }
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -109,4 +152,13 @@ body {
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* Utility: hide native scrollbars while still allowing scrolling */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }

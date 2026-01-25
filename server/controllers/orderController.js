@@ -44,7 +44,7 @@ const createOrder = async (req, res) => {
 
     // Use shipping details from frontend or fallback
     const shippingFee =
-      shippingDetails?.shippingFee || (subtotal > 1000 ? 0 : 50); // Free shipping over GH₵1,000
+      shippingDetails?.shippingFee || (subtotal >= 1000 ? 0 : 50); // Free shipping for subtotal >= GH₵1,000
 
     // Apply discount if provided
     const discountAmount = parseFloat(discount) || 0;

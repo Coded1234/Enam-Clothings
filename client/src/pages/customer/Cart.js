@@ -151,7 +151,7 @@ const Cart = () => {
   // Empty cart state
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 py-16">
+      <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg)] py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto text-center">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -177,7 +177,7 @@ const Cart = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-16">
+      <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg)] py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto text-center">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -203,12 +203,14 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg)] py-8">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Shopping Cart</h1>
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
+              Shopping Cart
+            </h1>
             <p className="text-gray-600 mt-1">
               {items.length} item(s) in your cart
             </p>
@@ -320,7 +322,10 @@ const Cart = () => {
                     {/* Price */}
                     <div className="text-right">
                       <p className="text-lg font-bold text-gray-800">
-                        GH₵{Math.round(item.price * item.quantity).toLocaleString()}
+                        GH₵
+                        {Math.round(
+                          item.price * item.quantity,
+                        ).toLocaleString()}
                       </p>
                       {item.quantity > 1 && (
                         <p className="text-sm text-gray-500">
@@ -345,8 +350,8 @@ const Cart = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-gray-800 mb-6">
+            <div className="bg-white dark:bg-surface rounded-xl shadow-sm p-6 sticky top-24">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6">
                 Order Summary
               </h2>
 
@@ -417,17 +422,25 @@ const Cart = () => {
                 )}
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  <span className="text-sm text-gray-500">Calculated at checkout</span>
+                  <span className="text-sm text-gray-500">
+                    {subtotal >= 1000 ? (
+                      <span className="text-green-600 font-medium">
+                        Free for orders ≥ GH₵1,000
+                      </span>
+                    ) : (
+                      "Calculated at checkout"
+                    )}
+                  </span>
                 </div>
               </div>
 
               {/* Total */}
               <div className="py-6 border-b">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-gray-800">
+                  <span className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                     Total
                   </span>
-                  <span className="text-2xl font-bold text-gray-800">
+                  <span className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                     GH₵{total.toLocaleString()}
                   </span>
                 </div>

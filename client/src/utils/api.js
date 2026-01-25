@@ -20,7 +20,7 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor to handle errors
@@ -28,12 +28,18 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/login";
+      // Do not force a full redirect when the failed request is the login attempt itself.
+      // This prevents the page from reloading on wrong credentials — the UI can show a toast instead.
+      const reqUrl = error?.config?.url || "";
+      const isLoginCall = reqUrl.includes("/auth/login");
+      if (!isLoginCall) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 // Auth API

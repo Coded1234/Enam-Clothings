@@ -46,7 +46,9 @@ const OrderSummary = () => {
 
   const subtotal = parseFloat(totalAmount) || 0;
   const discount = parseFloat(couponDiscount) || 0;
-  const shippingCost = parseFloat(passedShippingCost) || 0;
+  // Enforce free shipping in UI for subtotal >= GH₵1000
+  const shippingCost =
+    subtotal >= 1000 ? 0 : parseFloat(passedShippingCost) || 0;
   const tax = (subtotal - discount) * 0.0; // Tax included in prices
   const finalTotal = subtotal - discount + shippingCost + tax;
 
@@ -124,7 +126,7 @@ const OrderSummary = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg)] py-8">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
@@ -135,7 +137,9 @@ const OrderSummary = () => {
             <FiArrowLeft className="w-5 h-5" />
             <span>Back to Checkout</span>
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Order Summary</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Order Summary
+          </h1>
           <div className="w-32"></div> {/* Spacer for centering */}
         </div>
 
@@ -143,10 +147,10 @@ const OrderSummary = () => {
           {/* Order Items */}
           <div className="lg:col-span-2 space-y-6">
             {/* Shipping Information */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white dark:bg-surface rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-2 mb-4">
                 <FiMapPin className="w-5 h-5 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   Shipping Information
                 </h2>
               </div>
@@ -155,7 +159,7 @@ const OrderSummary = () => {
                   <FiMapPin className="w-4 h-4 text-gray-400 mt-1" />
                   <div>
                     <p className="text-sm text-gray-500">Address</p>
-                    <p className="text-gray-900">
+                    <p className="text-gray-900 dark:text-gray-100">
                       {orderData.shippingAddress.address}
                     </p>
                     {orderData.shippingAddress.addressDetails && (
@@ -169,7 +173,7 @@ const OrderSummary = () => {
                   <FiPhone className="w-4 h-4 text-gray-400 mt-1" />
                   <div>
                     <p className="text-sm text-gray-500">Phone</p>
-                    <p className="text-gray-900">
+                    <p className="text-gray-900 dark:text-gray-100">
                       {orderData.shippingAddress.phone}
                     </p>
                   </div>
@@ -178,7 +182,7 @@ const OrderSummary = () => {
                   <FiMail className="w-4 h-4 text-gray-400 mt-1" />
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <p className="text-gray-900">
+                    <p className="text-gray-900 dark:text-gray-100">
                       {orderData.shippingAddress.email}
                     </p>
                   </div>
@@ -187,10 +191,10 @@ const OrderSummary = () => {
             </div>
 
             {/* Payment Method */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white dark:bg-surface rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-2 mb-4">
                 <FiCreditCard className="w-5 h-5 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   Payment Method
                 </h2>
               </div>
@@ -205,7 +209,7 @@ const OrderSummary = () => {
                   <FiCreditCard className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-gray-900 dark:text-gray-100">
                     {orderData.paymentMethod === "cod"
                       ? "Pay on Delivery"
                       : "Paystack (Card/Mobile Money)"}
@@ -220,7 +224,7 @@ const OrderSummary = () => {
             </div>
 
             {/* Order Items */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white dark:bg-surface rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-2 mb-4">
                 <FiShoppingBag className="w-5 h-5 text-blue-600" />
                 <h2 className="text-lg font-semibold text-gray-900">
@@ -269,7 +273,7 @@ const OrderSummary = () => {
                         }}
                       />
                       <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">
+                        <h3 className="font-medium text-gray-900 dark:text-gray-100">
                           {item.product?.name}
                         </h3>
                         <div className="mt-1 space-y-1">
@@ -294,7 +298,7 @@ const OrderSummary = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-gray-900">
+                        <p className="font-semibold text-gray-900 dark:text-gray-100">
                           {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
@@ -307,16 +311,16 @@ const OrderSummary = () => {
 
           {/* Order Summary Card */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
+            <div className="bg-white dark:bg-surface rounded-lg shadow-sm p-6 sticky top-4">
               <div className="flex items-center gap-2 mb-4">
                 <FiCreditCard className="w-5 h-5 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   Payment Summary
                 </h2>
               </div>
 
               <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>Subtotal</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>

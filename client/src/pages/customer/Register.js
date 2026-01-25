@@ -5,7 +5,7 @@ import { clearError, googleLogin } from "../../redux/slices/authSlice";
 import IMAGES from "../../config/images";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { useGoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from "@react-oauth/google";
 import {
   FiUser,
   FiMail,
@@ -43,17 +43,18 @@ const Register = () => {
 
   const signupGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      dispatch(googleLogin(tokenResponse.access_token)).unwrap()
+      dispatch(googleLogin(tokenResponse.access_token))
+        .unwrap()
         .then(() => {
-             toast.success("Registration successful!");
+          toast.success("Registration successful!");
         })
         .catch((err) => {
-             // Error handled by slice or toast
+          // Error handled by slice or toast
         });
     },
     onError: () => {
       toast.error("Google signup failed");
-    }
+    },
   });
 
   useEffect(() => {
@@ -465,13 +466,15 @@ const Register = () => {
                   type="button"
                   onClick={() => {
                     if (!googleClientId) {
-                      toast.error("Google login is not configured in this build.");
+                      toast.error(
+                        "Google login is not configured in this build.",
+                      );
                       return;
                     }
                     signupGoogle();
                   }}
                   disabled={!googleClientId}
-                  className={`flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors ${!googleClientId ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  className={`flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors ${!googleClientId ? "opacity-60 cursor-not-allowed" : ""}`}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path

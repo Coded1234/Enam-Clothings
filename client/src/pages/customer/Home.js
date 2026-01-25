@@ -62,8 +62,7 @@ const Home = () => {
   ];
 
   const features = [
-    { icon: FiTruck, title: "Free Shipping", desc: "On orders over GH₵50,000" },
-    { icon: FiRefreshCw, title: "Easy Returns", desc: "30-day return policy" },
+    { icon: FiTruck, title: "Free Shipping", desc: "On orders over GH₵1,000" },
     { icon: FiShield, title: "Secure Payment", desc: "100% secure checkout" },
     { icon: FiHeadphones, title: "24/7 Support", desc: "Dedicated support" },
   ];
@@ -90,20 +89,20 @@ const Home = () => {
                 Perfect Style
               </span>
             </h1>
-            <p className="text-xl text-gray-100 dark:text-gray-200 mb-8 drop-shadow-md">
+            <p className="text-xl text-gray-100 dark:text-gray-200 mb-4 drop-shadow-md">
               Explore our latest collection of premium clothing. Quality fashion
               for everyone.
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex gap-4 flex-nowrap mt-10 md:mt-6">
               <Link
                 to="/shop"
-                className="btn-gradient px-8 py-4 rounded-full font-semibold text-lg inline-flex items-center gap-2"
+                className="btn-gradient px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-base sm:text-lg inline-flex items-center gap-2 whitespace-nowrap"
               >
                 Shop Now <FiArrowRight />
               </Link>
               <Link
                 to="/shop"
-                className="px-8 py-4 border-2 border-white text-white rounded-full font-semibold text-lg hover:bg-white hover:text-gray-900 transition-colors"
+                className="px-6 py-3 sm:px-8 sm:py-4 border-2 border-white text-white rounded-full font-semibold text-base sm:text-lg hover:bg-white hover:text-gray-900 transition-colors whitespace-nowrap"
               >
                 View Collection
               </Link>
@@ -112,26 +111,30 @@ const Home = () => {
         </div>
 
         {/* Decorative Elements */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
+        {/* Removed bottom white overlay to avoid extra white space under buttons */}
+        <div className="absolute bottom-0 left-0 right-0 h-0 bg-gradient-to-t from-white to-transparent"></div>
       </section>
 
-      {/* Features Bar */}
-      <section className="bg-white dark:bg-gray-900 py-8 border-b dark:border-gray-800">
+      {/* Features Bar (centered) */}
+      <section className="bg-white dark:bg-gray-900 py-6 border-b dark:border-gray-800">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-3 gap-4 justify-items-center max-w-3xl mx-auto">
             {features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
+              <div
+                key={index}
+                className="flex flex-col items-center gap-2 text-center p-2"
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
                   <feature.icon
                     className="text-primary-500 dark:text-primary-300"
-                    size={24}
+                    size={18}
                   />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-800 dark:text-gray-200">
+                  <h4 className="font-semibold text-sm sm:text-base whitespace-nowrap text-gray-800 dark:text-gray-200">
                     {feature.title}
                   </h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     {feature.desc}
                   </p>
                 </div>
@@ -142,15 +145,14 @@ const Home = () => {
       </section>
 
       {/* Categories */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+      <section className="py-10 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-5">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">
               Shop by Category
             </h2>
             <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Browse our wide selection of clothing and accessories for men and
-              women
+              Browse our wide selection of clothing for men and women
             </p>
           </div>
 
@@ -339,7 +341,9 @@ const Home = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">
               What Our Customers Say
             </h2>
-            <p className="text-gray-600">Real reviews from real customers</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              Real reviews from real customers
+            </p>
           </div>
 
           {testimonialsLoading ? (
@@ -351,7 +355,7 @@ const Home = () => {
               {testimonials.slice(0, 4).map((testimonial) => (
                 <div
                   key={testimonial.id}
-                  className="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-gray-100"
+                  className="bg-white dark:bg-surface p-4 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-gray-100"
                 >
                   <div className="hidden md:flex gap-0.5 mb-3">
                     {[...Array(testimonial.rating)].map((_, i) => (
@@ -363,7 +367,7 @@ const Home = () => {
                       </span>
                     ))}
                   </div>
-                  <p className="text-gray-600 text-xs md:text-sm mb-4 italic line-clamp-3">
+                  <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm mb-4 italic line-clamp-3">
                     "{testimonial.comment || testimonial.title}"
                   </p>
                   <div className="flex items-center gap-2 md:gap-3">
@@ -371,12 +375,12 @@ const Home = () => {
                       {testimonial.user?.firstName?.[0] || "C"}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 text-xs md:text-sm line-clamp-1">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 text-xs md:text-sm line-clamp-1">
                         {testimonial.user
                           ? `${testimonial.user.firstName} ${testimonial.user.lastName}`
                           : "Happy Customer"}
                       </h4>
-                      <p className="text-[10px] md:text-xs text-gray-500">
+                      <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400">
                         {testimonial.isVerifiedPurchase
                           ? "Verified Buyer"
                           : "Customer"}
@@ -410,7 +414,7 @@ const Home = () => {
               ].map((testimonial, index) => (
                 <div
                   key={`default-testimonial-${index}`}
-                  className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"
+                  className="bg-white dark:bg-surface p-8 rounded-2xl shadow-sm border border-gray-100"
                 >
                   <div className="flex gap-1 mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
@@ -422,7 +426,7 @@ const Home = () => {
                       </span>
                     ))}
                   </div>
-                  <p className="text-gray-600 mb-6 italic">
+                  <p className="text-gray-600 dark:text-gray-300 mb-6 italic">
                     "{testimonial.text}"
                   </p>
                   <div className="flex items-center gap-4">
@@ -430,10 +434,10 @@ const Home = () => {
                       {testimonial.name[0]}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100">
                         {testimonial.name}
                       </h4>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {testimonial.role}
                       </p>
                     </div>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   FiChevronDown,
   FiChevronUp,
@@ -254,25 +255,28 @@ const FAQ = () => {
           </div>
         </div>
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {categories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all ${
-                  activeCategory === category.id
-                    ? "bg-primary-600 text-white shadow-lg"
-                    : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-                }`}
-              >
-                <Icon className="text-lg" />
-                {category.name}
-              </button>
-            );
-          })}
+        {/* Category Tabs (inline nav with underline indicator) */}
+        <div className="mb-8">
+          <nav className="flex overflow-x-auto sm:justify-center border-b border-gray-200 -mx-4 sm:mx-0 hide-scrollbar">
+            <div className="inline-flex gap-6 px-4 py-2 whitespace-nowrap">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                  aria-current={
+                    activeCategory === category.id ? "page" : undefined
+                  }
+                  className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                    activeCategory === category.id
+                      ? "text-primary-500 border-b-2 border-primary-500"
+                      : "text-gray-600 hover:text-primary-500"
+                  }`}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          </nav>
         </div>
 
         {/* FAQ List */}
@@ -331,12 +335,17 @@ const FAQ = () => {
               we'll get back to you as soon as possible.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <a
-                href="mailto:support@enamsclothings.com"
+              <Link
+                to="/contact"
+                state={{
+                  subject:
+                    categories.find((c) => c.id === activeCategory)?.name ||
+                    "Support",
+                }}
                 className="inline-flex items-center justify-center gap-2 bg-white text-primary-600 px-6 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-colors"
               >
                 Email Support
-              </a>
+              </Link>
               <a
                 href="tel:+233256810699"
                 className="inline-flex items-center justify-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-400 transition-colors"
