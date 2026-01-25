@@ -16,6 +16,23 @@ import {
   FiSearch,
 } from "react-icons/fi";
 
+const FilterSection = ({ title, isOpen, onToggle, children }) => (
+  <div className="border-b border-gray-200 py-4">
+    <button
+      onClick={onToggle}
+      className="w-full flex items-center justify-between text-gray-800 font-medium"
+    >
+      {title}
+      <FiChevronDown
+        className={`transform transition-transform ${
+          isOpen ? "rotate-180" : ""
+        }`}
+      />
+    </button>
+    {isOpen && <div className="mt-4">{children}</div>}
+  </div>
+);
+
 const Shop = () => {
   const { category } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -200,23 +217,6 @@ const Shop = () => {
   const activeFiltersCount = Object.values(filters).filter(
     (v) => v && v !== "newest"
   ).length;
-  const FilterSection = ({ title, name, children }) => (
-    <div className="border-b border-gray-200 py-4">
-      <button
-        onClick={() => toggleFilterSection(name)}
-        className="w-full flex items-center justify-between text-gray-800 font-medium"
-      >
-        {title}
-        <FiChevronDown
-          className={`transform transition-transform ${
-            expandedFilters[name] ? "rotate-180" : ""
-          }`}
-        />
-      </button>
-      {expandedFilters[name] && <div className="mt-4">{children}</div>}
-    </div>
-  );
-
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -249,7 +249,10 @@ const Shop = () => {
                 )}
               </div>
 
-              <FilterSection title="Category" name="category">
+              <FilterSection
+                title="Category"
+                isOpen={expandedFilters.category}
+                onToggle={() => toggleFilterSection("category")}
               >
                 <div className="space-y-2">
                   {categories.map((cat) => (
@@ -272,7 +275,10 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              <FilterSection title="Price, GH₵" name="price">
+              <FilterSection
+                title="Price, GH₵"
+                isOpen={expandedFilters.price}
+                onToggle={() => toggleFilterSection("price")}
               >
                 <div className="space-y-3">
                   <div className="flex gap-2">
@@ -314,7 +320,10 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              <FilterSection title="Size" name="size">
+              <FilterSection
+                title="Size"
+                isOpen={expandedFilters.size}
+                onToggle={() => toggleFilterSection("size")}
               >
                 <div className="flex flex-wrap gap-2">
                   {sizes.map((size) => (
@@ -338,7 +347,10 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              <FilterSection title="Color" name="color">
+              <FilterSection
+                title="Color"
+                isOpen={expandedFilters.color}
+                onToggle={() => toggleFilterSection("color")}
               >
                 <div className="flex flex-wrap gap-3">
                   {colors.map((color) => (
@@ -594,7 +606,11 @@ const Shop = () => {
 
             <div className="p-4">
               {/* Category */}
-              <FilterSection title="Category" name="category">
+              <FilterSection
+                title="Category"
+                isOpen={expandedFilters.category}
+                onToggle={() => toggleFilterSection("category")}
+              >
                 <div className="space-y-2">
                   {categories.map((cat) => (
                     <label
@@ -616,7 +632,10 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              <FilterSection title="Size" name="size">
+              <FilterSection
+                title="Size"
+                isOpen={expandedFilters.size}
+                onToggle={() => toggleFilterSection("size")}
               >
                 <div className="flex flex-wrap gap-2">
                   {sizes.map((size) => (
@@ -640,7 +659,10 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              <FilterSection title="Color" name="color">
+              <FilterSection
+                title="Color"
+                isOpen={expandedFilters.color}
+                onToggle={() => toggleFilterSection("color")}
               >
                 <div className="flex flex-wrap gap-3">
                   {colors.map((color) => (
@@ -663,7 +685,10 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              <FilterSection title="Price, GH₵" name="price">
+              <FilterSection
+                title="Price, GH₵"
+                isOpen={expandedFilters.price}
+                onToggle={() => toggleFilterSection("price")}
               >
                 <div className="space-y-3">
                   <div className="flex gap-2">
