@@ -29,6 +29,9 @@ import ResetPassword from "./pages/customer/ResetPassword";
 import Contact from "./pages/customer/Contact";
 import VerifyEmail from "./pages/customer/VerifyEmail";
 import ResendVerification from "./pages/customer/ResendVerification";
+import PrivacyPolicy from "./pages/customer/PrivacyPolicy";
+import TermsOfService from "./pages/customer/TermsOfService";
+import CookiePolicy from "./pages/customer/CookiePolicy";
 
 // Admin Pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -73,6 +76,9 @@ function App() {
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="reset-password/:token" element={<ResetPassword />} />
         <Route path="contact" element={<Contact />} />
+        <Route path="privacy" element={<PrivacyPolicy />} />
+        <Route path="terms" element={<TermsOfService />} />
+        <Route path="cookies" element={<CookiePolicy />} />
         <Route path="search" element={<SearchResults />} />
 
         {/* Protected Customer Routes */}

@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "../redux/slices/authSlice";
+import { useTheme } from "../context/ThemeContext";
 import ScrollToTop from "../components/common/ScrollToTop";
 import {
   FiHome,
@@ -16,6 +17,8 @@ import {
   FiChevronDown,
   FiBarChart2,
   FiTag,
+  FiSun,
+  FiMoon,
 } from "react-icons/fi";
 
 const pageVariants = {
@@ -47,6 +50,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const { theme, toggleTheme } = useTheme();
 
   const menuItems = [
     { path: "/admin", icon: FiHome, label: "Dashboard" },
@@ -94,16 +98,16 @@ const AdminLayout = () => {
       <aside
         className={`${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transition-transform duration-300 flex flex-col`}
+        } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 text-gray-700 transition-transform duration-300 flex flex-col`}
       >
         {/* Logo */}
-        <div className="p-4 flex items-center justify-between border-b border-gray-800">
+        <div className="p-4 flex items-center justify-between border-b border-gray-200">
           <Link to="/admin" className="text-xl font-bold gradient-text">
             Enam's Clothings
           </Link>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg hover:bg-gray-800 lg:hidden"
+            className="p-2 rounded-lg hover:bg-gray-50 lg:hidden"
           >
             <FiX size={20} />
           </button>
@@ -120,7 +124,7 @@ const AdminLayout = () => {
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                     location.pathname === item.path
                       ? "bg-primary-500 text-white"
-                      : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                      : "text-gray-400 hover:bg-gray-50 hover:text-primary-500"
                   }`}
                 >
                   <item.icon size={20} />
@@ -132,15 +136,22 @@ const AdminLayout = () => {
         </nav>
 
         {/* Back to Store */}
-        <div className="p-4 border-t border-gray-800">
+        <div className="p-4 border-t border-gray-200 flex items-center gap-2">
           <Link
             to="/"
             onClick={() => setSidebarOpen(false)}
-            className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-lg"
+            className="flex-1 flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-50 hover:text-primary-500 rounded-lg"
           >
             <FiShoppingBag size={20} />
             <span>Back to Store</span>
           </Link>
+          <button
+            onClick={toggleTheme}
+            className="p-3 text-gray-400 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <FiSun size={20} /> : <FiMoon size={20} />}
+          </button>
         </div>
       </aside>
 

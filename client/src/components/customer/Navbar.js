@@ -109,6 +109,22 @@ const Navbar = () => {
     };
   }, [dropdownOpen]);
 
+  // Prevent background/body scrolling when the mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.documentElement.classList.add("overflow-hidden");
+      document.body.style.overflow = "hidden";
+    } else {
+      document.documentElement.classList.remove("overflow-hidden");
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.documentElement.classList.remove("overflow-hidden");
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
   return (
     <nav className="bg-white dark:bg-surface shadow-md sticky top-0 z-50">
       {/* Top Bar */}

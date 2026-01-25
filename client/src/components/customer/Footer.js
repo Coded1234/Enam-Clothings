@@ -202,7 +202,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3 text-gray-300">
                 <FiMail className="text-primary-500" />
-                <span>support@enamsclothings.com</span>
+                <span>enamclothings@gmail.com</span>
               </li>
             </ul>
           </div>
@@ -216,24 +216,15 @@ const Footer = () => {
             © 2026 Enam's Clothings. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm text-gray-300">
-            <button
-              type="button"
-              className="hover:text-white transition-colors"
-            >
+            <Link to="/privacy" className="hover:text-white transition-colors">
               Privacy Policy
-            </button>
-            <button
-              type="button"
-              className="hover:text-white transition-colors"
-            >
+            </Link>
+            <Link to="/terms" className="hover:text-white transition-colors">
               Terms of Service
-            </button>
-            <button
-              type="button"
-              className="hover:text-white transition-colors"
-            >
+            </Link>
+            <Link to="/cookies" className="hover:text-white transition-colors">
               Cookie Policy
-            </button>
+            </Link>
           </div>
         </div>
       </div>

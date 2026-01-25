@@ -86,6 +86,22 @@ const Shop = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category, dispatch]);
 
+  // Prevent background scrolling when mobile filter drawer is open
+  useEffect(() => {
+    if (mobileFilterOpen) {
+      document.documentElement.classList.add("overflow-hidden");
+      document.body.style.overflow = "hidden";
+    } else {
+      document.documentElement.classList.remove("overflow-hidden");
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.documentElement.classList.remove("overflow-hidden");
+      document.body.style.overflow = "";
+    };
+  }, [mobileFilterOpen]);
+
   useEffect(() => {
     const effectiveCategory = category || searchParams.get("category") || "";
     const params = {
@@ -184,7 +200,6 @@ const Shop = () => {
   const activeFiltersCount = Object.values(filters).filter(
     (v) => v && v !== "newest"
   ).length;
-
   const FilterSection = ({ title, name, children }) => (
     <div className="border-b border-gray-200 py-4">
       <button
@@ -201,6 +216,7 @@ const Shop = () => {
       {expandedFilters[name] && <div className="mt-4">{children}</div>}
     </div>
   );
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -233,8 +249,8 @@ const Shop = () => {
                 )}
               </div>
 
-              {/* Category Filter */}
               <FilterSection title="Category" name="category">
+              >
                 <div className="space-y-2">
                   {categories.map((cat) => (
                     <label
@@ -256,8 +272,8 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              {/* Price Filter */}
               <FilterSection title="Price, GH₵" name="price">
+              >
                 <div className="space-y-3">
                   <div className="flex gap-2">
                     <input
@@ -265,7 +281,7 @@ const Shop = () => {
                       placeholder="min"
                       value={tempMinPrice}
                       onChange={handleMinPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border rounded-lg text-sm text-black focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                     <span className="flex items-center text-gray-400">—</span>
                     <input
@@ -273,7 +289,7 @@ const Shop = () => {
                       placeholder="max"
                       value={tempMaxPrice}
                       onChange={handleMaxPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border rounded-lg text-sm text-black focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
                   <div className="flex items-center justify-between pt-2">
@@ -298,8 +314,8 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              {/* Size Filter */}
               <FilterSection title="Size" name="size">
+              >
                 <div className="flex flex-wrap gap-2">
                   {sizes.map((size) => (
                     <button
@@ -322,8 +338,8 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              {/* Color Filter */}
               <FilterSection title="Color" name="color">
+              >
                 <div className="flex flex-wrap gap-3">
                   {colors.map((color) => (
                     <button
@@ -600,8 +616,8 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              {/* Size */}
               <FilterSection title="Size" name="size">
+              >
                 <div className="flex flex-wrap gap-2">
                   {sizes.map((size) => (
                     <button
@@ -624,8 +640,8 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              {/* Color */}
               <FilterSection title="Color" name="color">
+              >
                 <div className="flex flex-wrap gap-3">
                   {colors.map((color) => (
                     <button
@@ -647,8 +663,8 @@ const Shop = () => {
                 </div>
               </FilterSection>
 
-              {/* Price */}
               <FilterSection title="Price, GH₵" name="price">
+              >
                 <div className="space-y-3">
                   <div className="flex gap-2">
                     <input
@@ -656,7 +672,7 @@ const Shop = () => {
                       placeholder="min"
                       value={tempMinPrice}
                       onChange={handleMinPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-sm"
+                      className="w-full px-3 py-2 border rounded-lg text-sm text-black"
                     />
                     <span className="flex items-center text-gray-400">—</span>
                     <input
@@ -664,7 +680,7 @@ const Shop = () => {
                       placeholder="max"
                       value={tempMaxPrice}
                       onChange={handleMaxPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-sm"
+                      className="w-full px-3 py-2 border rounded-lg text-sm text-black"
                     />
                   </div>
                   <div className="flex items-center justify-between pt-2">

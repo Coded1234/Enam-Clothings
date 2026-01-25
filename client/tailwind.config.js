@@ -24,7 +24,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: ["Poppins", "Inter", "sans-serif"],
+        heading: ["Poppins", "Inter", "sans-serif"],
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
