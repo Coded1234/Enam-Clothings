@@ -4,28 +4,47 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    // Check local storage or system preference
-    if (localStorage.getItem('theme')) {
-      return localStorage.getItem('theme');
+    // Check local storage first
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      return savedTheme;
     }
+    // Fallback to system preference
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
+  // Apply theme class to document
   useEffect(() => {
     const root = window.document.documentElement;
-    
-    // Remove previous theme class
     root.classList.remove('light', 'dark');
-    
-    // Add new theme class
     root.classList.add(theme);
-    
-    // Save to local storage
-    localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Listen for system theme changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleChange = (e) => {
+      // Only update if user hasn't set a preference in localStorage
+      if (!localStorage.getItem('theme')) {
+        setTheme(e.matches ? 'dark' : 'light');
+      }
+    };
+
+    // Modern event listener
+    mediaQuery.addEventListener('change', handleChange);
+    
+    // Cleanup
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+    setTheme((prevTheme) => {
+      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+      // Save user preference when manually toggled
+      localStorage.setItem('theme', newTheme);
+      return newTheme;
+    });
   };
 
   return (
