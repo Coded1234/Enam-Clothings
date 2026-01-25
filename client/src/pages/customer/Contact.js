@@ -58,12 +58,12 @@ const Contact = () => {
     {
       icon: FiPhone,
       title: "Call Us",
-      details: ["+233 XX XXX XXXX", "+233 XX XXX XXXX"],
+      details: ["+233 25 681 0699",],
     },
     {
       icon: FiMail,
       title: "Email Us",
-      details: ["support@enamsclothings.com", "info@enamsclothings.com"],
+      details: ["enamclothings@gmail.com",],
     },
     {
       icon: FiClock,
