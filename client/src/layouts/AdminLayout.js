@@ -15,7 +15,6 @@ import {
   FiLogOut,
   FiChevronDown,
   FiBarChart2,
-  FiSettings,
   FiTag,
 } from "react-icons/fi";
 
@@ -57,7 +56,6 @@ const AdminLayout = () => {
     { path: "/admin/reviews", icon: FiStar, label: "Reviews" },
     { path: "/admin/coupons", icon: FiTag, label: "Coupons" },
     { path: "/admin/reports", icon: FiBarChart2, label: "Reports" },
-    { path: "/admin/settings", icon: FiSettings, label: "Settings" },
   ];
 
   const handleLogout = () => {

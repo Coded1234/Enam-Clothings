@@ -39,7 +39,6 @@ import AdminOrderDetail from "./pages/admin/OrderDetail";
 import AdminCustomers from "./pages/admin/Customers";
 import AdminReviews from "./pages/admin/Reviews";
 import AdminReports from "./pages/admin/Reports";
-import AdminSettings from "./pages/admin/Settings";
 import AdminCoupons from "./pages/admin/Coupons";
 import AdminCategories from "./pages/admin/Categories";
 import SearchResults from "./pages/customer/SearchResults";
@@ -153,7 +152,7 @@ function App() {
         <Route path="customers" element={<AdminCustomers />} />
         <Route path="reviews" element={<AdminReviews />} />
         <Route path="reports" element={<AdminReports />} />
-        <Route path="settings" element={<AdminSettings />} />
+        {/* Settings page removed */}
         <Route path="coupons" element={<AdminCoupons />} />
         <Route path="categories" element={<AdminCategories />} />
       </Route>
