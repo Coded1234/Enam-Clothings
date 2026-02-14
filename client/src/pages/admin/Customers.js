@@ -46,8 +46,8 @@ const Customers = () => {
       await adminAPI.toggleCustomerStatus(customerId);
       setCustomers(
         customers.map((c) =>
-          c.id === customerId ? { ...c, isActive: !currentStatus } : c
-        )
+          c.id === customerId ? { ...c, isActive: !currentStatus } : c,
+        ),
       );
     } catch (err) {
       console.error("Failed to toggle status:", err);
@@ -100,7 +100,7 @@ const Customers = () => {
             placeholder="Search customers..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
           />
         </div>
       </div>
@@ -216,7 +216,7 @@ const Customers = () => {
                               onClick={() =>
                                 handleToggleStatus(
                                   customer.id,
-                                  customer.isActive !== false
+                                  customer.isActive !== false,
                                 )
                               }
                               disabled={togglingId === customer.id}
@@ -360,7 +360,7 @@ const Customers = () => {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
-                    }
+                    },
                   )}
                 </p>
               </div>

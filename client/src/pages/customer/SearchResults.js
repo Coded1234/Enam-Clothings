@@ -1,12 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import {
-  FiSearch,
-  FiFilter,
-  FiX,
-  FiGrid,
-  FiList,
-} from "react-icons/fi";
+import { FiSearch, FiFilter, FiX, FiGrid, FiList } from "react-icons/fi";
 import api from "../../utils/api";
 import ProductCard from "../../components/customer/ProductCard";
 
@@ -194,7 +188,7 @@ const SearchResults = () => {
                       onChange={(e) =>
                         handleFilterChange("minPrice", e.target.value)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                     <input
                       type="number"
@@ -203,7 +197,7 @@ const SearchResults = () => {
                       onChange={(e) =>
                         handleFilterChange("maxPrice", e.target.value)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -373,7 +367,7 @@ const SearchResults = () => {
                   <div
                     className={
                       viewMode === "grid"
-                        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                        ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
                         : "space-y-4"
                     }
                   >
@@ -442,7 +436,7 @@ const SearchResults = () => {
                             </div>
                           </div>
                         </div>
-                      )
+                      ),
                     )}
                   </div>
 

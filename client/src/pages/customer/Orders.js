@@ -113,7 +113,7 @@ const Orders = () => {
     const matchesSearch =
       order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.items?.some((item) =>
-        item.productName?.toLowerCase().includes(searchQuery.toLowerCase())
+        item.productName?.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     return matchesFilter && matchesSearch;
   });
@@ -123,7 +123,7 @@ const Orders = () => {
   const startIndex = (currentPage - 1) * ordersPerPage;
   const paginatedOrders = filteredOrders.slice(
     startIndex,
-    startIndex + ordersPerPage
+    startIndex + ordersPerPage,
   );
 
   // Loading State
@@ -167,7 +167,7 @@ const Orders = () => {
                 placeholder="Search by order ID or product name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -232,7 +232,7 @@ const Orders = () => {
                       <div className="flex items-start gap-4">
                         <div
                           className={`p-3 rounded-xl ${getStatusColor(
-                            order.status
+                            order.status,
                           )}`}
                         >
                           <StatusIcon size={24} />
@@ -263,7 +263,7 @@ const Orders = () => {
                           <p className="text-sm text-gray-500 mb-1">Status</p>
                           <span
                             className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${getStatusColor(
-                              order.status
+                              order.status,
                             )}`}
                           >
                             {order.status}
@@ -274,7 +274,10 @@ const Orders = () => {
                   </div>
 
                   {/* Order Items Preview */}
-                  <Link to={`/orders/${order.id}`} className="block p-4 md:p-6 bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <Link
+                    to={`/orders/${order.id}`}
+                    className="block p-4 md:p-6 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         {/* Product Images */}
@@ -384,7 +387,7 @@ const Orders = () => {
                                   )}
                                 </React.Fragment>
                               );
-                            }
+                            },
                           )}
                         </div>
                         <div className="flex justify-between mt-2 text-xs text-gray-500">
@@ -458,7 +461,7 @@ const Orders = () => {
               {
                 label: "In Progress",
                 value: orders.filter((o) =>
-                  ["pending", "confirmed", "shipped"].includes(o.status)
+                  ["pending", "confirmed", "shipped"].includes(o.status),
                 ).length,
                 color: "bg-yellow-500",
               },
@@ -467,7 +470,7 @@ const Orders = () => {
                 value: formatPrice(
                   orders
                     .filter((o) => o.status !== "cancelled")
-                    .reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+                    .reduce((sum, o) => sum + (o.totalAmount || 0), 0),
                 ),
                 color: "bg-purple-500",
                 isPrice: true,

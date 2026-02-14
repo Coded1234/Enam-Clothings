@@ -79,7 +79,7 @@ const ProductForm = () => {
         comparePrice: data.comparePrice || "",
         category: data.category || "",
         // Treat the "Total Stock" field as current/remaining stock for editing
-        totalStock: (data.remainingStock ?? data.totalStock) ?? "",
+        totalStock: data.remainingStock ?? data.totalStock ?? "",
         sizes: data.sizes || [],
         colors: data.colors || [],
         images: data.images || [],
@@ -118,7 +118,11 @@ const ProductForm = () => {
 
       // Keep size variant stocks in sync with the main stock field,
       // since the app uses a single inventory value per product in admin.
-      if (Array.isArray(prev.sizes) && prev.sizes.length > 0 && !Number.isNaN(stock)) {
+      if (
+        Array.isArray(prev.sizes) &&
+        prev.sizes.length > 0 &&
+        !Number.isNaN(stock)
+      ) {
         next.sizes = prev.sizes.map((s) => {
           if (typeof s === "string") return { size: s, stock };
           return { ...s, stock };
@@ -296,7 +300,7 @@ const ProductForm = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                 required
               />
             </div>
@@ -310,7 +314,7 @@ const ProductForm = () => {
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -322,7 +326,7 @@ const ProductForm = () => {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                 required
               >
                 <option value="">Select Category</option>
@@ -353,7 +357,7 @@ const ProductForm = () => {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                 required
               />
             </div>
@@ -369,7 +373,7 @@ const ProductForm = () => {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -383,7 +387,7 @@ const ProductForm = () => {
                 value={formData.totalStock}
                 onChange={handleStockChange}
                 min="0"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
               />
             </div>
           </div>

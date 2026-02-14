@@ -692,7 +692,7 @@ const ProductDetail = () => {
                             })
                           }
                           placeholder="Sum up your review"
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                         />
                       </div>
 
@@ -711,7 +711,7 @@ const ProductDetail = () => {
                           }
                           rows={4}
                           placeholder="What did you like or dislike about this product?"
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                           required
                         />
                       </div>

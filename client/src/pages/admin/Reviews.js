@@ -52,8 +52,8 @@ const Reviews = () => {
       await adminAPI.toggleReviewApproval(reviewId);
       setReviews(
         reviews.map((r) =>
-          r.id === reviewId ? { ...r, isApproved: !isApproved } : r
-        )
+          r.id === reviewId ? { ...r, isApproved: !isApproved } : r,
+        ),
       );
     } catch (err) {
       console.error("Failed to toggle approval:", err);
@@ -115,7 +115,7 @@ const Reviews = () => {
               placeholder="Search reviews..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
             />
           </div>
           <div className="flex items-center gap-2 md:gap-4">
@@ -200,7 +200,7 @@ const Reviews = () => {
                                 <img
                                   src={getImageUrl(
                                     review.product.images[0]?.url ||
-                                      review.product.images[0]
+                                      review.product.images[0],
                                   )}
                                   alt={review.product.name}
                                   className="w-full h-full object-cover"
@@ -264,7 +264,7 @@ const Reviews = () => {
                               onClick={() =>
                                 handleToggleApproval(
                                   review.id,
-                                  review.isApproved
+                                  review.isApproved,
                                 )
                               }
                               disabled={togglingId === review.id}
@@ -363,7 +363,7 @@ const Reviews = () => {
                       <img
                         src={getImageUrl(
                           selectedReview.product.images[0]?.url ||
-                            selectedReview.product.images[0]
+                            selectedReview.product.images[0],
                         )}
                         alt={selectedReview.product.name}
                         className="w-12 h-12 rounded-lg object-cover"
@@ -432,7 +432,7 @@ const Reviews = () => {
                 onClick={() => {
                   handleToggleApproval(
                     selectedReview.id,
-                    selectedReview.isApproved
+                    selectedReview.isApproved,
                   );
                   setSelectedReview(null);
                 }}

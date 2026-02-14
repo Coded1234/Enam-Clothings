@@ -101,7 +101,7 @@ const Products = () => {
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2 md:py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2 md:py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
             />
           </div>
         </form>
@@ -180,7 +180,7 @@ const Products = () => {
                               product.images?.[0] ? (
                                 <img
                                   src={getImageUrl(
-                                    product.images[0]?.url || product.images[0]
+                                    product.images[0]?.url || product.images[0],
                                   )}
                                   alt={product.name}
                                   className="h-full w-full object-cover"
@@ -214,7 +214,7 @@ const Products = () => {
                             {formatCurrency(
                               product.discountPrice ||
                                 product.comparePrice ||
-                                product.price
+                                product.price,
                             )}
                           </div>
                           {(product.discountPrice || product.comparePrice) &&
@@ -233,10 +233,10 @@ const Products = () => {
                                 product.stock) > 10
                                 ? "text-green-600"
                                 : (product.remainingStock ??
-                                    product.totalStock ??
-                                    product.stock) > 0
-                                ? "text-yellow-600"
-                                : "text-red-600"
+                                      product.totalStock ??
+                                      product.stock) > 0
+                                  ? "text-yellow-600"
+                                  : "text-red-600"
                             }`}
                           >
                             {product.remainingStock ??

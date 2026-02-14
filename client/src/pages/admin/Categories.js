@@ -54,7 +54,7 @@ const Categories = () => {
     setNotification({ show: true, type, message });
     setTimeout(
       () => setNotification({ show: false, type: "", message: "" }),
-      3000
+      3000,
     );
   };
 
@@ -114,7 +114,7 @@ const Categories = () => {
       console.error("Error saving category:", error);
       showNotification(
         "error",
-        error.response?.data?.message || "Failed to save category"
+        error.response?.data?.message || "Failed to save category",
       );
     }
   };
@@ -131,7 +131,7 @@ const Categories = () => {
       console.error("Error deleting category:", error);
       showNotification(
         "error",
-        error.response?.data?.message || "Failed to delete category"
+        error.response?.data?.message || "Failed to delete category",
       );
     }
   };
@@ -344,10 +344,10 @@ const Categories = () => {
         </h3>
         <p className="text-xs md:text-sm text-blue-700">
           The product system currently uses these predefined categories:{" "}
-          <strong>Men</strong> and <strong>Women</strong>.
-          Categories created here can be used for future product organization
-          and filtering. To use custom categories with products, the product
-          form needs to be updated to use dynamic categories from this list.
+          <strong>Men</strong> and <strong>Women</strong>. Categories created
+          here can be used for future product organization and filtering. To use
+          custom categories with products, the product form needs to be updated
+          to use dynamic categories from this list.
         </p>
       </div>
 
@@ -360,8 +360,8 @@ const Categories = () => {
                 {editingCategory
                   ? "Edit Category"
                   : formData.parent_id
-                  ? "Add Subcategory"
-                  : "Add Category"}
+                    ? "Add Subcategory"
+                    : "Add Category"}
               </h2>
               <button
                 onClick={closeModal}
@@ -388,7 +388,7 @@ const Categories = () => {
                   }
                   placeholder="e.g., T-Shirts"
                   required
-                  className="w-full px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -404,7 +404,7 @@ const Categories = () => {
                   }
                   placeholder="Brief description of this category"
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -418,7 +418,7 @@ const Categories = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, parent_id: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                 >
                   <option value="">None (Top-level category)</option>
                   {getAllParentOptions().map((cat) => (
@@ -445,7 +445,7 @@ const Categories = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, display_order: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Lower numbers appear first
@@ -470,7 +470,7 @@ const Categories = () => {
                         setFormData({ ...formData, meta_title: e.target.value })
                       }
                       placeholder="SEO title for this category"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                   </div>
 
@@ -488,7 +488,7 @@ const Categories = () => {
                       }
                       placeholder="SEO description for this category"
                       rows={2}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>

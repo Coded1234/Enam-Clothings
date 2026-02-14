@@ -234,7 +234,7 @@ const Settings = () => {
                     type="text"
                     value={settings.siteName}
                     onChange={(e) => handleChange("siteName", e.target.value)}
-                    className="w-full px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   />
                 </div>
 
@@ -248,7 +248,7 @@ const Settings = () => {
                     onChange={(e) =>
                       handleChange("contactEmail", e.target.value)
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   />
                 </div>
 
@@ -262,7 +262,7 @@ const Settings = () => {
                     onChange={(e) =>
                       handleChange("contactPhone", e.target.value)
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   />
                 </div>
 
@@ -274,7 +274,7 @@ const Settings = () => {
                     type="text"
                     value={settings.address}
                     onChange={(e) => handleChange("address", e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   />
                 </div>
 
@@ -288,7 +288,7 @@ const Settings = () => {
                       handleChange("siteDescription", e.target.value)
                     }
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -309,7 +309,7 @@ const Settings = () => {
                         handleChange("facebookUrl", e.target.value)
                       }
                       placeholder="https://facebook.com/yourpage"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                   </div>
 
@@ -324,7 +324,7 @@ const Settings = () => {
                         handleChange("instagramUrl", e.target.value)
                       }
                       placeholder="https://instagram.com/yourpage"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                   </div>
 
@@ -339,7 +339,7 @@ const Settings = () => {
                         handleChange("twitterUrl", e.target.value)
                       }
                       placeholder="https://twitter.com/yourpage"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                   </div>
 
@@ -354,7 +354,7 @@ const Settings = () => {
                         handleChange("youtubeUrl", e.target.value)
                       }
                       placeholder="https://youtube.com/yourchannel"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>

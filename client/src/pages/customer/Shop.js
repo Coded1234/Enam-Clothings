@@ -287,7 +287,7 @@ const Shop = () => {
                       placeholder="min"
                       value={tempMinPrice}
                       onChange={handleMinPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-sm text-black focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                     <span className="flex items-center text-gray-400">—</span>
                     <input
@@ -295,7 +295,7 @@ const Shop = () => {
                       placeholder="max"
                       value={tempMaxPrice}
                       onChange={handleMaxPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-sm text-black focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
                   <div className="flex items-center justify-between pt-2">
@@ -697,7 +697,7 @@ const Shop = () => {
                       placeholder="min"
                       value={tempMinPrice}
                       onChange={handleMinPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-sm text-black"
+                      className="w-full px-3 py-2 border rounded-lg text-sm text-gray-900 dark:text-white"
                     />
                     <span className="flex items-center text-gray-400">—</span>
                     <input
@@ -705,7 +705,7 @@ const Shop = () => {
                       placeholder="max"
                       value={tempMaxPrice}
                       onChange={handleMaxPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-sm text-black"
+                      className="w-full px-3 py-2 border rounded-lg text-sm text-gray-900 dark:text-white"
                     />
                   </div>
                   <div className="flex items-center justify-between pt-2">

@@ -57,8 +57,8 @@ const Orders = () => {
       await adminAPI.updateOrderStatus(orderId, { status: newStatus });
       setOrders(
         orders.map((order) =>
-          order.id === orderId ? { ...order, status: newStatus } : order
-        )
+          order.id === orderId ? { ...order, status: newStatus } : order,
+        ),
       );
     } catch (err) {
       console.error("Failed to update status:", err);
@@ -122,7 +122,7 @@ const Orders = () => {
               placeholder="Search orders..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -207,7 +207,7 @@ const Orders = () => {
                           {order.totalItems ||
                             order.items?.reduce(
                               (sum, item) => sum + (item.quantity || 1),
-                              0
+                              0,
                             ) ||
                             order.items?.length ||
                             0}{" "}
@@ -220,10 +220,11 @@ const Orders = () => {
                         </td>
                         <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
                           <div className="flex items-center gap-1 md:gap-2">
-                            {order.status === 'delivered' || order.status === 'cancelled' ? (
+                            {order.status === "delivered" ||
+                            order.status === "cancelled" ? (
                               <span
                                 className={`text-xs font-medium rounded-full px-1.5 md:px-2 py-0.5 md:py-1 ${getStatusColor(
-                                  order.status
+                                  order.status,
                                 )}`}
                               >
                                 {order.status.charAt(0).toUpperCase() +
@@ -237,7 +238,7 @@ const Orders = () => {
                                 }
                                 disabled={updatingStatus === order.id}
                                 className={`text-xs font-medium rounded-full px-1.5 md:px-2 py-0.5 md:py-1 border-0 cursor-pointer ${getStatusColor(
-                                  order.status
+                                  order.status,
                                 )}`}
                               >
                                 {statuses.map((status) => (

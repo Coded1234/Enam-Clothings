@@ -135,7 +135,17 @@ const Profile = () => {
     if (!file) return;
 
     // Validate file type
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif", "image/bmp", "image/heic", "image/heif", "image/avif"];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+      "image/bmp",
+      "image/heic",
+      "image/heif",
+      "image/avif",
+    ];
     if (!allowedTypes.includes(file.type)) {
       toast.error("Please upload a valid image file (JPEG, PNG, or WebP)");
       return;
@@ -245,7 +255,7 @@ const Profile = () => {
                               onError={(e) => {
                                 console.error(
                                   "Avatar load error. URL:",
-                                  getImageUrl(profileData.avatar)
+                                  getImageUrl(profileData.avatar),
                                 );
                                 e.target.style.display = "none";
                                 e.target.nextSibling.style.display = "flex";
@@ -388,7 +398,7 @@ const Profile = () => {
                             value={profileData.firstName}
                             onChange={handleProfileChange}
                             disabled={!isEditing}
-                            className={`w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                            className={`w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white ${
                               !isEditing ? "bg-gray-50" : ""
                             }`}
                           />
@@ -405,7 +415,7 @@ const Profile = () => {
                           value={profileData.lastName}
                           onChange={handleProfileChange}
                           disabled={!isEditing}
-                          className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                          className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white ${
                             !isEditing ? "bg-gray-50" : ""
                           }`}
                         />
@@ -423,7 +433,7 @@ const Profile = () => {
                             value={profileData.email}
                             onChange={handleProfileChange}
                             disabled={!isEditing}
-                            className={`w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                            className={`w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white ${
                               !isEditing ? "bg-gray-50" : ""
                             }`}
                           />
@@ -484,7 +494,7 @@ const Profile = () => {
                               name="currentPassword"
                               value={passwordData.currentPassword}
                               onChange={handlePasswordChange}
-                              className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                              className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                               required
                             />
                             <button
@@ -510,7 +520,7 @@ const Profile = () => {
                               name="newPassword"
                               value={passwordData.newPassword}
                               onChange={handlePasswordChange}
-                              className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                              className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                               required
                             />
                             <button
@@ -536,7 +546,7 @@ const Profile = () => {
                               name="confirmPassword"
                               value={passwordData.confirmPassword}
                               onChange={handlePasswordChange}
-                              className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                              className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                               required
                             />
                             <button

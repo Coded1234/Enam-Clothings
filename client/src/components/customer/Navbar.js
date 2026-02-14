@@ -296,19 +296,19 @@ const Navbar = () => {
 
         {/* Search Bar */}
         {searchOpen && (
-          <div className="py-4 border-t animate-slide-down">
-            <form onSubmit={handleSearch} className="flex gap-2">
+          <div className="py-4 border-t animate-slide-down px-4">
+            <form onSubmit={handleSearch} className="flex gap-2 max-w-full">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for products..."
-                className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-surface text-gray-900 dark:text-gray-100"
+                className="flex-1 min-w-0 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-surface text-gray-900 dark:text-white"
                 autoFocus
               />
               <button
                 type="submit"
-                className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                className="px-4 sm:px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors flex-shrink-0"
               >
                 Search
               </button>

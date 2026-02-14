@@ -71,7 +71,7 @@ const Coupons = () => {
     setNotification({ show: true, type, message });
     setTimeout(
       () => setNotification({ show: false, type: "", message: "" }),
-      3000
+      3000,
     );
   };
 
@@ -160,7 +160,7 @@ const Coupons = () => {
       console.error("Error saving coupon:", error);
       showNotification(
         "error",
-        error.response?.data?.message || "Failed to save coupon"
+        error.response?.data?.message || "Failed to save coupon",
       );
     }
   };
@@ -278,14 +278,14 @@ const Coupons = () => {
                 placeholder="Search by code or description..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
           </form>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -293,8 +293,6 @@ const Coupons = () => {
           </select>
         </div>
       </div>
-
-
 
       {/* Coupons Table */}
       <div className="bg-white rounded-lg md:rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -392,7 +390,7 @@ const Coupons = () => {
                               <p className="text-gray-600">
                                 From:{" "}
                                 {new Date(
-                                  coupon.start_date
+                                  coupon.start_date,
                                 ).toLocaleDateString()}
                               </p>
                             )}
@@ -505,7 +503,7 @@ const Coupons = () => {
                     }
                     placeholder="e.g., SUMMER20"
                     required
-                    className="w-full px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono uppercase"
+                    className="w-full px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono uppercase text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
@@ -519,7 +517,7 @@ const Coupons = () => {
                       setFormData({ ...formData, description: e.target.value })
                     }
                     placeholder="e.g., Summer sale discount"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -538,7 +536,7 @@ const Coupons = () => {
                         discount_type: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   >
                     <option value="percentage">Percentage (%)</option>
                     <option value="fixed">Fixed Amount (GH₵)</option>
@@ -572,7 +570,7 @@ const Coupons = () => {
                         : "e.g., 50.00"
                     }
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   />
                 </div>
                 {formData.discount_type === "percentage" && (
@@ -592,7 +590,7 @@ const Coupons = () => {
                         })
                       }
                       placeholder="e.g., 100"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                   </div>
                 )}
@@ -612,7 +610,7 @@ const Coupons = () => {
                     setFormData({ ...formData, min_purchase: e.target.value })
                   }
                   placeholder="e.g., 100"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -630,7 +628,7 @@ const Coupons = () => {
                       setFormData({ ...formData, usage_limit: e.target.value })
                     }
                     placeholder="Unlimited"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
@@ -648,7 +646,7 @@ const Coupons = () => {
                       })
                     }
                     placeholder="1"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -665,7 +663,7 @@ const Coupons = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, start_date: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
@@ -678,7 +676,7 @@ const Coupons = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, end_date: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
                   />
                 </div>
               </div>

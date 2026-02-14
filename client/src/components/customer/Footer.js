@@ -200,11 +200,11 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-gray-300">
                 <FiPhone className="text-primary-500" />
-                <span>+233256810699</span>
+                <span>+233200620026</span>
               </li>
               <li className="flex items-center gap-3 text-gray-300">
                 <FiMail className="text-primary-500" />
-                <span>contact@thefashiongallery.com</span>
+                <span>thefashiongallery264@gmail.com</span>
               </li>
             </ul>
           </div>

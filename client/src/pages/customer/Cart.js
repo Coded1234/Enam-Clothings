@@ -390,7 +390,7 @@ const Cart = () => {
                             setCouponError("");
                           }}
                           placeholder="Enter code"
-                          className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 uppercase"
+                          className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 uppercase text-gray-900 dark:text-white"
                         />
                       </div>
                       <button
@@ -473,14 +473,17 @@ const Cart = () => {
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-500 mb-3">We accept</p>
                 <div className="flex justify-center gap-4">
-                  <div className="px-3 py-2 bg-gray-100 rounded text-sm font-medium text-gray-700">
-                    Paystack
+                  <div className="px-3 py-2 rounded text-sm font-medium text-gray-700">
+                    MTN Mobile Money
                   </div>
-                  <div className="px-3 py-2 bg-gray-100 rounded text-sm font-medium text-gray-700">
-                    Visa
+                  <div className="px-3 py-2 rounded text-sm font-medium text-gray-700">
+                    ATMoney
                   </div>
-                  <div className="px-3 py-2 bg-gray-100 rounded text-sm font-medium text-gray-700">
-                    Mastercard
+                  <div className="px-3 py-2 rounded text-sm font-medium text-gray-700">
+                    Telecel Cash
+                  </div>
+                  <div className="px-3 py-2 rounded text-sm font-medium text-gray-700">
+                    Bank Transfers
                   </div>
                 </div>
               </div>

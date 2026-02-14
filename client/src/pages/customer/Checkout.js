@@ -344,7 +344,7 @@ const Checkout = () => {
                         name="firstName"
                         value={shippingInfo.firstName}
                         onChange={handleInputChange}
-                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                         placeholder="John"
                       />
                     </div>
@@ -360,7 +360,7 @@ const Checkout = () => {
                       name="lastName"
                       value={shippingInfo.lastName}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                       placeholder="Doe"
                     />
                   </div>
@@ -377,7 +377,7 @@ const Checkout = () => {
                         name="email"
                         value={shippingInfo.email}
                         onChange={handleInputChange}
-                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                         placeholder="john@example.com"
                       />
                     </div>
@@ -395,7 +395,7 @@ const Checkout = () => {
                         name="phone"
                         value={shippingInfo.phone}
                         onChange={handleInputChange}
-                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                         placeholder="+233256810699"
                       />
                     </div>
@@ -425,7 +425,7 @@ const Checkout = () => {
                         value={shippingInfo.address}
                         onChange={handleInputChange}
                         rows="2"
-                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                         placeholder="Street address (auto-filled from map)"
                       />
                     </div>
@@ -446,7 +446,7 @@ const Checkout = () => {
                         value={shippingInfo.addressDetails}
                         onChange={handleInputChange}
                         rows="2"
-                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                         placeholder="Apartment, floor, building name, nearest landmark, directions, etc."
                       />
                     </div>
@@ -464,7 +464,7 @@ const Checkout = () => {
                         setCity(e.target.value);
                         setShippingCalculated(false);
                       }}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 bg-gray-50"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 bg-gray-50 text-gray-900 dark:text-white"
                       placeholder="Auto-detected from map"
                       readOnly
                     />
@@ -485,7 +485,7 @@ const Checkout = () => {
                         setPostalCode(e.target.value);
                         setShippingCalculated(false);
                       }}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                       placeholder="e.g., GA-123-4567"
                     />
                   </div>
@@ -810,7 +810,7 @@ const Checkout = () => {
                           setCouponError("");
                         }}
                         placeholder="Enter code"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent uppercase"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent uppercase text-gray-900 dark:text-white"
                       />
                       <button
                         onClick={handleApplyCoupon}
