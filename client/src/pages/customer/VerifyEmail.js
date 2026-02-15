@@ -21,7 +21,13 @@ const VerifyEmail = () => {
 
         // Auto-login user with returned token
         if (data.token && data.user) {
+          // Clear any existing user data first
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+
+          // Set new user credentials
           localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
           dispatch(setCredentials({ user: data.user, token: data.token }));
         }
 
