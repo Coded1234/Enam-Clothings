@@ -125,7 +125,9 @@ const Register = () => {
     }
 
     if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
-      toast.error("Phone number must be exactly 10 digits (without country code)");
+      toast.error(
+        "Phone number must be exactly 10 digits (without country code)",
+      );
       return;
     }
 

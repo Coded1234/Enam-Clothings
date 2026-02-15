@@ -24,10 +24,10 @@ export const register = createAsyncThunk(
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Registration failed"
+        error.response?.data?.message || "Registration failed",
       );
     }
-  }
+  },
 );
 
 export const login = createAsyncThunk(
@@ -41,7 +41,7 @@ export const login = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
     }
-  }
+  },
 );
 
 export const googleLogin = createAsyncThunk(
@@ -53,9 +53,11 @@ export const googleLogin = createAsyncThunk(
       localStorage.setItem("user", JSON.stringify(data));
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Google login failed");
+      return rejectWithValue(
+        error.response?.data?.message || "Google login failed",
+      );
     }
-  }
+  },
 );
 
 export const loadUser = createAsyncThunk(
@@ -71,10 +73,10 @@ export const loadUser = createAsyncThunk(
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       return rejectWithValue(
-        error.response?.data?.message || "Failed to load user"
+        error.response?.data?.message || "Failed to load user",
       );
     }
-  }
+  },
 );
 
 export const updateProfile = createAsyncThunk(
@@ -87,7 +89,7 @@ export const updateProfile = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Update failed");
     }
-  }
+  },
 );
 
 const authSlice = createSlice({

@@ -498,13 +498,13 @@ const verifyEmail = async (req, res) => {
       console.error("Welcome email failed:", emailError);
     }
 
-    // Generate token to auto-login user
-    const token = generateToken(user.id);
+    // Generate JWT token to auto-login user
+    const authToken = generateToken(user.id);
 
     res.json({
       message: "Email verified successfully! You are now logged in.",
       emailVerified: true,
-      token,
+      token: authToken,
       user: {
         id: user.id,
         firstName: user.firstName,
