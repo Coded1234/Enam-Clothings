@@ -46,12 +46,6 @@ const ProductDetail = () => {
   // Reviews state
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
-  const [reviewForm, setReviewForm] = useState({
-    rating: 5,
-    title: "",
-    comment: "",
-  });
-  const [submittingReview, setSubmittingReview] = useState(false);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   const fetchReviews = useCallback(async () => {
@@ -156,30 +150,6 @@ const ProductDetail = () => {
     } catch (error) {
       console.error("Wishlist error:", error);
       toast.error(error.response?.data?.message || "Failed to update wishlist");
-    }
-  };
-
-  const handleSubmitReview = async (e) => {
-    e.preventDefault();
-    if (!isAuthenticated) {
-      toast.error("Please login to write a review");
-      navigate("/login");
-      return;
-    }
-
-    try {
-      setSubmittingReview(true);
-      await reviewsAPI.create({
-        productId: id,
-        ...reviewForm,
-      });
-      toast.success("Review submitted successfully!");
-      setReviewForm({ rating: 5, title: "", comment: "" });
-      fetchReviews();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to submit review");
-    } finally {
-      setSubmittingReview(false);
     }
   };
 
@@ -294,11 +264,11 @@ const ProductDetail = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Product Main Section */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-16">
+        <div className="grid lg:grid-cols-[400px,1fr] gap-8 mb-16">
           {/* Images */}
           <div className="space-y-4">
             {/* Main Image */}
-            <div className="relative aspect-square bg-white rounded-2xl overflow-hidden">
+            <div className="relative aspect-square bg-white rounded-xl overflow-hidden max-w-md">
               <img
                 src={getProductImage(product, selectedImage)}
                 alt={product.name}
@@ -313,12 +283,12 @@ const ProductDetail = () => {
 
             {/* Thumbnails */}
             {product.images?.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-2">
+              <div className="flex gap-2 overflow-x-auto pb-2">
                 {product.images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
                       selectedImage === index
                         ? "border-primary-500"
                         : "border-transparent"
@@ -344,7 +314,7 @@ const ProductDetail = () => {
                   {product.brand}
                 </p>
               )}
-              <h1 className="text-3xl font-bold text-gray-800 mb-3">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-3">
                 {product.name}
               </h1>
 
@@ -371,11 +341,11 @@ const ProductDetail = () => {
 
             {/* Price */}
             <div className="flex items-baseline gap-4">
-              <span className="text-3xl font-bold text-gray-900">
+              <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
                 GH₵{Math.round(Number(product.price)).toLocaleString()}
               </span>
               {product.comparePrice && (
-                <span className="text-xl text-gray-400 line-through">
+                <span className="text-base sm:text-lg md:text-xl text-gray-400 line-through">
                   GH₵{Math.round(Number(product.comparePrice)).toLocaleString()}
                 </span>
               )}
@@ -621,113 +591,11 @@ const ProductDetail = () => {
             {/* Reviews Tab */}
             {activeTab === "reviews" && (
               <div>
-                {/* Review Summary - Compact */}
-                <div className="flex items-center gap-3 mb-8 pb-6 border-b">
-                  <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <FiStar
-                        key={i}
-                        className={`${
-                          i < Math.round(product.averageRating)
-                            ? "text-yellow-400 fill-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                        size={20}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-gray-600">
-                    {product.reviewCount}{" "}
-                    {product.reviewCount === 1 ? "review" : "reviews"}
-                  </p>
-                </div>
+                {/* Header */}
+                <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 mb-6">
+                  Verified Customer Feedback
+                </h2>
 
-                {/* Write Review Form */}
-                {isAuthenticated && (
-                  <div className="mb-8 p-6 bg-gray-50 rounded-xl">
-                    <h3 className="font-semibold text-gray-800 mb-4">
-                      Write a Review
-                    </h3>
-                    <form onSubmit={handleSubmitReview} className="space-y-4">
-                      {/* Rating */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Rating
-                        </label>
-                        <div className="flex gap-2">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <button
-                              key={star}
-                              type="button"
-                              onClick={() =>
-                                setReviewForm({ ...reviewForm, rating: star })
-                              }
-                              className="p-1"
-                            >
-                              <FiStar
-                                size={28}
-                                className={`${
-                                  star <= reviewForm.rating
-                                    ? "text-yellow-400 fill-yellow-400"
-                                    : "text-gray-300"
-                                }`}
-                              />
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Title */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Review Title
-                        </label>
-                        <input
-                          type="text"
-                          value={reviewForm.title}
-                          onChange={(e) =>
-                            setReviewForm({
-                              ...reviewForm,
-                              title: e.target.value,
-                            })
-                          }
-                          placeholder="Sum up your review"
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
-                        />
-                      </div>
-
-                      {/* Comment */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Your Review
-                        </label>
-                        <textarea
-                          value={reviewForm.comment}
-                          onChange={(e) =>
-                            setReviewForm({
-                              ...reviewForm,
-                              comment: e.target.value,
-                            })
-                          }
-                          rows={4}
-                          placeholder="What did you like or dislike about this product?"
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
-                          required
-                        />
-                      </div>
-
-                      <button
-                        type="submit"
-                        disabled={submittingReview}
-                        className="px-6 py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 disabled:opacity-50"
-                      >
-                        {submittingReview ? "Submitting..." : "Submit Review"}
-                      </button>
-                    </form>
-                  </div>
-                )}
-
-                {/* Reviews List */}
                 {reviewsLoading ? (
                   <div className="space-y-4">
                     {[...Array(3)].map((_, i) => (
@@ -743,94 +611,150 @@ const ProductDetail = () => {
                 ) : reviews.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-gray-600">
-                      No reviews yet. Be the first to review!
+                      No reviews yet. Be the first to review this product after
+                      purchase!
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-6">
-                    {reviews.slice(0, 2).map((review) => (
-                      <div
-                        key={review.id}
-                        className="pb-6 border-b last:border-0"
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-medium">
-                                {review.user?.firstName?.[0]}
-                              </div>
-                              <div>
-                                <p className="font-medium text-gray-800">
-                                  {review.user?.firstName}{" "}
-                                  {review.user?.lastName}
-                                </p>
-                                <div className="flex items-center gap-2">
-                                  <div className="flex gap-0.5">
-                                    {[...Array(5)].map((_, i) => (
-                                      <FiStar
-                                        key={i}
-                                        size={14}
-                                        className={`${
-                                          i < review.rating
-                                            ? "text-yellow-400 fill-yellow-400"
-                                            : "text-gray-300"
-                                        }`}
-                                      />
-                                    ))}
-                                  </div>
-                                  {review.isVerifiedPurchase && (
-                                    <span className="text-xs text-green-600 flex items-center gap-1">
-                                      <FiCheck size={12} /> Verified Purchase
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
+                  <div>
+                    {/* Content Grid */}
+                    <div className="grid lg:grid-cols-[300px,1fr] gap-8">
+                      {/* Left: Rating Summary */}
+                      <div className="bg-gray-50 p-6 rounded-lg">
+                        <div className="text-center mb-6">
+                          <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                            {(() => {
+                              if (reviews.length === 0) return "0.0";
+                              const avg =
+                                reviews.reduce((sum, r) => sum + r.rating, 0) /
+                                reviews.length;
+                              return avg.toFixed(1);
+                            })()}
+                            /5
                           </div>
-                          <span className="text-sm text-gray-500">
-                            {new Date(review.createdAt).toLocaleDateString()}
-                          </span>
+                          <div className="flex justify-center gap-1 mb-2">
+                            {[...Array(5)].map((_, i) => {
+                              const avg =
+                                reviews.length > 0
+                                  ? reviews.reduce(
+                                      (sum, r) => sum + r.rating,
+                                      0,
+                                    ) / reviews.length
+                                  : 0;
+                              return (
+                                <FiStar
+                                  key={i}
+                                  className={`${
+                                    i < Math.round(avg)
+                                      ? "text-yellow-400 fill-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
+                                  size={20}
+                                />
+                              );
+                            })}
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            {reviews.length} verified rating
+                            {reviews.length !== 1 ? "s" : ""}
+                          </p>
                         </div>
 
-                        {review.title && (
-                          <h4 className="font-medium text-gray-800 mb-2">
-                            {review.title}
-                          </h4>
-                        )}
-                        <p className="text-gray-600 mb-4">{review.comment}</p>
+                        {/* Rating Breakdown */}
+                        <div className="space-y-2">
+                          {[5, 4, 3, 2, 1].map((rating) => {
+                            const count = reviews.filter(
+                              (r) => r.rating === rating,
+                            ).length;
+                            const percentage =
+                              reviews.length > 0
+                                ? (count / reviews.length) * 100
+                                : 0;
 
-                        <button
-                          onClick={() => handleMarkHelpful(review.id)}
-                          className={`flex items-center gap-2 text-sm transition-colors ${
-                            review.isHelpfulByUser
-                              ? "text-primary-500 font-medium"
-                              : "text-gray-500 hover:text-primary-500"
-                          }`}
-                        >
-                          <FiThumbsUp
-                            size={14}
-                            className={
-                              review.isHelpfulByUser ? "fill-current" : ""
-                            }
-                          />
-                          {review.isHelpfulByUser ? "Helpful" : "Helpful"} (
-                          {review.helpful || 0})
-                        </button>
+                            return (
+                              <div
+                                key={rating}
+                                className="flex items-center gap-2 text-sm"
+                              >
+                                <span className="w-3 text-gray-700">
+                                  {rating}
+                                </span>
+                                <FiStar
+                                  className="text-yellow-400 fill-yellow-400"
+                                  size={16}
+                                />
+                                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-yellow-400 rounded-full"
+                                    style={{ width: `${percentage}%` }}
+                                  />
+                                </div>
+                                <span className="w-10 text-gray-600 text-right">
+                                  ({count})
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                    ))}
 
-                    {/* View All Reviews Button */}
-                    {reviews.length > 2 && (
-                      <div className="pt-6 border-t">
-                        <Link
-                          to={`/product/${id}/reviews`}
-                          className="flex items-center justify-center gap-2 py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl font-medium transition-colors"
-                        >
-                          View All {reviews.length} Reviews
-                          <FiChevronRight />
-                        </Link>
+                      {/* Right: Reviews List */}
+                      <div className="space-y-6">
+                        {reviews.map((review) => (
+                          <div
+                            key={review.id}
+                            className="pb-6 border-b last:border-0"
+                          >
+                            {/* Stars */}
+                            <div className="flex gap-1 mb-3">
+                              {[...Array(5)].map((_, i) => (
+                                <FiStar
+                                  key={i}
+                                  className={`${
+                                    i < review.rating
+                                      ? "text-yellow-400 fill-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
+                                  size={18}
+                                />
+                              ))}
+                            </div>
+
+                            {/* Title */}
+                            {review.title && (
+                              <h4 className="font-semibold text-gray-900 mb-3">
+                                {review.title}
+                              </h4>
+                            )}
+
+                            {/* Comment */}
+                            <p className="text-gray-700 mb-4 leading-relaxed">
+                              {review.comment}
+                            </p>
+
+                            {/* Meta Info */}
+                            <div className="flex items-center justify-between">
+                              <div className="text-sm text-gray-500">
+                                {new Date(review.createdAt).toLocaleDateString(
+                                  "en-GB",
+                                  {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  },
+                                )}{" "}
+                                by {review.user?.firstName || "Anonymous"}
+                              </div>
+                              {review.isVerifiedPurchase && (
+                                <span className="text-sm text-green-600 flex items-center gap-1 font-medium">
+                                  <FiCheck size={16} /> Verified Purchase
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -865,11 +789,11 @@ const ProductDetail = () => {
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+          <div className="mt-16">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gold-light mb-6">
               You May Also Like
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {relatedProducts.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}

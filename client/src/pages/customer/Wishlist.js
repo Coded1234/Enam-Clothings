@@ -117,7 +117,7 @@ const Wishlist = () => {
         <div className="container mx-auto px-4">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-48 mb-8"></div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="bg-white rounded-2xl p-4 h-72"></div>
               ))}
@@ -134,7 +134,7 @@ const Wishlist = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-3">
               <FiHeart className="text-red-500" />
               My Wishlist
             </h1>
@@ -197,7 +197,7 @@ const Wishlist = () => {
             <div className="w-24 h-24 mx-auto mb-6 bg-red-50 rounded-full flex items-center justify-center">
               <FiHeart className="text-red-300" size={40} />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-2">
               Your wishlist is empty
             </h2>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
@@ -220,7 +220,7 @@ const Wishlist = () => {
                 Total value:{" "}
                 <span className="font-bold text-gray-800">
                   {formatPrice(
-                    wishlistItems.reduce((sum, item) => sum + item.price, 0)
+                    wishlistItems.reduce((sum, item) => sum + item.price, 0),
                   )}
                 </span>
               </p>
@@ -235,7 +235,7 @@ const Wishlist = () => {
 
             {/* Grid View */}
             {viewMode === "grid" && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {wishlistItems.map((item) => (
                   <div
                     key={item.id}
@@ -477,10 +477,10 @@ const Wishlist = () => {
             {/* Recently Viewed */}
             {recentlyViewed.length > 0 && (
               <div className="mt-12">
-                <h2 className="text-xl font-bold text-gray-800 mb-6">
+                <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-6">
                   You Also Viewed
                 </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {recentlyViewed.map((product) => {
                     const imageUrl = getProductImage(product);
                     const price = parseFloat(product.price) || 0;

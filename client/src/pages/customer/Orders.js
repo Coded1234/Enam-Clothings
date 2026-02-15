@@ -149,7 +149,9 @@ const Orders = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">My Orders</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+            My Orders
+          </h1>
           <p className="text-gray-600">Track and manage your orders</p>
         </div>
 
@@ -167,7 +169,7 @@ const Orders = () => {
                 placeholder="Search by order ID or product name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-black bg-white"
               />
             </div>
 
@@ -201,7 +203,7 @@ const Orders = () => {
             <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
               <FiShoppingBag className="text-gray-400" size={40} />
             </div>
-            <h2 className="text-xl font-bold text-gray-800 mb-2">
+            <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-2">
               No orders found
             </h2>
             <p className="text-gray-600 mb-6">
@@ -483,7 +485,9 @@ const Orders = () => {
                 <div
                   className={`w-2 h-2 rounded-full ${stat.color} mb-2`}
                 ></div>
-                <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
+                  {stat.value}
+                </p>
                 <p className="text-sm text-gray-500">{stat.label}</p>
               </div>
             ))}

@@ -40,7 +40,7 @@ const Shop = () => {
   const dispatch = useDispatch();
 
   const { products, loading, pagination, filters } = useSelector(
-    (state) => state.products
+    (state) => state.products,
   );
 
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
@@ -215,7 +215,7 @@ const Shop = () => {
   };
 
   const activeFiltersCount = Object.values(filters).filter(
-    (v) => v && v !== "newest"
+    (v) => v && v !== "newest",
   ).length;
 
   return (
@@ -223,10 +223,10 @@ const Shop = () => {
       {/* Page Header */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4 sm:py-8">
-          <h1 className="text-xl sm:text-3xl font-bold text-gray-800 capitalize">
+          <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-800 capitalize">
             {category || "All Products"}
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">
+          <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">
             {pagination.total} products found
           </p>
         </div>
@@ -238,11 +238,13 @@ const Shop = () => {
           <aside className="hidden lg:block w-64 flex-shrink-0">
             <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
+                <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+                  Filters
+                </h2>
                 {activeFiltersCount > 0 && (
                   <button
                     onClick={handleClearFilters}
-                    className="text-sm text-primary-500 hover:text-primary-600"
+                    className="text-xs sm:text-sm text-primary-500 hover:text-primary-600"
                   >
                     Clear All
                   </button>
@@ -269,7 +271,9 @@ const Shop = () => {
                         }
                         className="w-4 h-4 text-primary-500 focus:ring-primary-500"
                       />
-                      <span className="text-gray-600">{cat.label}</span>
+                      <span className="text-xs sm:text-sm text-gray-600">
+                        {cat.label}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -287,7 +291,8 @@ const Shop = () => {
                       placeholder="min"
                       value={tempMinPrice}
                       onChange={handleMinPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-black"
+                      style={{ backgroundColor: "white", color: "black" }}
                     />
                     <span className="flex items-center text-gray-400">—</span>
                     <input
@@ -295,7 +300,8 @@ const Shop = () => {
                       placeholder="max"
                       value={tempMaxPrice}
                       onChange={handleMaxPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-black"
+                      style={{ backgroundColor: "white", color: "black" }}
                     />
                   </div>
                   <div className="flex items-center justify-between pt-2">
@@ -332,10 +338,10 @@ const Shop = () => {
                       onClick={() =>
                         handleFilterChange(
                           "size",
-                          filters.size === size ? "" : size
+                          filters.size === size ? "" : size,
                         )
                       }
-                      className={`w-10 h-10 rounded-lg border font-medium transition-colors ${
+                      className={`w-10 h-10 rounded-lg border text-xs sm:text-sm font-medium transition-colors ${
                         filters.size === size
                           ? "bg-primary-500 text-white border-primary-500"
                           : "hover:border-primary-500 hover:text-primary-500"
@@ -359,7 +365,7 @@ const Shop = () => {
                       onClick={() =>
                         handleFilterChange(
                           "color",
-                          filters.color === color.name ? "" : color.name
+                          filters.color === color.name ? "" : color.name,
                         )
                       }
                       title={color.name}
@@ -383,7 +389,7 @@ const Shop = () => {
               {/* Mobile Filter Button */}
               <button
                 onClick={() => setMobileFilterOpen(true)}
-                className="lg:hidden flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"
+                className="lg:hidden flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 text-xs sm:text-sm"
               >
                 <FiFilter />
                 Filters
@@ -396,11 +402,13 @@ const Shop = () => {
 
               {/* Sort */}
               <div className="flex items-center gap-3">
-                <span className="text-gray-600 hidden sm:inline">Sort by:</span>
+                <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">
+                  Sort by:
+                </span>
                 <select
                   value={filters.sort}
                   onChange={(e) => handleFilterChange("sort", e.target.value)}
-                  className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                  className="px-4 py-2 border rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
                 >
                   {sortOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -439,7 +447,7 @@ const Shop = () => {
             {activeFiltersCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-6">
                 {filters.category && (
-                  <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs sm:text-sm">
                     Category: {filters.category}
                     <button onClick={() => handleFilterChange("category", "")}>
                       <FiX size={14} />
@@ -482,7 +490,7 @@ const Shop = () => {
             {/* Products Grid */}
             {loading ? (
               <div
-                className={`grid gap-6 ${
+                className={`grid gap-2 ${
                   viewMode === "grid"
                     ? "grid-cols-2 md:grid-cols-3"
                     : "grid-cols-1"
@@ -516,7 +524,7 @@ const Shop = () => {
               </div>
             ) : (
               <div
-                className={`grid gap-6 ${
+                className={`grid gap-4 ${
                   viewMode === "grid"
                     ? "grid-cols-2 md:grid-cols-4"
                     : "grid-cols-1"
@@ -595,7 +603,7 @@ const Shop = () => {
           />
           <div className="absolute right-0 top-0 bottom-0 w-80 bg-white overflow-y-auto animate-slide-down">
             <div className="p-4 border-b flex items-center justify-between sticky top-0 bg-white">
-              <h2 className="text-lg font-semibold">Filters</h2>
+              <h2 className="text-base sm:text-lg font-semibold">Filters</h2>
               <button
                 onClick={() => setMobileFilterOpen(false)}
                 className="p-2"
@@ -644,7 +652,7 @@ const Shop = () => {
                       onClick={() =>
                         handleFilterChange(
                           "size",
-                          filters.size === size ? "" : size
+                          filters.size === size ? "" : size,
                         )
                       }
                       className={`w-10 h-10 rounded-lg border font-medium ${
@@ -671,7 +679,7 @@ const Shop = () => {
                       onClick={() =>
                         handleFilterChange(
                           "color",
-                          filters.color === color.name ? "" : color.name
+                          filters.color === color.name ? "" : color.name,
                         )
                       }
                       className={`w-8 h-8 rounded-full border-2 ${

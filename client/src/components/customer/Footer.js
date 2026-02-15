@@ -35,7 +35,7 @@ const Footer = () => {
       {/* Newsletter - Hidden on mobile, visible on desktop */}
       <div className="hidden md:block bg-gradient-to-r from-primary-500 to-secondary-500 py-12">
         <div className="container mx-auto px-4 text-center">
-          <h3 className="text-2xl font-bold mb-2">
+          <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2">
             Subscribe to our Newsletter
           </h3>
           <p className="text-white/80 mb-6">
@@ -58,8 +58,16 @@ const Footer = () => {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-4 py-3 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
-                style={{ backgroundColor: "white", color: "black" }}
+                style={{
+                  backgroundColor: "#ffffff",
+                  color: "#000000",
+                  padding: "12px 16px",
+                  borderRadius: "8px",
+                  border: "none",
+                  outline: "none",
+                  flex: 1,
+                  fontSize: "16px",
+                }}
               />
               <button
                 type="submit"
@@ -111,7 +119,9 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-base sm:text-lg font-semibold mb-4">
+              Quick Links
+            </h4>
             <ul className="space-y-3">
               <li>
                 <Link

@@ -281,7 +281,7 @@ const Checkout = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 text-center">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-gold-light text-center">
             Shipping Information
           </h1>
         </div>

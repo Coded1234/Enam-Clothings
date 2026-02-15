@@ -6,15 +6,15 @@ const CookiePolicy = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg)] py-16 font-sans">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto bg-white dark:bg-surface rounded-2xl shadow-sm p-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gold-light mb-4">
             Cookie Policy
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">
+          <p className="text-gray-600 dark:text-gold mb-4">
             Effective date: January 25, 2026
           </p>
 
           <section className="space-y-4">
-            <pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-200 bg-transparent p-0 font-sans">{`Cookie Policy
+            <pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gold-light bg-transparent p-0 font-sans">{`Cookie Policy
 
 Effective date: January 25, 2026
 

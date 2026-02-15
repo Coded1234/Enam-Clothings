@@ -111,7 +111,6 @@ const Contact = () => {
       title: "Email Us",
       details: ["thefashiongallery264@gmail.com"],
     },
-    
   ];
 
   if (submitted) {
@@ -122,14 +121,14 @@ const Contact = () => {
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <FiMessageSquare className="text-green-500" size={40} />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gold-light mb-4">
               Message Sent!
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-gray-600 dark:text-gold mb-6">
               Thank you for contacting us. We've received your message and will
               get back to you within 24-48 hours.
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
+            <p className="text-sm text-gray-500 dark:text-primary-300 mb-8">
               A confirmation email has been sent to{" "}
               <strong>{formData.email}</strong>
             </p>
@@ -145,7 +144,7 @@ const Contact = () => {
                     message: "",
                   });
                 }}
-                className="px-6 py-3 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-opacity-5 transition-colors"
+                className="px-6 py-3 border border-gray-300 dark:border-primary-700 rounded-lg text-gray-700 dark:text-gold-light hover:bg-gray-50 dark:hover:bg-opacity-5 transition-colors"
               >
                 Send Another Message
               </button>
@@ -207,7 +206,7 @@ const Contact = () => {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
             <div className="bg-white dark:bg-surface rounded-2xl shadow-sm p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-2">
                 Send us a Message
               </h2>
               <p className="text-gray-600 mb-6">
@@ -226,7 +225,7 @@ const Contact = () => {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="John Doe"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-black bg-white"
                       required
                     />
                   </div>
@@ -240,7 +239,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="john@example.com"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-black bg-white"
                       required
                     />
                   </div>
@@ -257,7 +256,7 @@ const Contact = () => {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="+233 XX XXX XXXX"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-black bg-white"
                     />
                   </div>
                   <div>
@@ -297,7 +296,7 @@ const Contact = () => {
                     onChange={handleChange}
                     rows={5}
                     placeholder="How can we help you?"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none text-black placeholder-black bg-white"
                     required
                   />
                 </div>

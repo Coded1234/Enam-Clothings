@@ -104,7 +104,7 @@ const SearchResults = () => {
       <div className="container mx-auto px-4">
         {/* Search Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             Search Results
           </h1>
           {query && (
@@ -187,7 +187,8 @@ const SearchResults = () => {
                       onChange={(e) =>
                         handleFilterChange("minPrice", e.target.value)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder-black"
+                      style={{ backgroundColor: "white", color: "black" }}
                     />
                     <input
                       type="number"
@@ -196,7 +197,8 @@ const SearchResults = () => {
                       onChange={(e) =>
                         handleFilterChange("maxPrice", e.target.value)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder-black"
+                      style={{ backgroundColor: "white", color: "black" }}
                     />
                   </div>
                 </div>
@@ -343,7 +345,7 @@ const SearchResults = () => {
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                     {products.map((product) => (
                       <ProductCard key={product.id} product={product} />
                     ))}
