@@ -149,7 +149,7 @@ const Navbar = () => {
               Track Order
             </Link>
             <span>|</span>
-            <span>📞 +233256810699</span>
+            <span>📞 +233200620026</span>
           </div>
         </div>
       </div>
@@ -271,6 +271,13 @@ const Navbar = () => {
                       onClick={() => setDropdownOpen(false)}
                     >
                       Wishlist
+                    </Link>
+                    <Link
+                      to="/newsletter"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-opacity-10"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Newsletter
                     </Link>
                     <hr className="my-2" />
                     <button
@@ -475,7 +482,7 @@ const Navbar = () => {
           <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-surface border-t dark:border-gray-700">
             <div className="flex items-center justify-center gap-3 mb-1">
               <p className="text-sm text-gray-500 dark:text-gray-300">
-                📞 +233256810699
+                📞 +233200620026
               </p>
               <button
                 onClick={toggleTheme}

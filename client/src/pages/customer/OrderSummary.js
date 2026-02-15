@@ -14,6 +14,7 @@ import {
   FiShoppingBag,
   FiCreditCard,
   FiShield,
+  FiUser,
 } from "react-icons/fi";
 
 const OrderSummary = () => {
@@ -30,6 +31,19 @@ const OrderSummary = () => {
     shippingDetails,
   } = location.state || {};
   const [loading, setLoading] = useState(false);
+
+  // Personal information state
+  const [personalInfo, setPersonalInfo] = useState({
+    firstName: orderData?.shippingAddress?.firstName || "",
+    lastName: orderData?.shippingAddress?.lastName || "",
+    email: orderData?.shippingAddress?.email || "",
+    phone: orderData?.shippingAddress?.phone || "",
+  });
+
+  // Payment method state
+  const [paymentMethod, setPaymentMethod] = useState(
+    orderData?.paymentMethod || "paystack",
+  );
 
   // If no data, redirect back to checkout
   if (!orderData || !items) {
@@ -53,13 +67,35 @@ const OrderSummary = () => {
   const finalTotal = subtotal - discount + shippingCost + tax;
 
   const handleConfirmOrder = async () => {
+    // Validate personal information
+    if (
+      !personalInfo.firstName ||
+      !personalInfo.lastName ||
+      !personalInfo.email ||
+      !personalInfo.phone
+    ) {
+      toast.error("Please fill in all personal information fields");
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(personalInfo.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
     setLoading(true);
 
     try {
       // Prepare order data with proper structure
       const finalOrderData = {
-        shippingAddress: orderData.shippingAddress,
-        paymentMethod: orderData.paymentMethod,
+        shippingAddress: {
+          ...orderData.shippingAddress,
+          firstName: personalInfo.firstName,
+          lastName: personalInfo.lastName,
+          email: personalInfo.email,
+          phone: personalInfo.phone,
+        },
+        paymentMethod: paymentMethod,
         shippingDetails: shippingDetails || orderData.shippingDetails,
         couponId: coupon?.id || null,
         discount: discount,
@@ -87,15 +123,15 @@ const OrderSummary = () => {
       }
 
       // Handle payment based on method
-      if (orderData.paymentMethod === "paystack") {
+      if (paymentMethod === "paystack") {
         // Initialize Paystack payment
         const paymentResponse = await api.post("/payment/initialize", {
-          email: orderData.shippingAddress.email,
+          email: personalInfo.email,
           amount: finalTotal,
           metadata: {
             order_id: order.id,
-            customer_name: `${orderData.shippingAddress.firstName} ${orderData.shippingAddress.lastName}`,
-            customer_phone: orderData.shippingAddress.phone,
+            customer_name: `${personalInfo.firstName} ${personalInfo.lastName}`,
+            customer_phone: personalInfo.phone,
           },
         });
 
@@ -135,7 +171,6 @@ const OrderSummary = () => {
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <FiArrowLeft className="w-5 h-5" />
-            <span>Back to Checkout</span>
           </button>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Order Summary
@@ -146,6 +181,103 @@ const OrderSummary = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Order Items */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Personal Information */}
+            <div className="bg-white dark:bg-surface rounded-lg shadow-sm p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <FiUser className="w-5 h-5 text-blue-600" />
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  Personal Information
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    First Name *
+                  </label>
+                  <div className="relative">
+                    <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={personalInfo.firstName}
+                      onChange={(e) => {
+                        setPersonalInfo({
+                          ...personalInfo,
+                          firstName: e.target.value,
+                        });
+                      }}
+                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                      placeholder="John"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Last Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={personalInfo.lastName}
+                    onChange={(e) => {
+                      setPersonalInfo({
+                        ...personalInfo,
+                        lastName: e.target.value,
+                      });
+                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                    placeholder="Doe"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address *
+                  </label>
+                  <div className="relative">
+                    <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="email"
+                      name="email"
+                      value={personalInfo.email}
+                      onChange={(e) => {
+                        setPersonalInfo({
+                          ...personalInfo,
+                          email: e.target.value,
+                        });
+                      }}
+                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                      placeholder="john@example.com"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Phone Number *
+                  </label>
+                  <div className="relative">
+                    <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={personalInfo.phone}
+                      onChange={(e) => {
+                        setPersonalInfo({
+                          ...personalInfo,
+                          phone: e.target.value,
+                        });
+                      }}
+                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                      placeholder="+233200620026"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Shipping Information */}
             <div className="bg-white dark:bg-surface rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-2 mb-4">
@@ -169,24 +301,6 @@ const OrderSummary = () => {
                     )}
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <FiPhone className="w-4 h-4 text-gray-400 mt-1" />
-                  <div>
-                    <p className="text-sm text-gray-500">Phone</p>
-                    <p className="text-gray-900 dark:text-gray-100">
-                      {orderData.shippingAddress.phone}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <FiMail className="w-4 h-4 text-gray-400 mt-1" />
-                  <div>
-                    <p className="text-sm text-gray-500">Email</p>
-                    <p className="text-gray-900 dark:text-gray-100">
-                      {orderData.shippingAddress.email}
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -195,31 +309,69 @@ const OrderSummary = () => {
               <div className="flex items-center gap-2 mb-4">
                 <FiCreditCard className="w-5 h-5 text-blue-600" />
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  Payment Method
+                  Payment Method *
                 </h2>
               </div>
-              <div className="flex items-center gap-3">
-                <div
-                  className={`p-2 rounded-lg ${
-                    orderData.paymentMethod === "cod"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-blue-100 text-blue-600"
+              <div className="space-y-4">
+                {/* Paystack */}
+                <label
+                  className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                    paymentMethod === "paystack"
+                      ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
+                      : "border-gray-300 hover:border-gray-400"
                   }`}
                 >
-                  <FiCreditCard className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-gray-100">
-                    {orderData.paymentMethod === "cod"
-                      ? "Pay on Delivery"
-                      : "Paystack (Card/Mobile Money)"}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {orderData.paymentMethod === "cod"
-                      ? "Pay when you receive your order"
-                      : "Secure online payment"}
-                  </p>
-                </div>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="paystack"
+                    checked={paymentMethod === "paystack"}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-5 h-5 text-primary-500"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-500 rounded">
+                        <FiCreditCard className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-gray-100">
+                          Pay with Paystack
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Secure payment with cards, bank transfer, mobile money
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <FiShield className="text-green-500" size={24} />
+                </label>
+
+                {/* Pay on Delivery */}
+                <label
+                  className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                    paymentMethod === "cod"
+                      ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
+                      : "border-gray-300 hover:border-gray-400"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="cod"
+                    checked={paymentMethod === "cod"}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-5 h-5 text-primary-500"
+                  />
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900 dark:text-gray-100">
+                      Pay on Delivery
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Pay when you receive your order
+                    </p>
+                  </div>
+                </label>
               </div>
             </div>
 

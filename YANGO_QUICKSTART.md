@@ -65,7 +65,7 @@ npm start
    - First Name: John
    - Last Name: Doe
    - Email: john@example.com
-   - Phone: +233256810699
+   - Phone: +233200620026
    - Address: 123 Main Street, East Legon
    - City: Accra
    - Postal Code: GA-123-4567 (optional)
@@ -154,7 +154,7 @@ curl -X POST http://localhost:5000/api/shipping/calculate \
   -d '{
     "address": "Osu, Oxford Street",
     "city": "Accra",
-    "phone": "+233256810699"
+    "phone": "+233200620026"
   }'
 ```
 

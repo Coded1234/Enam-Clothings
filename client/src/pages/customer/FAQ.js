@@ -347,10 +347,10 @@ const FAQ = () => {
                 Email Support
               </Link>
               <a
-                href="tel:+233256810699"
+                href="tel:+233200620026"
                 className="inline-flex items-center justify-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-400 transition-colors"
               >
-                Call Us: +233 256 810 699
+                Call Us: +233200620026
               </a>
             </div>
           </div>

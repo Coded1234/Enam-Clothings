@@ -17,10 +17,6 @@ import {
   FiPlus,
   FiShoppingBag,
   FiArrowLeft,
-  FiTag,
-  FiTruck,
-  FiShield,
-  FiX,
   FiEye,
 } from "react-icons/fi";
 
@@ -38,6 +34,7 @@ const Cart = () => {
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState("");
+  const [editingQuantity, setEditingQuantity] = useState({});
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -62,6 +59,35 @@ const Cart = () => {
       await dispatch(updateCartItem({ itemId, quantity: newQty })).unwrap();
     } catch (error) {
       toast.error(error || "Failed to update quantity");
+    }
+  };
+
+  const handleDirectQuantityChange = (itemId, value) => {
+    // Update local state immediately for responsive UI
+    setEditingQuantity((prev) => ({ ...prev, [itemId]: value }));
+  };
+
+  const handleQuantityBlur = async (itemId, value) => {
+    const newQty = parseInt(value) || 1;
+    if (newQty < 1) {
+      setEditingQuantity((prev) => ({ ...prev, [itemId]: 1 }));
+      return;
+    }
+
+    try {
+      await dispatch(updateCartItem({ itemId, quantity: newQty })).unwrap();
+      setEditingQuantity((prev) => {
+        const updated = { ...prev };
+        delete updated[itemId];
+        return updated;
+      });
+    } catch (error) {
+      toast.error(error || "Failed to update quantity");
+      setEditingQuantity((prev) => {
+        const updated = { ...prev };
+        delete updated[itemId];
+        return updated;
+      });
     }
   };
 
@@ -208,7 +234,7 @@ const Cart = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
               Shopping Cart
             </h1>
             <p className="text-gray-600 mt-1">
@@ -293,18 +319,36 @@ const Cart = () => {
                             handleQuantityChange(item.id, item.quantity, -1)
                           }
                           disabled={item.quantity <= 1}
-                          className="p-2 hover:bg-gray-100 transition-colors disabled:opacity-50"
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                         >
                           <FiMinus size={16} />
                         </button>
-                        <span className="w-10 text-center font-medium">
-                          {item.quantity}
-                        </span>
+                        <input
+                          type="number"
+                          min="1"
+                          value={
+                            editingQuantity[item.id] !== undefined
+                              ? editingQuantity[item.id]
+                              : item.quantity
+                          }
+                          onChange={(e) =>
+                            handleDirectQuantityChange(item.id, e.target.value)
+                          }
+                          onBlur={(e) =>
+                            handleQuantityBlur(item.id, e.target.value)
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.target.blur();
+                            }
+                          }}
+                          className="w-10 text-center font-medium border-0 focus:outline-none focus:ring-0 text-gray-900 dark:text-white bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
                         <button
                           onClick={() =>
                             handleQuantityChange(item.id, item.quantity, 1)
                           }
-                          className="p-2 hover:bg-gray-100 transition-colors"
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
                           <FiPlus size={16} />
                         </button>
@@ -346,148 +390,15 @@ const Cart = () => {
               <FiArrowLeft />
               Continue Shopping
             </Link>
-          </div>
 
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-surface rounded-xl shadow-sm p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6">
-                Order Summary
-              </h2>
-
-              {/* Coupon Code */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Coupon Code
-                </label>
-                {appliedCoupon ? (
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
-                    <div>
-                      <p className="text-sm font-medium text-green-800">
-                        {appliedCoupon.code}
-                      </p>
-                      <p className="text-xs text-green-600">
-                        -GH₵{couponDiscount.toLocaleString()} discount
-                      </p>
-                    </div>
-                    <button
-                      onClick={handleRemoveCoupon}
-                      className="p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded"
-                    >
-                      <FiX className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex gap-2">
-                      <div className="flex-1 relative">
-                        <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                          type="text"
-                          value={couponCode}
-                          onChange={(e) => {
-                            setCouponCode(e.target.value.toUpperCase());
-                            setCouponError("");
-                          }}
-                          placeholder="Enter code"
-                          className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 uppercase text-gray-900 dark:text-white"
-                        />
-                      </div>
-                      <button
-                        onClick={handleApplyCoupon}
-                        disabled={couponLoading}
-                        className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors disabled:opacity-50"
-                      >
-                        {couponLoading ? "..." : "Apply"}
-                      </button>
-                    </div>
-                    {couponError && (
-                      <p className="text-xs text-red-500 mt-1">{couponError}</p>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {/* Summary Details */}
-              <div className="space-y-4 pb-6 border-b">
-                <div className="flex justify-between text-gray-600">
-                  <span>Subtotal ({items.length} items)</span>
-                  <span>GH₵{subtotal.toLocaleString()}</span>
-                </div>
-                {couponDiscount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Coupon Discount</span>
-                    <span>-GH₵{couponDiscount.toLocaleString()}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span className="text-sm text-gray-500">
-                    {subtotal >= 1000 ? (
-                      <span className="text-green-600 font-medium">
-                        Free for orders ≥ GH₵1,000
-                      </span>
-                    ) : (
-                      "Calculated at checkout"
-                    )}
-                  </span>
-                </div>
-              </div>
-
-              {/* Total */}
-              <div className="py-6 border-b">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                    Total
-                  </span>
-                  <span className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                    GH₵{total.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-
-              {/* Checkout Button */}
-              <button
-                onClick={handleCheckout}
-                disabled={loading}
-                className="w-full mt-6 py-4 btn-gradient rounded-xl font-semibold text-lg disabled:opacity-50"
-              >
-                Proceed to Checkout
-              </button>
-
-              {/* Trust Badges */}
-              <div className="mt-6 pt-6 border-t">
-                <div className="flex items-center justify-center gap-6 text-gray-500">
-                  <div className="flex items-center gap-2">
-                    <FiShield className="text-green-500" />
-                    <span className="text-sm">Secure</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FiTruck className="text-green-500" />
-                    <span className="text-sm">Fast Delivery</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Methods */}
-              <div className="mt-6 text-center">
-                <p className="text-sm text-gray-500 mb-3">We accept</p>
-                <div className="flex justify-center gap-4">
-                  <div className="px-3 py-2 rounded text-sm font-medium text-gray-700">
-                    MTN Mobile Money
-                  </div>
-                  <div className="px-3 py-2 rounded text-sm font-medium text-gray-700">
-                    ATMoney
-                  </div>
-                  <div className="px-3 py-2 rounded text-sm font-medium text-gray-700">
-                    Telecel Cash
-                  </div>
-                  <div className="px-3 py-2 rounded text-sm font-medium text-gray-700">
-                    Bank Transfers
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Checkout Button */}
+            <button
+              onClick={handleCheckout}
+              disabled={loading}
+              className="w-full mt-6 py-4 btn-gradient rounded-xl font-semibold text-lg disabled:opacity-50"
+            >
+              Proceed
+            </button>
           </div>
         </div>
 

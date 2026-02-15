@@ -70,7 +70,7 @@ POST /api/shipping/calculate
   "address": "123 Main Street, East Legon",
   "city": "Accra",
   "postalCode": "GA-123-4567",
-  "phone": "+233256810699"
+  "phone": "+233200620026"
 }
 ```
 

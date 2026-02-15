@@ -10,7 +10,6 @@ const SearchResults = () => {
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState("grid");
   const [showFilters, setShowFilters] = useState(false);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
 
@@ -264,26 +263,6 @@ const SearchResults = () => {
                       ))}
                     </select>
                   </div>
-
-                  {/* View Mode */}
-                  <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
-                    <button
-                      onClick={() => setViewMode("grid")}
-                      className={`p-2 rounded ${
-                        viewMode === "grid" ? "bg-gray-100" : ""
-                      }`}
-                    >
-                      <FiGrid className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setViewMode("list")}
-                      className={`p-2 rounded ${
-                        viewMode === "list" ? "bg-gray-100" : ""
-                      }`}
-                    >
-                      <FiList className="w-4 h-4" />
-                    </button>
-                  </div>
                 </div>
 
                 {/* Active Filters */}
@@ -364,80 +343,10 @@ const SearchResults = () => {
                 </div>
               ) : (
                 <>
-                  <div
-                    className={
-                      viewMode === "grid"
-                        ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
-                        : "space-y-4"
-                    }
-                  >
-                    {products.map((product) =>
-                      viewMode === "grid" ? (
-                        <ProductCard key={product.id} product={product} />
-                      ) : (
-                        <div
-                          key={product.id}
-                          className="bg-white rounded-xl shadow-sm p-4 flex gap-4"
-                        >
-                          <Link
-                            to={`/product/${product.id}`}
-                            className="w-32 h-32 flex-shrink-0"
-                          >
-                            <img
-                              src={
-                                product.images?.[0]?.startsWith("http")
-                                  ? product.images[0]
-                                  : `${
-                                      process.env.REACT_APP_API_URL ||
-                                      "http://localhost:5000"
-                                    }${product.images?.[0]}`
-                              }
-                              alt={product.name}
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </Link>
-                          <div className="flex-1">
-                            <Link
-                              to={`/product/${product.id}`}
-                              className="font-semibold text-gray-900 hover:text-primary-600"
-                            >
-                              {product.name}
-                            </Link>
-                            <p className="text-sm text-gray-500 capitalize">
-                              {product.category}
-                            </p>
-                            <div className="flex items-center gap-2 mt-2">
-                              <span className="text-lg font-bold text-primary-600">
-                                GH₵{product.price}
-                              </span>
-                              {product.compare_price &&
-                                product.compare_price > product.price && (
-                                  <span className="text-sm text-gray-400 line-through">
-                                    GH₵{product.compare_price}
-                                  </span>
-                                )}
-                            </div>
-                            <div className="flex items-center gap-1 mt-2">
-                              {[...Array(5)].map((_, i) => (
-                                <span
-                                  key={i}
-                                  className={`text-sm ${
-                                    i < Math.round(product.average_rating || 0)
-                                      ? "text-yellow-400"
-                                      : "text-gray-300"
-                                  }`}
-                                >
-                                  ★
-                                </span>
-                              ))}
-                              <span className="text-sm text-gray-500 ml-1">
-                                ({product.review_count || 0})
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ),
-                    )}
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    {products.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
                   </div>
 
                   {/* Pagination */}

@@ -32,6 +32,7 @@ import ResendVerification from "./pages/customer/ResendVerification";
 import PrivacyPolicy from "./pages/customer/PrivacyPolicy";
 import TermsOfService from "./pages/customer/TermsOfService";
 import CookiePolicy from "./pages/customer/CookiePolicy";
+import Newsletter from "./pages/customer/Newsletter";
 
 // Admin Pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -80,6 +81,7 @@ function App() {
         <Route path="terms" element={<TermsOfService />} />
         <Route path="cookies" element={<CookiePolicy />} />
         <Route path="search" element={<SearchResults />} />
+        <Route path="newsletter" element={<Newsletter />} />
 
         {/* Protected Customer Routes */}
         <Route

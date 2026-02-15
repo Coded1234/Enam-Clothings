@@ -32,8 +32,8 @@ const Footer = () => {
 
   return (
     <footer className="bg-gray-900 text-white">
-      {/* Newsletter */}
-      <div className="bg-gradient-to-r from-primary-500 to-secondary-500 py-12">
+      {/* Newsletter - Hidden on mobile, visible on desktop */}
+      <div className="hidden md:block bg-gradient-to-r from-primary-500 to-secondary-500 py-12">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-2xl font-bold mb-2">
             Subscribe to our Newsletter

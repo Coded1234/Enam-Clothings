@@ -111,15 +111,7 @@ const Contact = () => {
       title: "Email Us",
       details: ["thefashiongallery264@gmail.com"],
     },
-    {
-      icon: FiClock,
-      title: "Working Hours",
-      details: [
-        "Monday - Friday: 9AM - 6PM",
-        "Saturday: 10AM - 4PM",
-        "Sunday: Closed",
-      ],
-    },
+    
   ];
 
   if (submitted) {
