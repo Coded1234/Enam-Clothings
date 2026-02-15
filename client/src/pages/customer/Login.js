@@ -29,7 +29,7 @@ const Login = () => {
       dispatch(googleLogin(tokenResponse.access_token))
         .unwrap()
         .then(() => {
-          toast.success("Welcome back!");
+          toast.success("Welcome !");
         })
         .catch((err) => {
           // Error handled by slice or toast
@@ -74,7 +74,7 @@ const Login = () => {
 
     try {
       await dispatch(login(formData)).unwrap();
-      toast.success("Welcome back!");
+      toast.success("Welcome!");
     } catch (err) {
       // Safely derive an error message string to avoid runtime crashes
       const errMsg =
@@ -113,7 +113,7 @@ const Login = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary-500/80 to-secondary-500/80 flex items-center justify-center">
           <div className="text-white text-center p-8">
-            <h2 className="text-4xl font-bold mb-4">Welcome Back!</h2>
+            <h2 className="text-4xl font-bold mb-4">Welcome!</h2>
             <p className="text-xl text-white/90">
               Sign in to access your account and continue shopping
             </p>

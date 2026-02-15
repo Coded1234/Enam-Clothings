@@ -674,7 +674,7 @@ const getAllCustomers = async (req, res) => {
   try {
     const { page = 1, limit = 20, search } = req.query;
 
-    const where = { role: "customer" };
+    const where = { role: "customer", emailVerified: true };
     if (search) {
       where[Op.or] = [
         { firstName: { [Op.iLike]: `%${search}%` } },

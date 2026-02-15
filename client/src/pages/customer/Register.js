@@ -234,6 +234,7 @@ const Register = () => {
                         value={formData.firstName}
                         onChange={handleChange}
                         placeholder="First name"
+                        autoComplete="off"
                         className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                         required
                       />
@@ -249,6 +250,7 @@ const Register = () => {
                       value={formData.lastName}
                       onChange={handleChange}
                       placeholder="Last name"
+                      autoComplete="off"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                       required
                     />
@@ -271,6 +273,7 @@ const Register = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="Enter your email"
+                      autoComplete="off"
                       className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                       required
                     />
@@ -293,6 +296,7 @@ const Register = () => {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="+233200620026"
+                      autoComplete="off"
                       className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                     />
                   </div>
@@ -314,6 +318,7 @@ const Register = () => {
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="Create a password"
+                      autoComplete="new-password"
                       className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                       required
                     />
@@ -376,6 +381,7 @@ const Register = () => {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       placeholder="Confirm your password"
+                      autoComplete="new-password"
                       className={`w-full pl-11 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white ${
                         formData.confirmPassword &&
                         formData.password !== formData.confirmPassword
