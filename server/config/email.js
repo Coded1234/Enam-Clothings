@@ -85,7 +85,7 @@ const getEmailLayout = (content, title = "The Fashion Gallery") => `
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 20px; margin-bottom: 20px;">
       <!-- Header -->
       <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); padding: 40px 20px; text-align: center; border-bottom: 2px solid #c9ad65;">
-        <h1 style="color: #c9ad65; margin: 0; font-size: 28px; letter-spacing: 2px; font-weight: 600; text-transform: uppercase;">The Fashion Gallery</h1>
+        <img src="${process.env.CLIENT_URL}/images/loginlogo.png" alt="The Fashion Gallery" style="height: 40px; width: auto; object-fit: contain;" />
       </div>
       
       <!-- Content -->
