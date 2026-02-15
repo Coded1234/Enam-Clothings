@@ -181,7 +181,7 @@ const Navbar = () => {
               <Link
                 key={cat.path}
                 to={cat.path}
-                className="text-gray-700 dark:text-gray-200 hover:text-primary-500 font-medium transition-colors"
+                className="text-gray-700 dark:text-gold-light hover:text-primary-500 font-medium transition-colors"
               >
                 {cat.name}
               </Link>
@@ -239,13 +239,13 @@ const Navbar = () => {
 
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-surface rounded-lg shadow-lg py-2 z-50 animate-slide-down">
-                    <p className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                    <p className="px-4 py-2 text-sm text-gray-500 dark:text-primary-300 border-b dark:border-primary-700">
                       Hi, {user?.firstName}!
                     </p>
                     {user?.role === "admin" && (
                       <Link
                         to="/admin"
-                        className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-opacity-10"
+                        className="block px-4 py-2 text-gray-700 dark:text-gold-light hover:bg-gray-100 dark:hover:bg-opacity-10"
                         onClick={() => setDropdownOpen(false)}
                       >
                         Admin Dashboard
@@ -253,28 +253,28 @@ const Navbar = () => {
                     )}
                     <Link
                       to="/profile"
-                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-opacity-10"
+                      className="block px-4 py-2 text-gray-700 dark:text-gold-light hover:bg-gray-100 dark:hover:bg-opacity-10"
                       onClick={() => setDropdownOpen(false)}
                     >
                       My Profile
                     </Link>
                     <Link
                       to="/orders"
-                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-opacity-10"
+                      className="block px-4 py-2 text-gray-700 dark:text-gold-light hover:bg-gray-100 dark:hover:bg-opacity-10"
                       onClick={() => setDropdownOpen(false)}
                     >
                       My Orders
                     </Link>
                     <Link
                       to="/wishlist"
-                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-opacity-10"
+                      className="block px-4 py-2 text-gray-700 dark:text-gold-light hover:bg-gray-100 dark:hover:bg-opacity-10"
                       onClick={() => setDropdownOpen(false)}
                     >
                       Wishlist
                     </Link>
                     <Link
                       to="/newsletter"
-                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-opacity-10"
+                      className="block px-4 py-2 text-gray-700 dark:text-gold-light hover:bg-gray-100 dark:hover:bg-opacity-10"
                       onClick={() => setDropdownOpen(false)}
                     >
                       Newsletter
@@ -310,7 +310,8 @@ const Navbar = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for products..."
-                className="flex-1 min-w-0 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-surface text-gray-900 dark:text-white"
+                className="flex-1 min-w-0 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-black"
+                style={{ backgroundColor: "white", color: "black" }}
                 autoFocus
               />
               <button
@@ -369,10 +370,10 @@ const Navbar = () => {
                   {user?.firstName?.[0]}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-800 dark:text-gray-100">
+                  <p className="font-semibold text-gray-800 dark:text-gold-light">
                     Hi, {user?.firstName}!
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-500 dark:text-primary-300">
                     {user?.email}
                   </p>
                 </div>
@@ -400,7 +401,7 @@ const Navbar = () => {
               <Link
                 key={cat.path}
                 to={cat.path}
-                className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-opacity-10 hover:text-primary-600 font-medium transition-colors"
+                className="flex items-center px-4 py-3 text-gray-700 dark:text-gold-light hover:bg-primary-50 dark:hover:bg-opacity-10 hover:text-primary-600 font-medium transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {cat.name}
@@ -479,20 +480,20 @@ const Navbar = () => {
           )}
 
           {/* Contact Info */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-surface border-t dark:border-gray-700">
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-surface border-t dark:border-primary-700">
             <div className="flex items-center justify-center gap-3 mb-1">
-              <p className="text-sm text-gray-500 dark:text-gray-300">
+              <p className="text-sm text-gray-500 dark:text-gold">
                 📞 +233200620026
               </p>
               <button
                 onClick={toggleTheme}
-                className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="p-1.5 rounded-full bg-gray-100 dark:bg-secondary-600 text-gray-600 dark:text-gold hover:bg-gray-200 dark:hover:bg-secondary-700 transition-colors"
                 aria-label="Toggle theme"
               >
                 {theme === "dark" ? <FiSun size={16} /> : <FiMoon size={16} />}
               </button>
             </div>
-            <p className="text-xs text-gray-400 dark:text-gray-400 text-center">
+            <p className="text-xs text-gray-400 dark:text-primary-300 text-center">
               Free shipping on orders over GH₵1,000
             </p>
           </div>

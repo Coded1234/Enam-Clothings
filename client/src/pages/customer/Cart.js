@@ -234,7 +234,7 @@ const Cart = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gold-light">
               Shopping Cart
             </h1>
             <p className="text-gray-600 mt-1">
@@ -319,7 +319,7 @@ const Cart = () => {
                             handleQuantityChange(item.id, item.quantity, -1)
                           }
                           disabled={item.quantity <= 1}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-secondary-700 transition-colors disabled:opacity-50"
                         >
                           <FiMinus size={16} />
                         </button>
@@ -348,7 +348,7 @@ const Cart = () => {
                           onClick={() =>
                             handleQuantityChange(item.id, item.quantity, 1)
                           }
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-secondary-700 transition-colors"
                         >
                           <FiPlus size={16} />
                         </button>

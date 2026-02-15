@@ -172,7 +172,7 @@ const OrderSummary = () => {
           >
             <FiArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-gold-light">
             Order Summary
           </h1>
           <div className="w-32"></div> {/* Spacer for centering */}
@@ -185,13 +185,13 @@ const OrderSummary = () => {
             <div className="bg-white dark:bg-surface rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-2 mb-4">
                 <FiUser className="w-5 h-5 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gold-light">
                   Personal Information
                 </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gold mb-2">
                     First Name *
                   </label>
                   <div className="relative">
@@ -213,7 +213,7 @@ const OrderSummary = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gold mb-2">
                     Last Name *
                   </label>
                   <input
@@ -232,7 +232,7 @@ const OrderSummary = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gold mb-2">
                     Email Address *
                   </label>
                   <div className="relative">
@@ -254,7 +254,7 @@ const OrderSummary = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gold mb-2">
                     Phone Number *
                   </label>
                   <div className="relative">
@@ -282,7 +282,7 @@ const OrderSummary = () => {
             <div className="bg-white dark:bg-surface rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-2 mb-4">
                 <FiMapPin className="w-5 h-5 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gold-light">
                   Shipping Information
                 </h2>
               </div>
@@ -291,7 +291,7 @@ const OrderSummary = () => {
                   <FiMapPin className="w-4 h-4 text-gray-400 mt-1" />
                   <div>
                     <p className="text-sm text-gray-500">Address</p>
-                    <p className="text-gray-900 dark:text-gray-100">
+                    <p className="text-gray-900 dark:text-gold-light">
                       {orderData.shippingAddress.address}
                     </p>
                     {orderData.shippingAddress.addressDetails && (
@@ -308,7 +308,7 @@ const OrderSummary = () => {
             <div className="bg-white dark:bg-surface rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-2 mb-4">
                 <FiCreditCard className="w-5 h-5 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gold-light">
                   Payment Method *
                 </h2>
               </div>
@@ -335,12 +335,10 @@ const OrderSummary = () => {
                         <FiCreditCard className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900 dark:text-gray-100">
+                        <p className="font-semibold text-gray-900 dark:text-gold-light">
                           Pay with Paystack
                         </p>
-                        <p className="text-sm text-gray-500">
-                          Secure payment with cards, bank transfer, mobile money
-                        </p>
+                        MTN,Telecel,AirtelTigo
                       </div>
                     </div>
                   </div>
@@ -364,7 +362,7 @@ const OrderSummary = () => {
                     className="w-5 h-5 text-primary-500"
                   />
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-900 dark:text-gray-100">
+                    <p className="font-semibold text-gray-900 dark:text-gold-light">
                       Pay on Delivery
                     </p>
                     <p className="text-sm text-gray-500">
@@ -425,7 +423,7 @@ const OrderSummary = () => {
                         }}
                       />
                       <div className="flex-1">
-                        <h3 className="font-medium text-gray-900 dark:text-gray-100">
+                        <h3 className="font-medium text-gray-900 dark:text-gold-light">
                           {item.product?.name}
                         </h3>
                         <div className="mt-1 space-y-1">
@@ -450,7 +448,7 @@ const OrderSummary = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-gray-900 dark:text-gray-100">
+                        <p className="font-semibold text-gray-900 dark:text-gold-light">
                           {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
@@ -466,13 +464,13 @@ const OrderSummary = () => {
             <div className="bg-white dark:bg-surface rounded-lg shadow-sm p-6 sticky top-4">
               <div className="flex items-center gap-2 mb-4">
                 <FiCreditCard className="w-5 h-5 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gold-light">
                   Payment Summary
                 </h2>
               </div>
 
               <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                <div className="flex justify-between text-gray-600 dark:text-primary-300">
                   <span>Subtotal</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
@@ -496,7 +494,7 @@ const OrderSummary = () => {
                     <span className="text-lg font-semibold text-gray-900">
                       Total
                     </span>
-                    <span className="text-2xl font-bold text-blue-600">
+                    <span className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
                       {formatPrice(finalTotal)}
                     </span>
                   </div>

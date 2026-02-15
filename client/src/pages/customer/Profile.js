@@ -225,7 +225,7 @@ const Profile = () => {
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
               Account Settings
             </h1>
             <p className="text-gray-600 mt-1">
@@ -362,7 +362,7 @@ const Profile = () => {
               {activeTab === "profile" && (
                 <div className="bg-white rounded-2xl shadow-sm p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-gray-800">
+                    <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">
                       Personal Information
                     </h2>
                     {!isEditing ? (

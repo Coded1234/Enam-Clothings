@@ -242,7 +242,8 @@ const Register = () => {
                         onChange={handleChange}
                         placeholder="First name"
                         autoComplete="off"
-                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
+                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-black"
+                        style={{ backgroundColor: "white", color: "black" }}
                         required
                       />
                     </div>
@@ -258,7 +259,8 @@ const Register = () => {
                       onChange={handleChange}
                       placeholder="Last name"
                       autoComplete="off"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-black"
+                      style={{ backgroundColor: "white", color: "black" }}
                       required
                     />
                   </div>
@@ -281,7 +283,8 @@ const Register = () => {
                       onChange={handleChange}
                       placeholder="Enter your email"
                       autoComplete="off"
-                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
+                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-black"
+                      style={{ backgroundColor: "white", color: "black" }}
                       required
                     />
                   </div>
@@ -306,7 +309,8 @@ const Register = () => {
                       autoComplete="off"
                       maxLength="10"
                       pattern="\d{10}"
-                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
+                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-black"
+                      style={{ backgroundColor: "white", color: "black" }}
                     />
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
@@ -331,7 +335,8 @@ const Register = () => {
                       onChange={handleChange}
                       placeholder="Create a password"
                       autoComplete="new-password"
-                      className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
+                      className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-black"
+                      style={{ backgroundColor: "white", color: "black" }}
                       required
                     />
                     <button
@@ -394,12 +399,13 @@ const Register = () => {
                       onChange={handleChange}
                       placeholder="Confirm your password"
                       autoComplete="new-password"
-                      className={`w-full pl-11 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white ${
+                      className={`w-full pl-11 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-black ${
                         formData.confirmPassword &&
                         formData.password !== formData.confirmPassword
                           ? "border-red-500"
                           : "border-gray-300"
                       }`}
+                      style={{ backgroundColor: "white", color: "black" }}
                       required
                     />
                     <button

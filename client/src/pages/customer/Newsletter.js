@@ -49,13 +49,13 @@ const Newsletter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-secondary-500 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden"
+          className="bg-white dark:bg-secondary-600 rounded-2xl shadow-xl overflow-hidden"
         >
           {/* Header Section */}
           <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-8 py-12 text-center">
@@ -63,7 +63,7 @@ const Newsletter = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="inline-flex items-center justify-center w-20 h-20 bg-white dark:bg-gray-800 rounded-full mb-6"
+              className="inline-flex items-center justify-center w-20 h-20 bg-white dark:bg-secondary-600 rounded-full mb-6"
             >
               <FiBell className="text-primary-500" size={40} />
             </motion.div>
@@ -88,10 +88,10 @@ const Newsletter = () => {
                   className="text-green-500 mx-auto mb-6"
                   size={80}
                 />
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
                   Welcome Aboard!
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300 text-lg mb-8">
+                <p className="text-gray-600 dark:text-gold text-lg mb-8">
                   You're now subscribed to our newsletter. Check your inbox for
                   exciting updates!
                 </p>
@@ -106,7 +106,7 @@ const Newsletter = () => {
               <>
                 {/* Benefits Section */}
                 <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-6">
                     Why Subscribe?
                   </h2>
                   <div className="grid grid-cols-3 gap-6">
@@ -117,7 +117,7 @@ const Newsletter = () => {
                       <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                         Exclusive Deals
                       </h3>
-                      <p className="hidden md:block text-gray-600 dark:text-gray-400 text-sm">
+                      <p className="hidden md:block text-gray-600 dark:text-primary-300 text-sm">
                         Get access to subscriber-only discounts and offers
                       </p>
                     </div>
@@ -128,7 +128,7 @@ const Newsletter = () => {
                       <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                         New Arrivals
                       </h3>
-                      <p className="hidden md:block text-gray-600 dark:text-gray-400 text-sm">
+                      <p className="hidden md:block text-gray-600 dark:text-primary-300 text-sm">
                         Be the first to discover our latest collections
                       </p>
                     </div>
@@ -139,7 +139,7 @@ const Newsletter = () => {
                       <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                         Fashion Tips
                       </h3>
-                      <p className="hidden md:block text-gray-600 dark:text-gray-400 text-sm">
+                      <p className="hidden md:block text-gray-600 dark:text-primary-300 text-sm">
                         Receive expert styling advice and fashion insights
                       </p>
                     </div>
@@ -151,7 +151,7 @@ const Newsletter = () => {
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      className="block text-sm font-medium text-gray-700 dark:text-gold mb-2"
                     >
                       Email Address
                     </label>
@@ -165,8 +165,20 @@ const Newsletter = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Enter your email address"
-                        className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                         disabled={subscribing}
+                        style={{
+                          width: "100%",
+                          backgroundColor: "#ffffff",
+                          color: "#000000",
+                          paddingLeft: "48px",
+                          paddingRight: "16px",
+                          paddingTop: "12px",
+                          paddingBottom: "12px",
+                          border: "1px solid #d1d5db",
+                          borderRadius: "8px",
+                          outline: "none",
+                          fontSize: "16px",
+                        }}
                       />
                     </div>
                   </div>
@@ -179,13 +191,13 @@ const Newsletter = () => {
                         id="agree"
                         checked={agreed}
                         onChange={(e) => setAgreed(e.target.checked)}
-                        className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-secondary-700 dark:border-primary-600"
                         disabled={subscribing}
                       />
                     </div>
                     <label
                       htmlFor="agree"
-                      className="ml-3 text-sm text-gray-700 dark:text-gray-300"
+                      className="ml-3 text-sm text-gray-700 dark:text-gold"
                     >
                       I agree to The Fashion Gallery terms and conditions. You
                       can unsubscribe at anytime.
@@ -193,7 +205,7 @@ const Newsletter = () => {
                   </div>
 
                   {/* Privacy Policy Link */}
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-gray-600 dark:text-primary-300">
                     <p>
                       By subscribing, you agree to our{" "}
                       <Link
@@ -265,7 +277,7 @@ const Newsletter = () => {
             transition={{ delay: 0.3 }}
             className="mt-8 text-center"
           >
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
+            <p className="text-gray-600 dark:text-primary-300 text-sm">
               We respect your privacy. We'll never share your email with third
               parties.
             </p>

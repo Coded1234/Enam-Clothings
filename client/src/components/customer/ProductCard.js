@@ -96,9 +96,9 @@ const ProductCard = ({
   };
 
   return (
-    <div className="group bg-white dark:bg-surface rounded-xl shadow-sm overflow-hidden card-hover">
+    <div className="group bg-white dark:bg-surface rounded-lg shadow-sm overflow-hidden card-hover w-full">
       {/* Image */}
-      <div className="relative img-zoom aspect-[4/5]">
+      <div className="relative img-zoom aspect-square">
         <Link to={`/product/${product.id}`}>
           <img
             src={getProductImage(product)}
@@ -108,91 +108,82 @@ const ProductCard = ({
         </Link>
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
           {discountPercent > 0 && (
-            <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded">
+            <span className="bg-red-500 text-white text-xs font-medium px-2 py-0.5 rounded">
               -{discountPercent}%
             </span>
           )}
           {product.featured && (
-            <span className="bg-primary-500 text-white text-xs font-medium px-2 py-1 rounded">
+            <span className="bg-primary-500 text-white text-xs font-medium px-2 py-0.5 rounded">
               Featured
             </span>
           )}
         </div>
 
         {/* Quick Actions */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={handleToggleWishlist}
             disabled={wishlistLoading}
-            className={`p-2 rounded-full shadow-md transition-colors ${
+            className={`p-1.5 rounded-full shadow-md transition-colors ${
               isWishlisted
                 ? "bg-red-500 text-white"
-                : "bg-white dark:bg-surface text-gray-700 dark:text-gray-200 hover:bg-red-500 hover:text-white"
+                : "bg-white dark:bg-surface text-gray-700 dark:text-gold-light hover:bg-red-500 hover:text-white"
             } ${wishlistLoading ? "opacity-50 cursor-not-allowed" : ""}`}
             aria-label={
               isWishlisted ? "Remove from wishlist" : "Add to wishlist"
             }
           >
-            <FiHeart size={18} className={isWishlisted ? "fill-current" : ""} />
+            <FiHeart size={16} className={isWishlisted ? "fill-current" : ""} />
           </button>
         </div>
 
-        {/* Add to Cart Button */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
+        {/* Add to Cart Button - Hidden on compact view */}
+        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={handleAddToCart}
             disabled={product.remainingStock === 0}
-            className={`w-full py-2 bg-white dark:bg-surface text-gray-900 dark:text-gray-100 rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-primary-500 hover:text-white transition-colors ${
+            className={`w-full py-1.5 bg-white dark:bg-surface text-gray-900 dark:text-gold-light rounded text-xs font-medium flex items-center justify-center gap-1 hover:bg-primary-500 hover:text-white transition-colors ${
               product.remainingStock === 0
                 ? "opacity-50 cursor-not-allowed"
                 : ""
             }`}
           >
-            <FiShoppingCart size={18} />
-            {product.remainingStock === 0 ? "Out of Stock" : "Add to Cart"}
+            <FiShoppingCart size={14} />
+            {product.remainingStock === 0 ? "Out of Stock" : "Add"}
           </button>
         </div>
       </div>
 
       {/* Info */}
-      <div className="p-4">
+      <div className="p-3">
         <Link to={`/product/${product.id}`}>
-          <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2 hover:text-primary-500 transition-colors line-clamp-1">
+          <h3 className="font-medium text-gray-800 dark:text-gold-light text-sm mb-1 hover:text-primary-500 transition-colors line-clamp-2 leading-tight">
             {product.name}
           </h3>
-
-          {/* Description - Desktop Only */}
-          {product.description && (
-            <p
-              className={`hidden lg:block text-sm text-gray-600 dark:text-gray-300 mb-2 ${showFullDescription ? "" : "overflow-hidden text-ellipsis whitespace-nowrap"}`}
-            >
-              {product.description}
-            </p>
-          )}
         </Link>
 
         {/* Price */}
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
-            GH₵{Math.round(product.price)?.toLocaleString()}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-base font-bold text-gray-900 dark:text-gold-light">
+            GH₵{Math.round(product.price)}
           </span>
           {product.comparePrice && (
-            <span className="text-sm text-gray-400 dark:text-gray-500 line-through">
-              GH₵{Math.round(product.comparePrice).toLocaleString()}
+            <span className="text-xs text-gray-400 dark:text-primary-400 line-through">
+              GH₵{Math.round(product.comparePrice)}
             </span>
           )}
         </div>
 
-        {/* Stock Status - Desktop Only */}
+        {/* Stock Status */}
         {product.remainingStock <= 10 && product.remainingStock > 0 && (
-          <p className="hidden lg:block text-xs text-orange-500 mt-2">
-            Only {product.remainingStock} left in stock
+          <p className="text-xs text-orange-500 mt-1">
+            {product.remainingStock} left
           </p>
         )}
         {product.remainingStock === 0 && (
-          <p className="text-xs text-red-500 mt-2">Out of stock</p>
+          <p className="text-xs text-red-500 mt-1">Out of stock</p>
         )}
       </div>
     </div>

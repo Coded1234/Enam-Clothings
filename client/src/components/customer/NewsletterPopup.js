@@ -151,14 +151,14 @@ const NewsletterPopup = () => {
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div className="relative bg-white dark:bg-secondary-600 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
               {/* Close Button */}
               <button
                 onClick={handleClose}
-                className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors z-10"
+                className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 dark:bg-secondary-700 hover:bg-gray-200 dark:hover:bg-primary-900 transition-colors z-10"
                 aria-label="Close"
               >
-                <FiX size={20} className="text-gray-600 dark:text-gray-300" />
+                <FiX size={20} className="text-gray-600 dark:text-gold" />
               </button>
 
               {/* Header */}
@@ -167,11 +167,11 @@ const NewsletterPopup = () => {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className="inline-flex items-center justify-center w-16 h-16 bg-white dark:bg-gray-800 rounded-full mb-4"
+                  className="inline-flex items-center justify-center w-16 h-16 bg-white dark:bg-secondary-600 rounded-full mb-4"
                 >
                   <FiBell className="text-primary-500" size={32} />
                 </motion.div>
-                <h2 className="text-2xl font-bold text-white mb-2">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2">
                   Don't Miss Out!
                 </h2>
                 <p className="text-primary-100">
@@ -191,8 +191,20 @@ const NewsletterPopup = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email"
-                      className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-black dark:placeholder-yellow-300"
                       disabled={subscribing}
+                      style={{
+                        width: "100%",
+                        backgroundColor: "#ffffff",
+                        color: "#000000",
+                        paddingLeft: "48px",
+                        paddingRight: "16px",
+                        paddingTop: "12px",
+                        paddingBottom: "12px",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "8px",
+                        outline: "none",
+                        fontSize: "16px",
+                      }}
                     />
                   </div>
 
@@ -237,25 +249,25 @@ const NewsletterPopup = () => {
 
                 {/* Benefits */}
                 <div className="mt-6 space-y-2">
-                  <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-primary-300">
                     <span className="text-green-500">✓</span>
                     <span>Get 10% off your first order</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-primary-300">
                     <span className="text-green-500">✓</span>
                     <span>Early access to sales & new arrivals</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-primary-300">
                     <span className="text-green-500">✓</span>
                     <span>Exclusive fashion tips & styling advice</span>
                   </div>
                 </div>
 
                 {/* Don't show again */}
-                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-primary-700">
                   <button
                     onClick={handleNeverShow}
-                    className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                    className="text-sm text-gray-500 dark:text-primary-300 hover:text-gray-700 dark:hover:text-gold transition-colors"
                   >
                     Don't show this again
                   </button>
