@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/customer/Navbar";
 import Footer from "../components/customer/Footer";
 import ScrollToTop from "../components/common/ScrollToTop";
+import NewsletterPopup from "../components/customer/NewsletterPopup";
 
 const pageVariants = {
   initial: {
@@ -33,6 +34,7 @@ const CustomerLayout = () => {
     <div className="flex flex-col min-h-screen">
       <ScrollToTop />
       <Navbar />
+      <NewsletterPopup />
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           <motion.div
