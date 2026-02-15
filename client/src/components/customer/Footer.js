@@ -58,7 +58,8 @@ const Footer = () => {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-4 py-3 rounded-lg text-gray-900 dark:text-white bg-white dark:bg-surface focus:outline-none focus:ring-2 focus:ring-white placeholder-gray-900 dark:placeholder-white"
+                className="flex-1 px-4 py-3 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
+                style={{ backgroundColor: 'white', color: 'black' }}
               />
               <button
                 type="submit"

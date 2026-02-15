@@ -124,6 +124,11 @@ const Register = () => {
       return;
     }
 
+    if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
+      toast.error("Phone number must be exactly 10 digits (without country code)");
+      return;
+    }
+
     if (!agreeTerms) {
       toast.error("Please agree to the terms and conditions");
       return;
@@ -295,11 +300,16 @@ const Register = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="+233200620026"
+                      placeholder="Enter mobile number"
                       autoComplete="off"
+                      maxLength="10"
+                      pattern="\d{10}"
                       className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                     />
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter 10 digits only. Do not include country code (+233)
+                  </p>
                 </div>
 
                 {/* Password */}

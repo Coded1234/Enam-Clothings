@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../redux/slices/authSlice";
 import axios from "axios";
 import { FiCheckCircle, FiXCircle, FiLoader } from "react-icons/fi";
 
 const VerifyEmail = () => {
   const { token } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [status, setStatus] = useState("verifying"); // verifying, success, error
   const [message, setMessage] = useState("");
 
@@ -16,10 +19,16 @@ const VerifyEmail = () => {
         setStatus("success");
         setMessage(data.message);
 
-        // Redirect to login after 3 seconds
+        // Auto-login user with returned token
+        if (data.token && data.user) {
+          localStorage.setItem("token", data.token);
+          dispatch(setCredentials({ user: data.user, token: data.token }));
+        }
+
+        // Redirect to home after 2 seconds
         setTimeout(() => {
-          navigate("/login");
-        }, 3000);
+          navigate("/");
+        }, 2000);
       } catch (error) {
         setStatus("error");
         setMessage(
@@ -65,13 +74,13 @@ const VerifyEmail = () => {
               <p className="text-gray-600 mb-6">{message}</p>
               <div className="space-y-3">
                 <p className="text-sm text-gray-500">
-                  Redirecting to login page...
+                  Redirecting to home page...
                 </p>
                 <Link
-                  to="/login"
+                  to="/"
                   className="inline-block bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-lg font-medium hover:from-primary-700 hover:to-primary-800 transition-all"
                 >
-                  Go to Login Now
+                  Go to Home Now
                 </Link>
               </div>
             </>

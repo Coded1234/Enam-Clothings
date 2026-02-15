@@ -498,9 +498,20 @@ const verifyEmail = async (req, res) => {
       console.error("Welcome email failed:", emailError);
     }
 
+    // Generate token to auto-login user
+    const token = generateToken(user.id);
+
     res.json({
-      message: "Email verified successfully! You can now log in.",
+      message: "Email verified successfully! You are now logged in.",
       emailVerified: true,
+      token,
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.error("Email verification error:", error);
