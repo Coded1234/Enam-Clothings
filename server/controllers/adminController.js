@@ -324,17 +324,22 @@ const updateProduct = async (req, res) => {
     // Remove existingImages from updateData (it's not a model field)
     delete updateData.existingImages;
 
-    // Handle stock updates - when totalStock is updated, also update remainingStock
+    // Handle stock updates - admin edits the displayed stock (remainingStock)
+    // When admin updates stock, they're setting the new remainingStock directly
     if (updateData.totalStock !== undefined) {
-      const newTotalStock = parseInt(updateData.totalStock);
+      const newDisplayedStock = parseInt(updateData.totalStock);
       const currentSoldCount = product.soldCount || 0;
 
-      // Update remainingStock based on new totalStock and current soldCount
-      updateData.remainingStock = newTotalStock - currentSoldCount;
+      // The value admin enters IS the new remainingStock
+      updateData.remainingStock = newDisplayedStock;
+
+      // Recalculate totalStock = remainingStock + soldCount
+      updateData.totalStock = newDisplayedStock + currentSoldCount;
 
       // Ensure remainingStock is not negative
       if (updateData.remainingStock < 0) {
         updateData.remainingStock = 0;
+        updateData.totalStock = currentSoldCount;
       }
     }
 
