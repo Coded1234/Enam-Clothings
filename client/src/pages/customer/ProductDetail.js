@@ -61,6 +61,7 @@ const ProductDetail = () => {
   }, [id]);
 
   useEffect(() => {
+    // Force fresh fetch of product data
     dispatch(fetchProductById(id));
     dispatch(fetchRelatedProducts(id));
     fetchReviews();
@@ -79,7 +80,7 @@ const ProductDetail = () => {
     window.scrollTo(0, 0);
   }, [dispatch, id, fetchReviews, isAuthenticated]);
 
-  // Refetch product data when page becomes visible (to update stock after orders)
+  // Force refetch when component becomes visible to ensure stock is up-to-date
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -87,10 +88,17 @@ const ProductDetail = () => {
       }
     };
 
+    // Also refetch when window gains focus
+    const handleFocus = () => {
+      dispatch(fetchProductById(id));
+    };
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
     };
   }, [dispatch, id]);
 
