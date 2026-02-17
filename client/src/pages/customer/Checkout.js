@@ -149,6 +149,19 @@ const Checkout = () => {
     return true;
   };
 
+  const validateShippingCalculation = () => {
+    // Only validate address and city for shipping calculation
+    if (!shippingInfo.address || shippingInfo.address.trim() === "") {
+      toast.error("Please enter your address");
+      return false;
+    }
+    if (!city) {
+      toast.error("Please enter your city");
+      return false;
+    }
+    return true;
+  };
+
   // Handle address selection from map
   const handleAddressSelect = (addressData) => {
     setShippingInfo({
@@ -165,7 +178,7 @@ const Checkout = () => {
 
   // Calculate shipping rate using Yango API
   const calculateShipping = async () => {
-    if (!validateShipping()) {
+    if (!validateShippingCalculation()) {
       return;
     }
 

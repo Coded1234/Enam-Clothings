@@ -79,6 +79,21 @@ const ProductDetail = () => {
     window.scrollTo(0, 0);
   }, [dispatch, id, fetchReviews, isAuthenticated]);
 
+  // Refetch product data when page becomes visible (to update stock after orders)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        dispatch(fetchProductById(id));
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [dispatch, id]);
+
   useEffect(() => {
     if (product?.sizes?.length > 0) {
       setSelectedSize(product.sizes[0]);
