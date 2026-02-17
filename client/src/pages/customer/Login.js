@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { login, clearError, googleLogin } from "../../redux/slices/authSlice";
+import {
+  login,
+  clearError,
+  googleLogin,
+  loadUser,
+} from "../../redux/slices/authSlice";
 import IMAGES from "../../config/images";
 import toast from "react-hot-toast";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import { useGoogleLogin } from "@react-oauth/google";
+import CompleteProfileModal from "../../components/customer/CompleteProfileModal";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +19,7 @@ const Login = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,8 +35,18 @@ const Login = () => {
     onSuccess: (tokenResponse) => {
       dispatch(googleLogin(tokenResponse.access_token))
         .unwrap()
-        .then(() => {
-          toast.success("Welcome !");
+        .then((userData) => {
+          // Check if profile is incomplete
+          if (
+            !userData.user?.firstName ||
+            !userData.user?.lastName ||
+            !userData.user?.phone
+          ) {
+            setShowProfileModal(true);
+            toast.success("Welcome! Please complete your profile.");
+          } else {
+            toast.success("Welcome!");
+          }
         })
         .catch((err) => {
           // Error handled by slice or toast
@@ -294,6 +311,16 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Complete Profile Modal */}
+      <CompleteProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        onComplete={(updatedUser) => {
+          dispatch(loadUser());
+        }}
+        user={user}
+      />
     </div>
   );
 };

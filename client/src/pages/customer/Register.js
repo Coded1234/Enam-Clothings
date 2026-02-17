@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { clearError, googleLogin } from "../../redux/slices/authSlice";
+import {
+  clearError,
+  googleLogin,
+  loadUser,
+} from "../../redux/slices/authSlice";
 import IMAGES from "../../config/images";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
+import CompleteProfileModal from "../../components/customer/CompleteProfileModal";
 import {
   FiUser,
   FiMail,
@@ -33,6 +38,7 @@ const Register = () => {
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -45,8 +51,20 @@ const Register = () => {
     onSuccess: (tokenResponse) => {
       dispatch(googleLogin(tokenResponse.access_token))
         .unwrap()
-        .then(() => {
-          toast.success("Registration successful!");
+        .then((userData) => {
+          // Check if profile is incomplete
+          if (
+            !userData.user?.firstName ||
+            !userData.user?.lastName ||
+            !userData.user?.phone
+          ) {
+            setShowProfileModal(true);
+            toast.success(
+              "Registration successful! Please complete your profile.",
+            );
+          } else {
+            toast.success("Registration successful!");
+          }
         })
         .catch((err) => {
           // Error handled by slice or toast
@@ -571,6 +589,16 @@ const Register = () => {
           </div>
         </div>
       </div>
+
+      {/* Complete Profile Modal */}
+      <CompleteProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        onComplete={(updatedUser) => {
+          dispatch(loadUser());
+        }}
+        user={user}
+      />
     </div>
   );
 };

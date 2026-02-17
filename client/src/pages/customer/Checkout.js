@@ -27,10 +27,10 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [shippingInfo, setShippingInfo] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
+    firstName: user?.firstName && user.firstName !== "" ? user.firstName : "",
+    lastName: user?.lastName && user.lastName !== "" ? user.lastName : "",
     email: user?.email || "",
-    phone: user?.phone || "",
+    phone: user?.phone && user.phone !== "" ? user.phone : "",
     address: "",
     addressDetails: "",
   });
@@ -128,9 +128,9 @@ const Checkout = () => {
   };
 
   const validateShipping = () => {
-    const required = ["address"];
+    const required = ["firstName", "lastName", "phone", "address"];
     for (const field of required) {
-      if (!shippingInfo[field]) {
+      if (!shippingInfo[field] || shippingInfo[field].trim() === "") {
         toast.error(
           `Please enter your ${field.replace(/([A-Z])/g, " $1").toLowerCase()}`,
         );
@@ -139,6 +139,11 @@ const Checkout = () => {
     }
     if (!city) {
       toast.error("Please enter your city");
+      return false;
+    }
+    // Validate phone number length
+    if (shippingInfo.phone.length < 10) {
+      toast.error("Please enter a valid phone number");
       return false;
     }
     return true;
@@ -365,8 +370,8 @@ const Checkout = () => {
                 />
               </div>
 
-              {/* Calculate Shipping Button - Hidden, auto-calculates */}
-              <div className="hidden">
+              {/* Calculate Shipping Button */}
+              <div>
                 <button
                   type="button"
                   onClick={calculateShipping}
