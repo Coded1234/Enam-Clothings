@@ -164,10 +164,10 @@ const Checkout = () => {
 
   // Handle address selection from map
   const handleAddressSelect = (addressData) => {
-    setShippingInfo({
-      ...shippingInfo,
+    setShippingInfo((prev) => ({
+      ...prev,
       address: addressData.address,
-    });
+    }));
     setCity(addressData.city);
     setSelectedLocation({
       latitude: addressData.latitude,
@@ -175,6 +175,19 @@ const Checkout = () => {
     });
     setShippingCalculated(false);
   };
+
+  // Auto-calculate shipping whenever address + city are both set
+  useEffect(() => {
+    if (
+      shippingInfo.address &&
+      city &&
+      !shippingCalculated &&
+      subtotal < 1000
+    ) {
+      calculateShipping();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shippingInfo.address, city]);
 
   // Calculate shipping rate using Yango API
   const calculateShipping = async () => {
@@ -383,34 +396,18 @@ const Checkout = () => {
                 />
               </div>
 
-              {/* Calculate Shipping Button */}
+              {/* Shipping Details — auto-calculated on location select */}
               <div>
-                <button
-                  type="button"
-                  onClick={calculateShipping}
-                  disabled={shippingLoading || !shippingInfo.address || !city}
-                  className="w-full py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 disabled:bg-gray-400 transition-colors flex items-center justify-center gap-2"
-                >
-                  {shippingLoading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Calculating...
-                    </>
-                  ) : shippingCalculated ? (
-                    <>
-                      <FiCheck className="text-white" />
-                      Shipping Calculated
-                    </>
-                  ) : (
-                    <>
-                      <FiTruck />
-                      Calculate Shipping Cost
-                    </>
-                  )}
-                </button>
+                {shippingLoading && (
+                  <div className="flex items-center gap-3 py-3 text-primary-600">
+                    <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-sm font-medium">
+                      Calculating shipping cost...
+                    </span>
+                  </div>
+                )}
 
-                {/* Shipping Details Display */}
-                {shippingDetails && (
+                {shippingDetails && !shippingLoading && (
                   <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
