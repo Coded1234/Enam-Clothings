@@ -469,11 +469,6 @@ const ProductDetail = () => {
                     );
                   })}
                 </div>
-                {selectedSizeStock > 0 && selectedSizeStock <= 10 && (
-                  <p className="text-orange-500 text-sm mt-2">
-                    Only {selectedSizeStock} left in stock!
-                  </p>
-                )}
               </div>
             )}
 
@@ -501,9 +496,6 @@ const ProductDetail = () => {
                     <FiPlus />
                   </button>
                 </div>
-                <span className="text-gray-500 text-sm">
-                  {selectedSizeStock} available
-                </span>
               </div>
             </div>
 
