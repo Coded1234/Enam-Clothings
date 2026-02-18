@@ -106,7 +106,7 @@ const Footer = () => {
                 <FiInstagram />
               </a>
               <a
-                href="https://tiktok.com"
+                href="https://www.tiktok.com/@enamdiamond?_r=1&_t=ZS-9429LMlZZmE"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary-500 transition-colors"
