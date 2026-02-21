@@ -606,9 +606,7 @@ const googleLogin = async (req, res) => {
       }
     } else {
       // Create new user
-      const randomPassword =
-        Math.random().toString(36).slice(-8) +
-        Math.random().toString(36).slice(-8);
+      const randomPassword = crypto.randomBytes(16).toString("hex");
 
       user = await User.create({
         firstName,

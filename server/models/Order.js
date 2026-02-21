@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
+const crypto = require("crypto");
 
 const Order = sequelize.define(
   "Order",
@@ -48,7 +49,8 @@ const Order = sequelize.define(
     shippingDetails: {
       type: DataTypes.JSONB,
       allowNull: true,
-      comment: "Stores carrier, service type, estimated delivery, distance, etc.",
+      comment:
+        "Stores carrier, service type, estimated delivery, distance, etc.",
     },
     discount: {
       type: DataTypes.DECIMAL(10, 2),
@@ -64,7 +66,7 @@ const Order = sequelize.define(
         "confirmed",
         "shipped",
         "delivered",
-        "cancelled"
+        "cancelled",
       ),
       defaultValue: "pending",
     },
@@ -104,7 +106,7 @@ const Order = sequelize.define(
       beforeCreate: (order) => {
         // Generate order number
         const timestamp = Date.now().toString(36).toUpperCase();
-        const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const random = crypto.randomBytes(2).toString("hex").toUpperCase();
         order.orderNumber = `ORD-${timestamp}-${random}`;
 
         // Initialize status history
@@ -126,7 +128,7 @@ const Order = sequelize.define(
         }
       },
     },
-  }
+  },
 );
 
 module.exports = Order;

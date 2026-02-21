@@ -7,7 +7,7 @@ async function createAdmin() {
     console.log("✅ Database connected successfully");
 
     const adminEmail = "thefashiongallery264@gmail.com";
-    const adminPassword = "[REDACTED_ADMIN_PWD]";
+    const adminPassword = process.env.ADMIN_PASSWORD || "[REDACTED_ADMIN_PWD]";
     const adminData = {
       firstName: "Admin",
       lastName: "User",
