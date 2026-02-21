@@ -128,22 +128,13 @@ const Checkout = () => {
   };
 
   const validateShipping = () => {
-    const required = ["firstName", "lastName", "phone", "address"];
-    for (const field of required) {
-      if (!shippingInfo[field] || shippingInfo[field].trim() === "") {
-        toast.error(
-          `Please enter your ${field.replace(/([A-Z])/g, " $1").toLowerCase()}`,
-        );
-        return false;
-      }
-    }
-    if (!city) {
-      toast.error("Please enter your city");
+    // Only require address and city at this step — name/phone validated on Order Summary
+    if (!shippingInfo.address || shippingInfo.address.trim() === "") {
+      toast.error("Please select your delivery location on the map");
       return false;
     }
-    // Validate phone number length
-    if (shippingInfo.phone.length < 10) {
-      toast.error("Please enter a valid phone number");
+    if (!city) {
+      toast.error("Please select your city on the map");
       return false;
     }
     return true;

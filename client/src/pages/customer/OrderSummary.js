@@ -67,19 +67,29 @@ const OrderSummary = () => {
   const finalTotal = subtotal - discount + shippingCost + tax;
 
   const handleConfirmOrder = async () => {
-    // Validate personal information
-    if (
-      !personalInfo.firstName ||
-      !personalInfo.lastName ||
-      !personalInfo.email ||
-      !personalInfo.phone
-    ) {
-      toast.error("Please fill in all personal information fields");
+    // Validate personal information with specific per-field messages
+    if (!personalInfo.firstName || personalInfo.firstName.trim() === "") {
+      toast.error("Please enter your first name");
       return;
     }
-
+    if (!personalInfo.lastName || personalInfo.lastName.trim() === "") {
+      toast.error("Please enter your last name");
+      return;
+    }
+    if (!personalInfo.email || personalInfo.email.trim() === "") {
+      toast.error("Please enter your email address");
+      return;
+    }
     if (!/^\S+@\S+\.\S+$/.test(personalInfo.email)) {
       toast.error("Please enter a valid email address");
+      return;
+    }
+    if (!personalInfo.phone || personalInfo.phone.trim() === "") {
+      toast.error("Please enter your phone number");
+      return;
+    }
+    if (personalInfo.phone.trim().length < 10) {
+      toast.error("Please enter a valid phone number");
       return;
     }
 
