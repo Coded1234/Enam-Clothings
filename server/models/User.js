@@ -47,11 +47,6 @@ const User = sequelize.define(
       unique: true,
       allowNull: true,
     },
-    facebookId: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: true,
-    },
     phone: {
       type: DataTypes.STRING(20),
       allowNull: true,

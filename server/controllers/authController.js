@@ -668,19 +668,13 @@ const facebookLogin = async (req, res) => {
 
     let user = await User.findOne({ where: { email } });
 
-    if (user) {
-      if (!user.facebookId) {
-        user.facebookId = facebookId;
-        await user.save();
-      }
-    } else {
+    if (!user) {
       const randomPassword = crypto.randomBytes(16).toString("hex");
       user = await User.create({
         firstName,
         lastName: lastName || "User",
         email,
         password: randomPassword,
-        facebookId,
         emailVerified: true,
         isActive: true,
         role: "customer",
@@ -739,7 +733,6 @@ const deleteAccount = async (req, res) => {
       email: `deleted_${user.id}@deleted.invalid`,
       phone: null,
       googleId: null,
-      facebookId: null,
       address: {},
       isActive: false,
       emailVerified: false,
@@ -795,23 +788,8 @@ const facebookDataDeletion = async (req, res) => {
     const facebookUserId = data.user_id;
 
     // Find and delete (or anonymise) the user
-    if (facebookUserId) {
-      const user = await User.findOne({
-        where: { facebookId: facebookUserId },
-      });
-      if (user) {
-        // Anonymise personal data rather than hard-delete to preserve order history integrity
-        await user.update({
-          firstName: "Deleted",
-          lastName: "User",
-          email: `deleted_fb_${facebookUserId}@deleted.invalid`,
-          phone: null,
-          facebookId: null,
-          address: {},
-          isActive: false,
-        });
-      }
-    }
+    // Note: Facebook login is no longer active; no user records to anonymise by facebookId
+    void facebookUserId;
 
     // Generate a confirmation code
     const confirmationCode = crypto
