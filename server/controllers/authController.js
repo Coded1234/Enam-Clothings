@@ -36,16 +36,13 @@ const register = async (req, res) => {
       role: userRole,
     });
 
-    // Generate email verification token
-    const verificationToken = user.generateEmailVerificationToken();
+    // Generate OTP for email verification
+    const otp = user.generateEmailOTP();
     await user.save();
 
-    // Send verification email
+    // Send verification email with OTP
     try {
-      const { subject, html } = emailTemplates.emailVerification(
-        user,
-        verificationToken,
-      );
+      const { subject, html } = emailTemplates.emailVerification(user, otp);
       await sendEmail(user.email, subject, html);
     } catch (emailError) {
       console.error("Verification email failed:", emailError);
@@ -96,7 +93,7 @@ const login = async (req, res) => {
     if (!user.emailVerified) {
       return res.status(401).json({
         message:
-          "Please verify your email address before logging in. Check your inbox for the verification link.",
+          "Please verify your email address before logging in. Check your inbox for your 6-digit OTP code.",
         emailVerified: false,
       });
     }
@@ -462,35 +459,45 @@ const deleteAvatar = async (req, res) => {
 
 // @desc    Verify email address
 // @route   GET /api/auth/verify-email/:token
+// @desc    Verify email with OTP
+// @route   POST /api/auth/verify-email
 const verifyEmail = async (req, res) => {
   try {
-    const { token } = req.params;
+    const { email, otp } = req.body;
 
-    // Find user with this verification token
-    const user = await User.findOne({
-      where: { emailVerificationToken: token },
-    });
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required" });
+    }
 
+    const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(400).json({
-        message: "Invalid or expired verification token",
-      });
+      return res.status(400).json({ message: "Invalid email or OTP" });
     }
 
-    // Check if already verified
     if (user.emailVerified) {
+      return res.status(400).json({ message: "Email is already verified" });
+    }
+
+    // Parse stored token: "<otp>|<expiryMs>"
+    const stored = user.emailVerificationToken || "";
+    const [storedOtp, expiryStr] = stored.split("|");
+
+    if (!storedOtp || otp.trim() !== storedOtp) {
+      return res.status(400).json({ message: "Incorrect OTP code" });
+    }
+
+    if (expiryStr && Date.now() > parseInt(expiryStr, 10)) {
       return res.status(400).json({
-        message: "Email is already verified",
+        message: "OTP has expired. Please request a new one.",
       });
     }
 
-    // Verify the email
     user.emailVerified = true;
     user.emailVerifiedAt = new Date();
     user.emailVerificationToken = null;
     await user.save();
 
-    // Send welcome email after verification
+    // Send welcome email
     try {
       const { subject, html } = emailTemplates.welcomeEmail(user);
       await sendEmail(user.email, subject, html);
@@ -498,7 +505,6 @@ const verifyEmail = async (req, res) => {
       console.error("Welcome email failed:", emailError);
     }
 
-    // Generate JWT token to auto-login user
     const authToken = generateToken(user.id);
 
     res.json({
@@ -515,10 +521,9 @@ const verifyEmail = async (req, res) => {
     });
   } catch (error) {
     console.error("Email verification error:", error);
-    res.status(500).json({
-      message: "Error verifying email",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({ message: "Error verifying email", error: error.message });
   }
 };
 
@@ -546,27 +551,22 @@ const resendVerificationEmail = async (req, res) => {
       });
     }
 
-    // Generate new verification token
-    const verificationToken = user.generateEmailVerificationToken();
+    // Generate new OTP
+    const otp = user.generateEmailOTP();
     await user.save();
 
-    // Send verification email
+    // Send OTP email
     try {
-      const { subject, html } = emailTemplates.emailVerification(
-        user,
-        verificationToken,
-      );
+      const { subject, html } = emailTemplates.emailVerification(user, otp);
       await sendEmail(user.email, subject, html);
     } catch (emailError) {
       console.error("Verification email failed:", emailError);
-      return res.status(500).json({
-        message: "Failed to send verification email",
-      });
+      return res
+        .status(500)
+        .json({ message: "Failed to send verification email" });
     }
 
-    res.json({
-      message: "Verification email sent! Please check your inbox.",
-    });
+    res.json({ message: "A new 6-digit OTP has been sent to your email." });
   } catch (error) {
     console.error("Resend verification error:", error);
     res.status(500).json({

@@ -41,7 +41,7 @@ const sequelize = process.env.DATABASE_URL
           timestamps: true,
           underscored: true,
         },
-      }
+      },
     );
 
 const connectDB = async () => {
@@ -49,10 +49,14 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log("✅ PostgreSQL connected successfully");
 
-    // Sync all models (in development)
     if (process.env.NODE_ENV === "development") {
+      // In dev, alter schema to match models
       await sequelize.sync({ alter: true });
-      console.log("✅ Database synchronized");
+      console.log("✅ Database synchronized (alter)");
+    } else {
+      // In production, only create tables that don't exist yet (safe, never drops/alters)
+      await sequelize.sync({ force: false });
+      console.log("✅ Database synchronized (create-if-not-exists)");
     }
   } catch (error) {
     console.error("❌ PostgreSQL connection error:", error.message);

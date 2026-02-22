@@ -30,7 +30,7 @@ router.post("/facebook", facebookLogin);
 router.post("/facebook/data-deletion", facebookDataDeletion);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
-router.get("/verify-email/:token", verifyEmail);
+router.post("/verify-email", verifyEmail);
 router.post("/resend-verification", resendVerificationEmail);
 
 // Protected routes

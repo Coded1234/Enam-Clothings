@@ -28,6 +28,7 @@ const settingsRoutes = require("./routes/settings");
 const couponRoutes = require("./routes/coupons");
 const categoryRoutes = require("./routes/categories");
 const shippingRoutes = require("./routes/shipping");
+const announcementRoutes = require("./routes/announcements");
 
 const app = express();
 
@@ -36,9 +37,11 @@ const app = express();
 app.set("trust proxy", 1);
 
 // Security headers
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }, // allow static uploads to load
-}));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // allow static uploads to load
+  }),
+);
 
 // Rate limiting
 const generalLimiter = rateLimit({
@@ -66,7 +69,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
@@ -81,7 +84,7 @@ app.use(
   swaggerUi.setup(swaggerSpecs, {
     customCss: ".swagger-ui .topbar { display: none }",
     customSiteTitle: "StyleStore API Documentation",
-  })
+  }),
 );
 
 // Routes
@@ -98,6 +101,7 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/shipping", shippingRoutes);
+app.use("/api/announcements", announcementRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -109,7 +113,10 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res
     .status(500)
-    .json({ message: "Something went wrong!", error: process.env.NODE_ENV === "production" ? undefined : err.message });
+    .json({
+      message: "Something went wrong!",
+      error: process.env.NODE_ENV === "production" ? undefined : err.message,
+    });
 });
 
 // Connect to PostgreSQL and start server

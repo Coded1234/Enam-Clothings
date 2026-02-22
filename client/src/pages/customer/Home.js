@@ -236,7 +236,7 @@ const Home = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {" "}
               {featuredProducts.slice(0, 4).map((product) => (
-                <ProductCard key={product._id} product={product} />
+                <ProductCard key={product.id || product._id} product={product} />
               ))}{" "}
             </div>
           )}{" "}

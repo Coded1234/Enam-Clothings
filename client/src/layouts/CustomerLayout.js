@@ -5,6 +5,8 @@ import Navbar from "../components/customer/Navbar";
 import Footer from "../components/customer/Footer";
 import ScrollToTop from "../components/common/ScrollToTop";
 import NewsletterPopup from "../components/customer/NewsletterPopup";
+import AnnouncementPopup from "../components/customer/AnnouncementPopup";
+import { AnnouncementsProvider } from "../context/AnnouncementsContext";
 
 const pageVariants = {
   initial: {
@@ -31,25 +33,28 @@ const CustomerLayout = () => {
   const location = useLocation();
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <ScrollToTop />
-      <Navbar />
-      <NewsletterPopup />
-      <main className="flex-grow">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={location.pathname}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            variants={pageVariants}
-          >
-            <Outlet />
-          </motion.div>
-        </AnimatePresence>
-      </main>
-      <Footer />
-    </div>
+    <AnnouncementsProvider>
+      <div className="flex flex-col min-h-screen">
+        <ScrollToTop />
+        <Navbar />
+        <NewsletterPopup />
+        <AnnouncementPopup />
+        <main className="flex-grow">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              variants={pageVariants}
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
+        </main>
+        <Footer />
+      </div>
+    </AnnouncementsProvider>
   );
 };
 

@@ -14,8 +14,10 @@ import {
   FiChevronDown,
   FiSun,
   FiMoon,
+  FiBell,
 } from "react-icons/fi";
 import { useTheme } from "../../context/ThemeContext";
+import { useAnnouncements } from "../../context/AnnouncementsContext";
 
 const defaultPromoMessages = [
   "Free shipping on orders over GH₵1,000",
@@ -26,13 +28,16 @@ const defaultPromoMessages = [
 
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
+  const { unread, unreadCount, dismissAll, dismissOne, announcements, openAnnouncement } = useAnnouncements();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [bellOpen, setBellOpen] = useState(false);
   const [promoIndex, setPromoIndex] = useState(0);
   const [promoMessages, setPromoMessages] = useState(defaultPromoMessages);
   const dropdownRef = useRef(null);
+  const bellRef = useRef(null);
 
   // Fetch active coupon and add to promo messages
   useEffect(() => {
@@ -108,6 +113,21 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownOpen]);
+
+  // Close bell dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (bellRef.current && !bellRef.current.contains(event.target)) {
+        setBellOpen(false);
+      }
+    };
+    if (bellOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [bellOpen]);
 
   // Prevent background/body scrolling when the mobile menu is open
   useEffect(() => {
@@ -199,14 +219,80 @@ const Navbar = () => {
               <FiSearch size={20} />
             </button>
 
-            {/* Wishlist */}
-            <Link
-              to="/wishlist"
-              className="p-2 hover:bg-gray-100 dark:hover:bg-opacity-10 rounded-full transition-colors hidden md:block"
-              aria-label="View wishlist"
-            >
-              <FiHeart size={20} />
-            </Link>
+            {/* Announcements Bell */}
+            <div className="relative" ref={bellRef}>
+              <button
+                onClick={() => setBellOpen(!bellOpen)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-opacity-10 rounded-full transition-colors relative"
+                aria-label="Announcements"
+              >
+                <FiBell size={20} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Bell dropdown */}
+              {bellOpen && (
+                <div className="fixed left-2 right-2 mt-2 md:absolute md:left-auto md:right-0 md:w-80 top-[60px] md:top-auto bg-white dark:bg-surface rounded-xl shadow-xl border border-gray-100 dark:border-primary-700 z-50 overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-3 border-b dark:border-primary-700">
+                    <h4 className="font-semibold text-gray-800 dark:text-gold-light text-sm">
+                      Announcements
+                    </h4>
+                    {announcements.length > 0 && unreadCount > 0 && (
+                      <button
+                        onClick={() => { dismissAll(); setBellOpen(false); }}
+                        className="text-xs text-primary-500 hover:text-primary-700 font-medium"
+                      >
+                        Clear all
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="max-h-72 overflow-y-auto">
+                    {unread.length === 0 ? (
+                      <div className="px-4 py-6 text-center text-gray-400 text-sm">
+                        No announcements
+                      </div>
+                    ) : (
+                      unread.map((a) => (
+                        <div
+                          key={a.id}
+                          onClick={() => { openAnnouncement(a); setBellOpen(false); }}
+                          className="px-4 py-3 border-b dark:border-primary-800 last:border-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-primary-900/30 transition-colors bg-blue-50 dark:bg-blue-900/20"
+                        >
+                          <div className="flex items-start gap-2">
+                            <span className="mt-1.5 w-2 h-2 rounded-full bg-primary-500 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-gray-800 dark:text-gold-light text-sm">
+                                {a.title}
+                              </p>
+                              <p className="text-gray-500 dark:text-gray-400 text-xs mt-0.5 line-clamp-2">
+                                {a.message}
+                              </p>
+                              {a.createdAt && (
+                                <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">
+                                  {new Date(a.createdAt).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}
+                                </p>
+                              )}
+                            </div>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); dismissOne(a.id); }}
+                              className="ml-1 flex-shrink-0 text-gray-300 hover:text-red-500 transition-colors p-0.5 rounded"
+                              aria-label="Dismiss announcement"
+                            >
+                              <FiX size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Cart */}
             <Link

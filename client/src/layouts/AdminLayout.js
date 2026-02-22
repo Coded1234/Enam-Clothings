@@ -19,6 +19,7 @@ import {
   FiTag,
   FiSun,
   FiMoon,
+  FiBell,
 } from "react-icons/fi";
 
 const pageVariants = {
@@ -59,6 +60,7 @@ const AdminLayout = () => {
     { path: "/admin/customers", icon: FiUsers, label: "Customers" },
     { path: "/admin/reviews", icon: FiStar, label: "Reviews" },
     { path: "/admin/coupons", icon: FiTag, label: "Coupons" },
+    { path: "/admin/announcements", icon: FiBell, label: "Announcements" },
     { path: "/admin/reports", icon: FiBarChart2, label: "Reports" },
   ];
 

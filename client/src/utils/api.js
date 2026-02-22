@@ -171,4 +171,13 @@ export const contactAPI = {
   submit: (data) => api.post("/contact", data),
 };
 
+// Announcements API
+export const announcementsAPI = {
+  getActive: () => api.get("/announcements/active"),
+  getAll: () => api.get("/announcements"),
+  create: (data) => api.post("/announcements", data),
+  update: (id, data) => api.put(`/announcements/${id}`, data),
+  delete: (id) => api.delete(`/announcements/${id}`),
+};
+
 export default api;

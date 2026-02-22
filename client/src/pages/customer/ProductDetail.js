@@ -791,7 +791,7 @@ const ProductDetail = () => {
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {relatedProducts.map((product) => (
-                <ProductCard key={product._id} product={product} />
+                <ProductCard key={product.id || product._id} product={product} />
               ))}
             </div>
           </div>

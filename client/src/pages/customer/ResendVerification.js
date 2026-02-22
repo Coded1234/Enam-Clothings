@@ -26,7 +26,7 @@ const ResendVerification = () => {
       toast.success(data.message);
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Failed to resend verification email",
+        error.response?.data?.message || "Failed to resend OTP code",
       );
     } finally {
       setLoading(false);
@@ -43,11 +43,11 @@ const ResendVerification = () => {
                 <FiMail className="mx-auto text-primary-600" size={64} />
               </div>
               <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                Resend Verification Email
+                Resend OTP Code
               </h2>
               <p className="text-gray-600">
-                Enter your email address and we'll send you a new verification
-                link
+                Enter your email address and we'll send you a new 6-digit OTP
+                code
               </p>
             </div>
 
@@ -75,7 +75,7 @@ const ResendVerification = () => {
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 rounded-lg font-medium hover:from-primary-700 hover:to-primary-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Sending..." : "Send Verification Email"}
+                {loading ? "Sending..." : "Send New OTP Code"}
               </button>
 
               <div className="text-center text-sm">
@@ -97,8 +97,8 @@ const ResendVerification = () => {
               Email Sent!
             </h2>
             <p className="text-gray-600 mb-6">
-              We've sent a verification link to <strong>{email}</strong>. Please
-              check your inbox and click the link to verify your account.
+              We've sent a 6-digit OTP code to <strong>{email}</strong>. Please
+              check your inbox and enter the code to verify your account.
             </p>
             <div className="space-y-3">
               <p className="text-sm text-gray-500">

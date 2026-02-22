@@ -46,6 +46,7 @@ import AdminReviews from "./pages/admin/Reviews";
 import AdminReports from "./pages/admin/Reports";
 import AdminCoupons from "./pages/admin/Coupons";
 import AdminCategories from "./pages/admin/Categories";
+import AdminAnnouncements from "./pages/admin/Announcements";
 import SearchResults from "./pages/customer/SearchResults";
 
 // Components
@@ -71,7 +72,7 @@ function App() {
         <Route path="cart" element={<Cart />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
-        <Route path="verify-email/:token" element={<VerifyEmail />} />
+        <Route path="verify-email" element={<VerifyEmail />} />
         <Route path="resend-verification" element={<ResendVerification />} />
         <Route path="faq" element={<FAQ />} />
         <Route path="size-guide" element={<SizeGuidePage />} />
@@ -165,6 +166,7 @@ function App() {
         {/* Settings page removed */}
         <Route path="coupons" element={<AdminCoupons />} />
         <Route path="categories" element={<AdminCategories />} />
+        <Route path="announcements" element={<AdminAnnouncements />} />
       </Route>
     </Routes>
   );

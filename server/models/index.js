@@ -14,6 +14,7 @@ const ContactMessage = require("./ContactMessage");
 const Coupon = require("./Coupon");
 const CouponUsage = require("./CouponUsage");
 const Category = require("./Category");
+const Announcement = require("./Announcement");
 
 // User - Cart (One-to-One)
 User.hasOne(Cart, { foreignKey: "userId", as: "cart" });
@@ -92,4 +93,5 @@ module.exports = {
   Coupon,
   CouponUsage,
   Category,
+  Announcement,
 };
