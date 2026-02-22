@@ -42,7 +42,7 @@ const getBiometricRegisterChallenge = async (req, res) => {
       userDisplayName: `${user.firstName} ${user.lastName}`,
       attestationType: "none",
       excludeCredentials: existingCredentials.map((cred) => ({
-        id: fromBase64url(cred.credentialID),
+        id: cred.credentialID, // v13: expects base64url string, not Uint8Array
         type: "public-key",
         transports: cred.transports || [],
       })),
@@ -89,32 +89,27 @@ const verifyBiometricRegistration = async (req, res) => {
         expectedRPID: RP_ID,
       });
     } catch (err) {
-      return res
-        .status(400)
-        .json({
-          message: "Registration verification failed",
-          error: err.message,
-        });
+      return res.status(400).json({
+        message: "Registration verification failed",
+        error: err.message,
+      });
     }
 
     const { verified, registrationInfo } = verification;
 
     if (verified && registrationInfo) {
-      const {
-        credentialID,
-        credentialPublicKey,
-        counter,
-        credentialDeviceType,
-        credentialBackedUp,
-      } = registrationInfo;
+      // v13: fields are nested under registrationInfo.credential
+      const { credential, credentialDeviceType, credentialBackedUp } =
+        registrationInfo;
 
       const newCredential = {
-        credentialID: toBase64url(credentialID),
-        credentialPublicKey: toBase64url(credentialPublicKey),
-        counter,
+        credentialID: credential.id, // already a base64url string in v13
+        credentialPublicKey: toBase64url(credential.publicKey), // Uint8Array → base64url
+        counter: credential.counter,
         deviceType: credentialDeviceType,
         backedUp: credentialBackedUp,
-        transports: req.body.response?.transports || [],
+        transports:
+          credential.transports || req.body.response?.transports || [],
         createdAt: new Date().toISOString(),
       };
 
@@ -171,7 +166,7 @@ const getBiometricLoginChallenge = async (req, res) => {
       rpID: RP_ID,
       userVerification: "required",
       allowCredentials: credentials.map((cred) => ({
-        id: fromBase64url(cred.credentialID),
+        id: cred.credentialID, // v13: expects base64url string, not Uint8Array
         type: "public-key",
         transports: cred.transports || [],
       })),
@@ -234,9 +229,10 @@ const verifyBiometricLogin = async (req, res) => {
         expectedChallenge: user.webauthnChallenge,
         expectedOrigin: ORIGIN,
         expectedRPID: RP_ID,
-        authenticator: {
-          credentialID: fromBase64url(credential.credentialID),
-          credentialPublicKey: fromBase64url(credential.credentialPublicKey),
+        // v13: renamed from 'authenticator' to 'credential'
+        credential: {
+          id: credential.credentialID, // base64url string
+          publicKey: fromBase64url(credential.credentialPublicKey), // Uint8Array
           counter: credential.counter,
           transports: credential.transports || [],
         },
