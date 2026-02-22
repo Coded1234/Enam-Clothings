@@ -31,6 +31,10 @@ const shippingRoutes = require("./routes/shipping");
 
 const app = express();
 
+// Trust the first proxy hop (required on Vercel / any reverse-proxy host)
+// so express-rate-limit can read the real client IP from X-Forwarded-For
+app.set("trust proxy", 1);
+
 // Security headers
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }, // allow static uploads to load

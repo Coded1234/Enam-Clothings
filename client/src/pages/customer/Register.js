@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   clearError,
   googleLogin,
-  facebookLogin,
   loadUser,
 } from "../../redux/slices/authSlice";
 import IMAGES from "../../config/images";
@@ -75,64 +74,6 @@ const Register = () => {
       toast.error("Google signup failed");
     },
   });
-
-  const loadFBSdk = () =>
-    new Promise((resolve) => {
-      if (window.FB) {
-        resolve(window.FB);
-        return;
-      }
-      window.fbAsyncInit = function () {
-        window.FB.init({
-          appId: process.env.REACT_APP_FACEBOOK_APP_ID,
-          cookie: true,
-          xfbml: true,
-          version: "v18.0",
-        });
-        resolve(window.FB);
-      };
-      const s = document.createElement("script");
-      s.src = "https://connect.facebook.net/en_US/sdk.js";
-      document.body.appendChild(s);
-    });
-
-  const handleFacebookLogin = async () => {
-    if (!process.env.REACT_APP_FACEBOOK_APP_ID) {
-      toast.error("Facebook login is not configured yet");
-      return;
-    }
-    try {
-      const FB = await loadFBSdk();
-      FB.login(
-        (response) => {
-          if (response.authResponse) {
-            dispatch(facebookLogin(response.authResponse.accessToken))
-              .unwrap()
-              .then((userData) => {
-                if (
-                  !userData.user?.firstName ||
-                  !userData.user?.lastName ||
-                  !userData.user?.phone
-                ) {
-                  setShowProfileModal(true);
-                  toast.success(
-                    "Registration successful! Please complete your profile.",
-                  );
-                } else {
-                  toast.success("Registration successful!");
-                }
-              })
-              .catch(() => {});
-          } else {
-            toast.error("Facebook login was cancelled");
-          }
-        },
-        { scope: "email" },
-      );
-    } catch (err) {
-      toast.error("Facebook signup failed");
-    }
-  };
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -564,7 +505,7 @@ const Register = () => {
               </div>
 
               {/* Social Signup */}
-              <div className="grid grid-cols-2 gap-4">
+              <div>
                 <button
                   type="button"
                   onClick={() => {
@@ -577,7 +518,7 @@ const Register = () => {
                     signupGoogle();
                   }}
                   disabled={!googleClientId}
-                  className={`flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors ${!googleClientId ? "opacity-60 cursor-not-allowed" : ""}`}
+                  className={`w-full flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors ${!googleClientId ? "opacity-60 cursor-not-allowed" : ""}`}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path
@@ -598,16 +539,6 @@ const Register = () => {
                     />
                   </svg>
                   <span className="font-medium text-gray-700">Google</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleFacebookLogin}
-                  className="flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                  </svg>
-                  <span className="font-medium text-gray-700">Facebook</span>
                 </button>
               </div>
             </>
