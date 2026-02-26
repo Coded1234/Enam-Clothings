@@ -63,17 +63,6 @@ export const authAPI = {
   forgotPassword: (email) => api.post("/auth/forgot-password", { email }),
   resetPassword: (token, password) =>
     api.post(`/auth/reset-password/${token}`, { password }),
-  // Biometric (WebAuthn)
-  biometricRegisterChallenge: () =>
-    api.post("/auth/biometric/register-challenge"),
-  biometricRegisterVerify: (data) =>
-    api.post("/auth/biometric/register-verify", data),
-  biometricLoginChallenge: (email) =>
-    api.post("/auth/biometric/login-challenge", { email }),
-  biometricLoginVerify: (email, data) =>
-    api.post("/auth/biometric/login-verify", { email, ...data }),
-  removeBiometricCredential: (credentialID) =>
-    api.delete(`/auth/biometric/${encodeURIComponent(credentialID)}`),
 };
 
 // Products API

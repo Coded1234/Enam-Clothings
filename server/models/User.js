@@ -83,15 +83,6 @@ const User = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
-    webauthnCredentials: {
-      type: DataTypes.JSONB,
-      defaultValue: [],
-      allowNull: true,
-    },
-    webauthnChallenge: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
   },
   {
     tableName: "users",

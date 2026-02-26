@@ -23,9 +23,7 @@ import {
   FiHeart,
   FiLogOut,
   FiTrash2,
-  FiCheck,
 } from "react-icons/fi";
-import useBiometric from "../../hooks/useBiometric";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -63,18 +61,6 @@ const Profile = () => {
     smsAlerts: true,
   });
 
-  const {
-    supported: biometricSupported,
-    loading: biometricLoading,
-    registerBiometric,
-    removeBiometric,
-  } = useBiometric();
-
-  // Local copy of webauthn credentials (sourced from user object on each profile fetch)
-  const [biometricCredentials, setBiometricCredentials] = useState(
-    user?.webauthnCredentials || [],
-  );
-
   useEffect(() => {
     if (user) {
       setProfileData({
@@ -84,7 +70,6 @@ const Profile = () => {
         phone: user.phone || "",
         avatar: user.avatar || "",
       });
-      setBiometricCredentials(user.webauthnCredentials || []);
     }
   }, [user]);
 
@@ -150,30 +135,6 @@ const Profile = () => {
       toast.error(error.response?.data?.message || "Failed to delete account");
     } finally {
       setDeleteLoading(false);
-    }
-  };
-
-  const handleRegisterBiometric = async () => {
-    const result = await registerBiometric();
-    if (result?.verified) {
-      toast.success(result.message || "Biometric login registered!");
-      // Refresh user profile to get updated credentials list
-      const { data: updatedUser } = await api.get("/auth/profile");
-      dispatch(updateProfile(updatedUser));
-    } else if (result?.message) {
-      toast.error(result.message);
-    }
-  };
-
-  const handleRemoveBiometric = async (credentialID) => {
-    try {
-      await removeBiometric(credentialID);
-      setBiometricCredentials((prev) =>
-        prev.filter((c) => c.credentialID !== credentialID),
-      );
-      toast.success("Biometric credential removed");
-    } catch (err) {
-      toast.error(err.message || "Failed to remove credential");
     }
   };
 
@@ -630,94 +591,6 @@ const Profile = () => {
                       </button>
                     </form>
                   </div>
-
-                  {/* Biometric / Passkey Login */}
-                  {biometricSupported && (
-                    <div className="bg-white rounded-2xl shadow-sm p-6">
-                      <div className="flex items-center gap-3 mb-2">
-                        <svg
-                          className="w-6 h-6 text-primary-500"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 11c0-1.657-1.343-3-3-3S6 9.343 6 11v2a6 6 0 0012 0v-2c0-1.657-1.343-3-3-3s-3 1.343-3 3z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 3C7.029 3 3 7.029 3 12s4.029 9 9 9 9-4.029 9-9-4.029-9-9-9z"
-                          />
-                        </svg>
-                        <h2 className="text-xl font-bold text-gray-800">
-                          Biometric Login
-                        </h2>
-                      </div>
-                      <p className="text-gray-500 text-sm mb-5">
-                        Use your device's fingerprint, Face ID, or Windows Hello
-                        to sign in without a password.
-                      </p>
-
-                      {/* Registered credentials */}
-                      {biometricCredentials.length > 0 && (
-                        <div className="mb-5 space-y-2">
-                          {biometricCredentials.map((cred, idx) => (
-                            <div
-                              key={cred.credentialID}
-                              className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200"
-                            >
-                              <div className="flex items-center gap-3">
-                                <FiCheck className="text-green-500" size={18} />
-                                <div>
-                                  <p className="text-sm font-medium text-gray-800">
-                                    Device {idx + 1}
-                                  </p>
-                                  <p className="text-xs text-gray-400">
-                                    Registered{" "}
-                                    {cred.createdAt
-                                      ? new Date(
-                                          cred.createdAt,
-                                        ).toLocaleDateString()
-                                      : ""}
-                                  </p>
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleRemoveBiometric(cred.credentialID)
-                                }
-                                className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                title="Remove this credential"
-                              >
-                                <FiTrash2 size={16} />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={handleRegisterBiometric}
-                        disabled={biometricLoading}
-                        className="px-6 py-3 btn-gradient rounded-xl font-semibold flex items-center gap-2 disabled:opacity-50"
-                      >
-                        {biometricLoading ? (
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <FiShield />
-                        )}
-                        {biometricCredentials.length > 0
-                          ? "Register Another Device"
-                          : "Set Up Biometric Login"}
-                      </button>
-                    </div>
-                  )}
 
                   {/* Danger Zone */}
                   <div className="bg-white rounded-2xl shadow-sm p-6 border-2 border-red-100">

@@ -9,7 +9,6 @@
     "db:create": "node scripts/createDatabase.js"
   },
   "dependencies": {
-    "@simplewebauthn/server": "^13.2.3",
     "axios": "^1.13.5",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.41.3",

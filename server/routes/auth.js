@@ -19,13 +19,6 @@ const {
   verifyEmail,
   resendVerificationEmail,
 } = require("../controllers/authController");
-const {
-  getBiometricRegisterChallenge,
-  verifyBiometricRegistration,
-  getBiometricLoginChallenge,
-  verifyBiometricLogin,
-  removeBiometricCredential,
-} = require("../controllers/biometricController");
 const { protect } = require("../middleware/auth");
 const { avatarUpload } = require("../config/cloudinary");
 
@@ -49,18 +42,5 @@ router.get("/wishlist", protect, getWishlist);
 router.post("/avatar", protect, avatarUpload.single("avatar"), uploadAvatar);
 router.delete("/avatar", protect, deleteAvatar);
 router.delete("/account", protect, deleteAccount);
-
-// Biometric (WebAuthn) routes
-// Public - login flow
-router.post("/biometric/login-challenge", getBiometricLoginChallenge);
-router.post("/biometric/login-verify", verifyBiometricLogin);
-// Protected - registration flow (must be logged in to register a device)
-router.post(
-  "/biometric/register-challenge",
-  protect,
-  getBiometricRegisterChallenge,
-);
-router.post("/biometric/register-verify", protect, verifyBiometricRegistration);
-router.delete("/biometric/:credentialID", protect, removeBiometricCredential);
 
 module.exports = router;

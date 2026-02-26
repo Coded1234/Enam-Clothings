@@ -108,22 +108,6 @@ export const updateProfile = createAsyncThunk(
   },
 );
 
-export const biometricLogin = createAsyncThunk(
-  "auth/biometricLogin",
-  async (userData, { rejectWithValue }) => {
-    try {
-      // userData = { token, ...userFields } — token + user data returned from server
-      localStorage.setItem("token", userData.token);
-      localStorage.setItem("user", JSON.stringify(userData));
-      return userData;
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Biometric login failed",
-      );
-    }
-  },
-);
-
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -216,20 +200,6 @@ const authSlice = createSlice({
       // Update Profile
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.user = { ...state.user, ...action.payload };
-      })
-      // Biometric Login
-      .addCase(biometricLogin.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(biometricLogin.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-        state.isAuthenticated = true;
-      })
-      .addCase(biometricLogin.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
       });
   },
 });

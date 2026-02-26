@@ -12,7 +12,6 @@ import toast from "react-hot-toast";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import { useGoogleLogin } from "@react-oauth/google";
 import CompleteProfileModal from "../../components/customer/CompleteProfileModal";
-import useBiometric from "../../hooks/useBiometric";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -31,12 +30,6 @@ const Login = () => {
   );
 
   const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
-  const {
-    supported: biometricSupported,
-    loading: biometricLoading,
-    loginWithBiometric,
-  } = useBiometric();
-
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       dispatch(googleLogin(tokenResponse.access_token))
@@ -122,19 +115,6 @@ const Login = () => {
         );
       }
       // Other errors handled by useEffect
-    }
-  };
-
-  const handleBiometricLogin = async () => {
-    if (!formData.email) {
-      toast.error("Please enter your email address first");
-      return;
-    }
-    try {
-      await loginWithBiometric(formData.email);
-      toast.success("Welcome!");
-    } catch (err) {
-      toast.error(err.message || "Biometric login failed");
     }
   };
 
@@ -318,42 +298,6 @@ const Login = () => {
               </svg>
               <span className="font-medium text-gray-700">Google</span>
             </button>
-
-            {/* Biometric Login — only shown when device supports WebAuthn */}
-            {biometricSupported && (
-              <button
-                type="button"
-                onClick={handleBiometricLogin}
-                disabled={biometricLoading}
-                className="w-full flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
-              >
-                {biometricLoading ? (
-                  <div className="spinner w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <svg
-                    className="w-5 h-5 text-gray-600"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 11c0-1.657-1.343-3-3-3S6 9.343 6 11v2a6 6 0 0012 0v-2c0-1.657-1.343-3-3-3s-3 1.343-3 3z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 3C7.029 3 3 7.029 3 12s4.029 9 9 9 9-4.029 9-9-4.029-9-9-9z"
-                    />
-                  </svg>
-                )}
-                <span className="font-medium text-gray-700">
-                  {biometricLoading ? "Verifying..." : "Biometric / Passkey"}
-                </span>
-              </button>
-            )}
           </div>
         </div>
       </div>
