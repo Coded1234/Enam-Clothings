@@ -1,16 +1,17 @@
+"use client";
+import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiMail, FiBell } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 import { newsletterAPI } from "../../utils/api";
-import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const NewsletterPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [subscribing, setSubscribing] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
   const { user } = useSelector((state) => state.auth);
 
   // Pages where popup should NOT show
@@ -24,7 +25,7 @@ const NewsletterPopup = () => {
 
   useEffect(() => {
     // Don't show on excluded pages
-    if (excludedPaths.some((path) => location.pathname.startsWith(path))) {
+    if (excludedPaths.some((path) => pathname.startsWith(path))) {
       return;
     }
 
@@ -85,7 +86,7 @@ const NewsletterPopup = () => {
       clearTimeout(timer);
       document.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [location.pathname]);
+  }, [pathname]);
 
   const handleClose = () => {
     setIsOpen(false);

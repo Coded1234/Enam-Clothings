@@ -1,9 +1,14 @@
+"use client";
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
-import AddressMapPicker from "../../components/customer/AddressMapPicker";
+import dynamic from "next/dynamic";
+const AddressMapPicker = dynamic(
+  () => import("../../components/customer/AddressMapPicker"),
+  { ssr: false }
+);
 import {
   FiMapPin,
   FiCreditCard,
@@ -15,14 +20,14 @@ import {
 } from "react-icons/fi";
 
 const Checkout = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { items, totalAmount } = useSelector((state) => state.cart);
+  const router = useRouter();
+    const { items, totalAmount } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.auth);
 
   // Get coupon data from Cart page if passed
-  const passedCoupon = location.state?.coupon || null;
-  const passedDiscount = location.state?.couponDiscount || 0;
+  const _checkoutState = typeof window !== "undefined" ? JSON.parse(sessionStorage.getItem("checkoutState") || "{}") : {};
+  const passedCoupon = _checkoutState.coupon || null;
+  const passedDiscount = _checkoutState.couponDiscount || 0;
 
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -77,9 +82,9 @@ const Checkout = () => {
   // Nigerian states
   useEffect(() => {
     if (items.length === 0) {
-      navigate("/cart");
+      router.push("/cart");
     }
-  }, [items, navigate]);
+  }, [items, router]);
 
   const handleInputChange = (e) => {
     setShippingInfo({ ...shippingInfo, [e.target.name]: e.target.value });
@@ -247,26 +252,28 @@ const Checkout = () => {
       setTimeout(
         () => {
           // Navigate directly to order summary page
-          navigate("/order-summary", {
-            state: {
-              orderData: {
-                shippingAddress: {
-                  ...shippingInfo,
-                  city,
-                  postalCode,
-                },
-                couponId: appliedCoupon?.id || null,
-                discount: couponDiscount,
-                shippingDetails: shippingDetails,
+          const _orderSummaryData1 = {
+            orderData: {
+              shippingAddress: {
+                ...shippingInfo,
+                city,
+                postalCode,
               },
-              items: items,
-              totalAmount: totalAmount,
-              coupon: appliedCoupon,
-              couponDiscount: couponDiscount,
-              shippingCost: shippingCost,
+              couponId: appliedCoupon?.id || null,
+              discount: couponDiscount,
               shippingDetails: shippingDetails,
             },
-          });
+            items: items,
+            totalAmount: totalAmount,
+            coupon: appliedCoupon,
+            couponDiscount: couponDiscount,
+            shippingCost: shippingCost,
+            shippingDetails: shippingDetails,
+          };
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("orderSummaryState", JSON.stringify(_orderSummaryData1));
+          }
+          router.push("/order-summary");
         },
         shippingCalculated ? 0 : 500,
       );
@@ -275,27 +282,29 @@ const Checkout = () => {
 
   const handlePayment = async () => {
     // Navigate to order summary page for review
-    navigate("/order-summary", {
-      state: {
-        orderData: {
-          shippingAddress: {
-            ...shippingInfo,
-            city,
-            postalCode,
-          },
-          paymentMethod: paymentMethod,
-          couponId: appliedCoupon?.id || null,
-          discount: couponDiscount,
-          shippingDetails: shippingDetails,
+    const _orderSummaryData2 = {
+      orderData: {
+        shippingAddress: {
+          ...shippingInfo,
+          city,
+          postalCode,
         },
-        items: items,
-        totalAmount: totalAmount,
-        coupon: appliedCoupon,
-        couponDiscount: couponDiscount,
-        shippingCost: shippingCost,
+        paymentMethod: paymentMethod,
+        couponId: appliedCoupon?.id || null,
+        discount: couponDiscount,
         shippingDetails: shippingDetails,
       },
-    });
+      items: items,
+      totalAmount: totalAmount,
+      coupon: appliedCoupon,
+      couponDiscount: couponDiscount,
+      shippingCost: shippingCost,
+      shippingDetails: shippingDetails,
+    };
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("orderSummaryState", JSON.stringify(_orderSummaryData2));
+    }
+    router.push("/order-summary");
   };
 
   const formatPrice = (price) => {

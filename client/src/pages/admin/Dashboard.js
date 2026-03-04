@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import {
   FiPackage,
   FiDollarSign,
@@ -194,7 +195,7 @@ const Dashboard = () => {
               Orders by Status
             </h2>
             <Link
-              to="/admin/orders"
+              href="/admin/orders"
               className="text-primary-600 hover:text-primary-700 text-xs md:text-sm font-medium"
             >
               View All
@@ -229,7 +230,7 @@ const Dashboard = () => {
           </h2>
           <div className="grid grid-cols-2 gap-2 md:gap-4">
             <Link
-              to="/admin/products/new"
+              href="/admin/products/new"
               className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 p-2 md:p-4 bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 transition-colors"
             >
               <FiPackage size={16} className="md:w-5 md:h-5" />
@@ -238,7 +239,7 @@ const Dashboard = () => {
               </span>
             </Link>
             <Link
-              to="/admin/orders"
+              href="/admin/orders"
               className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 p-2 md:p-4 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
             >
               <FiShoppingBag size={16} className="md:w-5 md:h-5" />
@@ -247,14 +248,14 @@ const Dashboard = () => {
               </span>
             </Link>
             <Link
-              to="/admin/customers"
+              href="/admin/customers"
               className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 p-2 md:p-4 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
             >
               <FiUsers size={16} className="md:w-5 md:h-5" />
               <span className="font-medium text-xs md:text-sm">Customers</span>
             </Link>
             <Link
-              to="/admin/reviews"
+              href="/admin/reviews"
               className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 p-2 md:p-4 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
             >
               <FiTrendingUp size={16} className="md:w-5 md:h-5" />
@@ -271,7 +272,7 @@ const Dashboard = () => {
             Recent Orders
           </h2>
           <Link
-            to="/admin/orders"
+            href="/admin/orders"
             className="text-primary-600 hover:text-primary-700 text-xs md:text-sm font-medium"
           >
             View All
@@ -328,7 +329,7 @@ const Dashboard = () => {
                     </td>
                     <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-right text-sm">
                       <Link
-                        to={`/admin/orders/${order.id}`}
+                        href={`/admin/orders/${order.id}`}
                         className="text-primary-600 hover:text-primary-900"
                       >
                         <FiEye size={16} className="md:w-[18px] md:h-[18px]" />

@@ -1,9 +1,10 @@
+"use client";
+import Link from "next/link";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FiMail, FiBell, FiCheckCircle } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 import { newsletterAPI } from "../../utils/api";
-import { Link } from "react-router-dom";
 
 const Newsletter = () => {
   const [email, setEmail] = useState("");
@@ -96,7 +97,7 @@ const Newsletter = () => {
                   exciting updates!
                 </p>
                 <Link
-                  to="/"
+                  href="/"
                   className="inline-block px-8 py-3 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-colors"
                 >
                   Continue Shopping
@@ -209,14 +210,14 @@ const Newsletter = () => {
                     <p>
                       By subscribing, you agree to our{" "}
                       <Link
-                        to="/privacy-policy"
+                        href="/privacy-policy"
                         className="text-primary-500 hover:text-primary-600 underline"
                       >
                         Privacy Policy
                       </Link>{" "}
                       and{" "}
                       <Link
-                        to="/terms"
+                        href="/terms"
                         className="text-primary-500 hover:text-primary-600 underline"
                       >
                         Terms of Service

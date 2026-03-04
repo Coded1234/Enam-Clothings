@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { FiMail, FiCheckCircle } from "react-icons/fi";
@@ -78,7 +79,7 @@ const ResendVerification = () => {
 
               <div className="text-center text-sm">
                 <Link
-                  to="/login"
+                  href="/login"
                   className="text-primary-600 hover:underline font-medium"
                 >
                   Back to Login

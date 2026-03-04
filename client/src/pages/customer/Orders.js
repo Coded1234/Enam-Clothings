@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import api from "../../utils/api";
 import { getImageUrl } from "../../utils/imageUrl";
 import toast from "react-hot-toast";
@@ -212,7 +213,7 @@ const Orders = () => {
                 : "You haven't placed any orders yet"}
             </p>
             <Link
-              to="/shop"
+              href="/shop"
               className="inline-flex items-center gap-2 px-6 py-3 btn-gradient rounded-xl font-semibold"
             >
               Start Shopping
@@ -278,7 +279,7 @@ const Orders = () => {
 
                   {/* Order Items Preview */}
                   <Link
-                    to={`/orders/${order.id}`}
+                    href={`/orders/${order.id}`}
                     className="block p-4 md:p-6 bg-gray-50 hover:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-center justify-between">

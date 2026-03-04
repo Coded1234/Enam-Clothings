@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React from "react";
-import { Link } from "react-router-dom";
 
 const PrivacyPolicy = () => {
   return (
@@ -89,7 +90,7 @@ Note: This is a concise, general-purpose privacy policy suitable for an e-commer
           </section>
 
           <div className="mt-6">
-            <Link to="/" className="text-primary-500 hover:underline">
+            <Link href="/" className="text-primary-500 hover:underline">
               Back to Home
             </Link>
           </div>

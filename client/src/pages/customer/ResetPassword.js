@@ -1,12 +1,14 @@
+"use client";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import React, { useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
 import { FiLock, FiEye, FiEyeOff, FiCheck, FiX } from "react-icons/fi";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
 
 const ResetPassword = () => {
   const { token } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -45,7 +47,7 @@ const ResetPassword = () => {
 
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        navigate("/login");
+        router.push("/login");
       }, 3000);
     } catch (err) {
       const message = err.response?.data?.message || "Failed to reset password";
@@ -75,7 +77,7 @@ const ResetPassword = () => {
               Redirecting to login page...
             </p>
             <Link
-              to="/login"
+              href="/login"
               className="block w-full py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity text-center"
             >
               Go to Login
@@ -92,7 +94,7 @@ const ResetPassword = () => {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <Link to="/" className="inline-block mb-6">
+            <Link href="/" className="inline-block mb-6">
               <img
                 src="/images/loginlogo.png"
                 alt="The Fashion Gallery"
@@ -236,7 +238,7 @@ const ResetPassword = () => {
           {/* Back to Login */}
           <div className="mt-6 text-center">
             <Link
-              to="/login"
+              href="/login"
               className="text-gray-600 hover:text-primary-500 transition-colors"
             >
               Remember your password? <span className="font-medium">Login</span>

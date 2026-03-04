@@ -1,5 +1,7 @@
+"use client";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchCart,
@@ -22,7 +24,7 @@ import {
 
 const Cart = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const { items, totalAmount, loading } = useSelector((state) => state.cart);
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -114,16 +116,14 @@ const Cart = () => {
   const handleCheckout = () => {
     if (!isAuthenticated) {
       toast.error("Please login to checkout");
-      navigate("/login", { state: { from: "/checkout" } });
+      router.push("/login?from=/checkout");
       return;
     }
     // Pass coupon data to checkout
-    navigate("/checkout", {
-      state: {
-        coupon: appliedCoupon,
-        couponDiscount: couponDiscount,
-      },
-    });
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("checkoutState", JSON.stringify({ coupon: appliedCoupon, couponDiscount: couponDiscount }));
+    }
+    router.push("/checkout");
   };
 
   // Coupon handlers
@@ -190,7 +190,7 @@ const Cart = () => {
               Please login to view your cart and start shopping!
             </p>
             <Link
-              to="/login"
+              href="/login"
               className="inline-flex items-center gap-2 px-8 py-3 btn-gradient rounded-full font-semibold"
             >
               Login to Continue
@@ -216,7 +216,7 @@ const Cart = () => {
               Looks like you haven't added any items to your cart yet.
             </p>
             <Link
-              to="/shop"
+              href="/shop"
               className="inline-flex items-center gap-2 px-8 py-3 btn-gradient rounded-full font-semibold"
             >
               <FiShoppingBag />
@@ -260,7 +260,7 @@ const Cart = () => {
               >
                 {/* Product Image */}
                 <Link
-                  to={`/product/${item.product?.id}`}
+                  href={`/product/${item.product?.id}`}
                   className="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 rounded-lg overflow-hidden bg-gray-100"
                 >
                   <img
@@ -275,7 +275,7 @@ const Cart = () => {
                   <div className="flex justify-between gap-4">
                     <div>
                       <Link
-                        to={`/product/${item.product?.id}`}
+                        href={`/product/${item.product?.id}`}
                         className="font-medium text-gray-800 hover:text-primary-500 line-clamp-2"
                       >
                         {item.product?.name}
@@ -384,7 +384,7 @@ const Cart = () => {
 
             {/* Continue Shopping */}
             <Link
-              to="/shop"
+              href="/shop"
               className="inline-flex items-center gap-2 text-primary-500 hover:text-primary-600 font-medium mt-4"
             >
               <FiArrowLeft />
@@ -441,7 +441,7 @@ const Cart = () => {
                 return (
                   <Link
                     key={product.id}
-                    to={`/product/${product.id}`}
+                    href={`/product/${product.id}`}
                     className="bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-md transition-shadow"
                   >
                     <div className="aspect-[3/4] bg-gray-100 overflow-hidden">
@@ -487,7 +487,7 @@ const Cart = () => {
                 recently viewed items here!
               </p>
               <Link
-                to="/shop"
+                href="/shop"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-xl font-semibold text-gray-800 hover:shadow-md transition-shadow"
               >
                 Browse Products

@@ -1,5 +1,7 @@
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
 import {
   FiPlus,
   FiEdit2,
@@ -15,7 +17,7 @@ import { getImageUrl } from "../../utils/imageUrl";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const Products = () => {
-  const location = useLocation();
+  const pathname = usePathname();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,7 +32,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [currentPage, categoryFilter, location.pathname, location.state]);
+  }, [currentPage, categoryFilter, pathname]);
 
   const fetchProducts = async () => {
     try {
@@ -108,7 +110,7 @@ const Products = () => {
         </form>
 
         <Link
-          to="/admin/products/new"
+          href="/admin/products/new"
           className="inline-flex items-center justify-center bg-primary-600 text-white w-10 h-10 rounded-full hover:bg-primary-700 transition-colors flex-shrink-0"
           title="Add Product"
         >
@@ -260,7 +262,7 @@ const Products = () => {
                         <td className="px-2 md:px-6 pl-1 md:pl-3 py-2 md:py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex items-center justify-end gap-1 md:gap-2">
                             <Link
-                              to={`/admin/products/${product.id}/edit`}
+                              href={`/admin/products/${product.id}/edit`}
                               className="p-1.5 md:p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                               title="Edit"
                             >

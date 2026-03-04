@@ -1,9 +1,11 @@
+"use client";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import React from "react";
-import { Link, useSearchParams } from "react-router-dom";
 import { FiCheckCircle, FiShield } from "react-icons/fi";
 
 const DataDeletionStatus = () => {
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const code = searchParams.get("code");
 
   return (
@@ -49,7 +51,7 @@ const DataDeletionStatus = () => {
         </div>
 
         <Link
-          to="/"
+          href="/"
           className="inline-block px-6 py-3 btn-gradient rounded-xl font-semibold text-sm"
         >
           Return to Home

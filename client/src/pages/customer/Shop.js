@@ -1,5 +1,7 @@
+"use client";
+import Link from "next/link";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProducts,
@@ -35,8 +37,8 @@ const FilterSection = ({ title, isOpen, onToggle, children }) => (
 
 const Shop = () => {
   const { category } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const dispatch = useDispatch();
 
   const { products, loading, pagination, filters } = useSelector(
@@ -159,7 +161,7 @@ const Shop = () => {
 
       const targetPath = value ? `/shop/${value}` : "/shop";
       const qs = newParams.toString();
-      navigate(qs ? `${targetPath}?${qs}` : targetPath);
+      router.push(qs ? `${targetPath}?${qs}` : targetPath);
       return;
     }
 
@@ -172,7 +174,7 @@ const Shop = () => {
       newParams.delete(key);
     }
     newParams.set("page", "1");
-    setSearchParams(newParams);
+    router.push('?' + newParams.toString());
   };
 
   const handleClearFilters = () => {
@@ -198,7 +200,7 @@ const Shop = () => {
     }
 
     newParams.set("page", "1");
-    setSearchParams(newParams);
+    router.push('?' + newParams.toString());
 
     dispatch(setFilters({ minPrice: tempMinPrice, maxPrice: tempMaxPrice }));
   }, [tempMinPrice, tempMaxPrice, searchParams, setSearchParams, dispatch]);
@@ -206,7 +208,7 @@ const Shop = () => {
   const handlePageChange = (page) => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set("page", page.toString());
-    setSearchParams(newParams);
+    router.push('?' + newParams.toString());
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

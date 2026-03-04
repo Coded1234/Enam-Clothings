@@ -1,5 +1,7 @@
+"use client";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
 import { reviewsAPI } from "../../utils/api";
 import { FiStar, FiChevronLeft, FiThumbsUp, FiCheck } from "react-icons/fi";
 import toast from "react-hot-toast";
@@ -8,7 +10,7 @@ import { fetchProductById } from "../../redux/slices/productSlice";
 
 const ProductReviews = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { product } = useSelector((state) => state.products);
@@ -42,7 +44,7 @@ const ProductReviews = () => {
   const handleMarkHelpful = async (reviewId) => {
     if (!isAuthenticated) {
       toast.error("Please login to mark reviews as helpful");
-      navigate("/login");
+      router.push("/login");
       return;
     }
 
@@ -93,7 +95,7 @@ const ProductReviews = () => {
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Back Button */}
         <Link
-          to={`/product/${id}`}
+          href={`/product/${id}`}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-primary-600 mb-6 transition-colors"
         >
           <FiChevronLeft />

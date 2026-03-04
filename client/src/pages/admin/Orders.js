@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import {
   FiSearch,
   FiFilter,
@@ -270,7 +271,7 @@ const Orders = () => {
                         </td>
                         <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-right">
                           <Link
-                            to={`/admin/orders/${order.id}`}
+                            href={`/admin/orders/${order.id}`}
                             className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-900 text-xs md:text-sm font-medium"
                           >
                             <FiEye size={14} className="md:w-4 md:h-4" />

@@ -1,6 +1,5 @@
 {
-  "buildCommand": "cd client && npm install && npm run build",
-  "outputDirectory": "client/build",
+  "buildCommand": "next build",
   "installCommand": "npm install && npm install --prefix server",
   "functions": {
     "api/**/*.js": {

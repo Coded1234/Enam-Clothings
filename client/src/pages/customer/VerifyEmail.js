@@ -1,5 +1,7 @@
+"use client";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import React, { useState, useRef, useEffect } from "react";
-import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/slices/authSlice";
 import axios from "axios";
@@ -9,7 +11,7 @@ import { FiMail, FiCheckCircle, FiRefreshCw } from "react-icons/fi";
 const OTP_LENGTH = 6;
 
 const VerifyEmail = () => {
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const emailFromQuery = searchParams.get("email") || "";
 
   const [email, setEmail] = useState(emailFromQuery);
@@ -19,7 +21,7 @@ const VerifyEmail = () => {
   const [verified, setVerified] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const inputRefs = useRef([]);
-  const navigate = useNavigate();
+  const router = useRouter();
   const dispatch = useDispatch();
 
   // Countdown timer for resend cooldown
@@ -82,7 +84,7 @@ const VerifyEmail = () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         dispatch(setCredentials({ user: data.user, token: data.token }));
-        setTimeout(() => navigate("/"), 1500);
+        setTimeout(() => router.push("/"), 1500);
       }
     } catch (error) {
       const msg = error.response?.data?.message || "Verification failed";
@@ -127,7 +129,7 @@ const VerifyEmail = () => {
             You're being redirected to the home page…
           </p>
           <Link
-            to="/"
+            href="/"
             className="inline-block px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium hover:from-primary-700 hover:to-primary-800 transition-colors"
           >
             Go to Home
@@ -220,7 +222,7 @@ const VerifyEmail = () => {
 
         <div className="mt-4 text-center">
           <Link
-            to="/login"
+            href="/login"
             className="text-sm text-gray-500 hover:text-primary-600"
           >
             ← Back to Login

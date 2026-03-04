@@ -1,11 +1,14 @@
+"use client";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import React, { useState, useEffect, useCallback } from "react";
-import { useSearchParams, Link } from "react-router-dom";
 import { FiSearch, FiFilter, FiX, FiGrid, FiList } from "react-icons/fi";
 import api from "../../utils/api";
 import ProductCard from "../../components/customer/ProductCard";
 
 const SearchResults = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const query = searchParams.get("q") || "";
 
   const [products, setProducts] = useState([]);
@@ -83,7 +86,7 @@ const SearchResults = () => {
     } else {
       params.delete(key);
     }
-    setSearchParams(params);
+    router.push('?' + params.toString());
   };
 
   const clearFilters = () => {
@@ -93,7 +96,7 @@ const SearchResults = () => {
       maxPrice: "",
       sort: "relevance",
     });
-    setSearchParams({ q: query });
+    router.push('?q=' + encodeURIComponent(query));
   };
 
   const hasActiveFilters =
@@ -131,7 +134,7 @@ const SearchResults = () => {
               Enter a search term to find products
             </p>
             <Link
-              to="/shop"
+              href="/shop"
               className="inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
               Browse All Products
@@ -336,7 +339,7 @@ const SearchResults = () => {
                       </button>
                     )}
                     <Link
-                      to="/shop"
+                      href="/shop"
                       className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                     >
                       Browse All Products

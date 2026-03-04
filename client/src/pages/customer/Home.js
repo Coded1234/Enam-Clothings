@@ -1,5 +1,7 @@
+"use client";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFeaturedProducts } from "../../redux/slices/productSlice";
 import ProductCard from "../../components/customer/ProductCard";
@@ -90,14 +92,14 @@ const Home = () => {
             <div className="flex gap-4 flex-nowrap mt-10 md:mt-6">
               {" "}
               <Link
-                to="/shop"
+                href="/shop"
                 className="btn-gradient px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-base sm:text-lg inline-flex items-center gap-4 whitespace-nowrap"
               >
                 {" "}
                 Shop Now <FiArrowRight />{" "}
               </Link>{" "}
               <Link
-                to="/shop"
+                href="/shop"
                 className="px-6 py-3 sm:px-8 sm:py-4 border-2 border-white text-white rounded-full font-semibold text-base sm:text-lg hover:bg-white hover:text-gray-900 transition-colors whitespace-nowrap"
               >
                 {" "}
@@ -167,7 +169,7 @@ const Home = () => {
             {categories.map((category) => (
               <Link
                 key={category.name}
-                to={category.path}
+                href={category.path}
                 className="group relative h-80 rounded-2xl overflow-hidden card-hover"
               >
                 {" "}
@@ -213,7 +215,7 @@ const Home = () => {
               </p>{" "}
             </div>{" "}
             <Link
-              to="/shop?featured=true"
+              href="/shop?featured=true"
               className="hidden md:flex items-center gap-4 text-primary-500 font-medium hover:text-primary-600"
             >
               {" "}
@@ -246,7 +248,7 @@ const Home = () => {
           <div className="text-center mt-8 md:hidden">
             {" "}
             <Link
-              to="/shop"
+              href="/shop"
               className="inline-flex items-center gap-4 text-primary-500 font-medium"
             >
               {" "}
@@ -290,7 +292,7 @@ const Home = () => {
                     `Use code ${activeCoupon.code} at checkout`}{" "}
                 </p>{" "}
                 <Link
-                  to="/shop"
+                  href="/shop"
                   className="inline-flex items-center gap-4 bg-white text-primary-500 px-6 py-3 md:px-8 md:py-4 rounded-full font-semibold hover:bg-gray-100 hover:scale-105 transition-all duration-300 text-sm md:text-base shadow-xl animate-bounce"
                 >
                   {" "}
@@ -336,7 +338,7 @@ const Home = () => {
                   New Arrivals{" "}
                 </h3>{" "}
                 <Link
-                  to="/shop?sort=newest"
+                  href="/shop?sort=newest"
                   className="px-3 py-1.5 md:px-6 md:py-3 text-xs md:text-base border-2 border-white rounded-full font-medium hover:bg-white hover:text-gray-900 transition-colors"
                 >
                   {" "}
@@ -364,7 +366,7 @@ const Home = () => {
                   Best Sellers{" "}
                 </h3>{" "}
                 <Link
-                  to="/shop?sort=rating"
+                  href="/shop?sort=rating"
                   className="px-3 py-1.5 md:px-6 md:py-3 text-xs md:text-base border-2 border-white rounded-full font-medium hover:bg-white hover:text-gray-900 transition-colors"
                 >
                   {" "}

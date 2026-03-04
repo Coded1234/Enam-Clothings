@@ -1,5 +1,7 @@
+"use client";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProductById,
@@ -28,7 +30,7 @@ import {
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const dispatch = useDispatch();
 
   const { product, relatedProducts, loading } = useSelector(
@@ -125,7 +127,7 @@ const ProductDetail = () => {
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
       toast.error("Please login to add items to cart");
-      navigate("/login", { state: { from: `/product/${id}` } });
+      router.push(`/login?from=${encodeURIComponent(`/product/${id}`)}`);
       return;
     }
 
@@ -154,13 +156,13 @@ const ProductDetail = () => {
 
   const handleBuyNow = async () => {
     await handleAddToCart();
-    navigate("/cart");
+    router.push("/cart");
   };
 
   const handleToggleWishlist = async () => {
     if (!isAuthenticated) {
       toast.error("Please login to add to wishlist");
-      navigate("/login");
+      router.push("/login");
       return;
     }
 
@@ -179,7 +181,7 @@ const ProductDetail = () => {
   const handleMarkHelpful = async (reviewId) => {
     if (!isAuthenticated) {
       toast.error("Please login to mark reviews as helpful");
-      navigate("/login");
+      router.push("/login");
       return;
     }
 
@@ -265,16 +267,16 @@ const ProductDetail = () => {
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4">
           <nav className="flex items-center gap-2 text-sm text-gray-600">
-            <Link to="/" className="hover:text-primary-500">
+            <Link href="/" className="hover:text-primary-500">
               Home
             </Link>
             <FiChevronRight size={14} />
-            <Link to="/shop" className="hover:text-primary-500">
+            <Link href="/shop" className="hover:text-primary-500">
               Shop
             </Link>
             <FiChevronRight size={14} />
             <Link
-              to={`/shop/${product.category}`}
+              href={`/shop/${product.category}`}
               className="hover:text-primary-500 capitalize"
             >
               {product.category}
