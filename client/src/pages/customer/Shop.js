@@ -101,7 +101,7 @@ const Shop = () => {
     const newParams = new URLSearchParams(searchParams);
     if (newParams.has("category")) newParams.delete("category");
     if (newParams.get("page") !== "1") newParams.set("page", "1");
-    setSearchParams(newParams, { replace: true });
+    router.replace(`?${newParams.toString()}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category, dispatch]);
 
@@ -179,7 +179,7 @@ const Shop = () => {
 
   const handleClearFilters = () => {
     dispatch(clearFilters());
-    setSearchParams({});
+    router.push("?");
     setTempMinPrice("");
     setTempMaxPrice("");
   };
