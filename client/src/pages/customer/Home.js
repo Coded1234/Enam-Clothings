@@ -78,7 +78,7 @@ const Home = () => {
             </p>{" "}
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-6 leading-tight drop-shadow-lg">
               {" "}
-              Discover Your{" "}
+               Your{" "}
               <span className="block gradient-text drop-shadow-lg">
                 {" "}
                 Perfect Style{" "}
