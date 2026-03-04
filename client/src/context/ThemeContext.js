@@ -1,15 +1,15 @@
+"use client";
 import React, { createContext, useState, useEffect, useContext } from "react";
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    // Check local storage first
+    if (typeof window === "undefined") return "light";
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
       return savedTheme;
     }
-    // Fallback to system preference
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";

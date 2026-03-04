@@ -1,5 +1,7 @@
+"use client";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearError,
@@ -41,7 +43,7 @@ const Register = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const { user, isAuthenticated, error } = useSelector((state) => state.auth);
 
@@ -79,12 +81,12 @@ const Register = () => {
     if (isAuthenticated && user) {
       // Role-based redirect after registration
       if (user.role === "admin") {
-        navigate("/admin", { replace: true });
+        router.replace("/admin");
       } else {
-        navigate("/", { replace: true });
+        router.replace("/");
       }
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, router]);
 
   useEffect(() => {
     if (error) {
@@ -167,7 +169,7 @@ const Register = () => {
       toast.success(
         "Registration successful! Check your email for your 6-digit OTP code.",
       );
-      navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+      router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
     } finally {
@@ -181,7 +183,7 @@ const Register = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           {/* Logo */}
-          <Link to="/" className="block text-center mb-8">
+          <Link href="/" className="block text-center mb-8">
             <img
               src="/images/loginlogo.png"
               alt="The Fashion Gallery"
@@ -198,7 +200,7 @@ const Register = () => {
               <p className="text-gray-600">
                 Already have an account?{" "}
                 <Link
-                  to="/login"
+                  href="/login"
                   className="text-primary-500 hover:text-primary-600 font-medium"
                 >
                   Sign In

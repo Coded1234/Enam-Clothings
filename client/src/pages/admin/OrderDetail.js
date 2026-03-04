@@ -1,5 +1,7 @@
+"use client";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   FiArrowLeft,
   FiPackage,
@@ -15,7 +17,7 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const OrderDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
@@ -94,7 +96,7 @@ const OrderDetail = () => {
       <div className="text-center py-12">
         <p className="text-gray-500">Order not found</p>
         <Link
-          to="/admin/orders"
+          href="/admin/orders"
           className="text-primary-600 hover:text-primary-700 mt-4 inline-block"
         >
           Back to Orders
@@ -109,7 +111,7 @@ const OrderDetail = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate("/admin/orders")}
+            onClick={() => router.push("/admin/orders")}
             className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <FiArrowLeft size={20} className="md:w-6 md:h-6" />

@@ -3,7 +3,7 @@ import axios from "axios";
 // Use relative "/api" in the browser so it always hits the same domain (Vercel).
 // REACT_APP_API_URL can override this for local dev pointing at a separate server.
 const API_URL =
-  process.env.REACT_APP_API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
   (typeof window !== "undefined" ? "/api" : "http://localhost:5000/api");
 
 const api = axios.create({

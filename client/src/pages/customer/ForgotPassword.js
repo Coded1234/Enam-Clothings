@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import { FiMail, FiArrowLeft, FiCheck } from "react-icons/fi";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
@@ -57,7 +58,7 @@ const ForgotPassword = () => {
                 Try Different Email
               </button>
               <Link
-                to="/login"
+                href="/login"
                 className="block w-full py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity text-center"
               >
                 Back to Login
@@ -75,7 +76,7 @@ const ForgotPassword = () => {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <Link to="/" className="inline-block mb-6">
+            <Link href="/" className="inline-block mb-6">
               <img
                 src="/images/loginlogo.png"
                 alt="The Fashion Gallery"
@@ -145,7 +146,7 @@ const ForgotPassword = () => {
           {/* Back to Login */}
           <div className="mt-6 text-center">
             <Link
-              to="/login"
+              href="/login"
               className="inline-flex items-center gap-2 text-gray-600 hover:text-primary-500 transition-colors"
             >
               <FiArrowLeft size={16} />

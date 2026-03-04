@@ -1,5 +1,7 @@
+"use client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "../../redux/slices/authSlice";
@@ -80,7 +82,7 @@ const Navbar = () => {
     return () => clearInterval(interval);
   }, [promoMessages.length]);
 
-  const navigate = useNavigate();
+  const router = useRouter();
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const { items } = useSelector((state) => state.cart);
@@ -93,7 +95,7 @@ const Navbar = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
       setSearchOpen(false);
       setSearchQuery("");
     }
@@ -101,7 +103,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    router.push("/login");
   };
 
   // Close dropdown when clicking outside
@@ -172,7 +174,7 @@ const Navbar = () => {
             </AnimatePresence>
           </div>
           <div className="hidden md:flex gap-4 flex-shrink-0 ml-4">
-            <Link to="/orders" className="hover:text-primary-400">
+            <Link href="/orders" className="hover:text-primary-400">
               Track Order
             </Link>
             <span>|</span>
@@ -194,7 +196,7 @@ const Navbar = () => {
           </button>
 
           {/* Logo */}
-          <Link to="/" className="flex items-center">
+          <Link href="/" className="flex items-center">
             <img
               src="/images/loginlogo.png"
               alt="The Fashion Gallery"
@@ -207,7 +209,7 @@ const Navbar = () => {
             {categories.map((cat) => (
               <Link
                 key={cat.path}
-                to={cat.path}
+                href={cat.path}
                 className="text-gray-700 dark:text-gold-light hover:text-primary-500 font-medium transition-colors"
               >
                 {cat.name}
@@ -319,7 +321,7 @@ const Navbar = () => {
 
             {/* Cart */}
             <Link
-              to="/cart"
+              href="/cart"
               className="p-2 hover:bg-gray-100 dark:hover:bg-opacity-10 rounded-full transition-colors relative"
               aria-label={`Shopping cart with ${items.length} items`}
             >
@@ -353,7 +355,7 @@ const Navbar = () => {
                     </p>
                     {user?.role === "admin" && (
                       <Link
-                        to="/admin"
+                        href="/admin"
                         className="block px-4 py-2 text-gray-700 dark:text-gold-light hover:bg-gray-100 dark:hover:bg-opacity-10"
                         onClick={() => setDropdownOpen(false)}
                       >
@@ -361,28 +363,28 @@ const Navbar = () => {
                       </Link>
                     )}
                     <Link
-                      to="/profile"
+                      href="/profile"
                       className="block px-4 py-2 text-gray-700 dark:text-gold-light hover:bg-gray-100 dark:hover:bg-opacity-10"
                       onClick={() => setDropdownOpen(false)}
                     >
                       My Profile
                     </Link>
                     <Link
-                      to="/orders"
+                      href="/orders"
                       className="block px-4 py-2 text-gray-700 dark:text-gold-light hover:bg-gray-100 dark:hover:bg-opacity-10"
                       onClick={() => setDropdownOpen(false)}
                     >
                       My Orders
                     </Link>
                     <Link
-                      to="/wishlist"
+                      href="/wishlist"
                       className="block px-4 py-2 text-gray-700 dark:text-gold-light hover:bg-gray-100 dark:hover:bg-opacity-10"
                       onClick={() => setDropdownOpen(false)}
                     >
                       Wishlist
                     </Link>
                     <Link
-                      to="/newsletter"
+                      href="/newsletter"
                       className="block px-4 py-2 text-gray-700 dark:text-gold-light hover:bg-gray-100 dark:hover:bg-opacity-10"
                       onClick={() => setDropdownOpen(false)}
                     >
@@ -400,7 +402,7 @@ const Navbar = () => {
               </div>
             ) : (
               <Link
-                to="/login"
+                href="/login"
                 className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-colors"
               >
                 <FiUser size={18} />
@@ -453,7 +455,7 @@ const Navbar = () => {
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary-500 to-secondary-500">
             <Link
-              to="/"
+              href="/"
               className="flex items-center"
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -491,7 +493,7 @@ const Navbar = () => {
           ) : (
             <div className="p-4 border-b bg-white dark:bg-surface">
               <Link
-                to="/login"
+                href="/login"
                 className="flex items-center justify-center gap-2 w-full py-3 bg-primary-500 text-white rounded-lg font-semibold hover:bg-primary-600 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -509,7 +511,7 @@ const Navbar = () => {
             {categories.map((cat) => (
               <Link
                 key={cat.path}
-                to={cat.path}
+                href={cat.path}
                 className="flex items-center px-4 py-3 text-gray-700 dark:text-gold-light hover:bg-primary-50 dark:hover:bg-opacity-10 hover:text-primary-600 font-medium transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -528,7 +530,7 @@ const Navbar = () => {
             </p>
             {isAuthenticated && user?.role === "admin" && (
               <Link
-                to="/admin"
+                href="/admin"
                 className="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 font-medium transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -536,28 +538,28 @@ const Navbar = () => {
               </Link>
             )}
             <Link
-              to="/profile"
+              href="/profile"
               className="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 font-medium transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               My Profile
             </Link>
             <Link
-              to="/orders"
+              href="/orders"
               className="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 font-medium transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               My Orders
             </Link>
             <Link
-              to="/wishlist"
+              href="/wishlist"
               className="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 font-medium transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               <FiHeart className="mr-2" /> Wishlist
             </Link>
             <Link
-              to="/cart"
+              href="/cart"
               className="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 font-medium transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >

@@ -1,5 +1,7 @@
+"use client";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { clearCart } from "../../redux/slices/cartSlice";
 import api from "../../utils/api";
@@ -13,8 +15,8 @@ import {
 } from "react-icons/fi";
 
 const PaymentVerify = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const dispatch = useDispatch();
 
   const [status, setStatus] = useState("verifying"); // verifying, success, failed
@@ -184,14 +186,14 @@ const PaymentVerify = () => {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
-              to="/orders"
+              href="/orders"
               className="flex-1 py-3 btn-gradient rounded-xl font-semibold text-center flex items-center justify-center gap-2"
             >
               <FiShoppingBag />
               View Order
             </Link>
             <Link
-              to="/"
+              href="/"
               className="flex-1 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 text-center flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
             >
               <FiHome />
@@ -246,13 +248,13 @@ const PaymentVerify = () => {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
-            to="/cart"
+            href="/cart"
             className="flex-1 py-3 btn-gradient rounded-xl font-semibold text-center"
           >
             Try Again
           </Link>
           <Link
-            to="/"
+            href="/"
             className="flex-1 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 text-center hover:bg-gray-50 transition-colors"
           >
             Go Home

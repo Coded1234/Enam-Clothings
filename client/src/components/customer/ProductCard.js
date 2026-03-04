@@ -1,5 +1,7 @@
+"use client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FiHeart, FiShoppingCart, FiStar } from "react-icons/fi";
 import { getProductImage } from "../../utils/imageUrl";
@@ -15,7 +17,7 @@ const ProductCard = ({
   showFullDescription = false,
 }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [isWishlisted, setIsWishlisted] = useState(externalWishlisted || false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
@@ -39,7 +41,7 @@ const ProductCard = ({
 
     if (!isAuthenticated) {
       toast.error("Please login to add items to cart");
-      navigate("/login");
+      router.push("/login");
       return;
     }
 
@@ -73,7 +75,7 @@ const ProductCard = ({
 
     if (!isAuthenticated) {
       toast.error("Please login to add items to wishlist");
-      navigate("/login");
+      router.push("/login");
       return;
     }
 
@@ -99,7 +101,7 @@ const ProductCard = ({
     <div className="group bg-white dark:bg-surface rounded-lg shadow-sm overflow-hidden card-hover w-full">
       {/* Image */}
       <div className="relative img-zoom aspect-square">
-        <Link to={`/product/${product.id}`}>
+        <Link href={`/product/${product.id}`}>
           <img
             src={getProductImage(product)}
             alt={product.name}
@@ -158,7 +160,7 @@ const ProductCard = ({
 
       {/* Info */}
       <div className="p-3">
-        <Link to={`/product/${product.id}`}>
+        <Link href={`/product/${product.id}`}>
           <h3 className="font-medium text-gray-800 dark:text-gold-light text-sm mb-1 hover:text-primary-500 transition-colors line-clamp-2 leading-tight">
             {product.name}
           </h3>

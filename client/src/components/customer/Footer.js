@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import { FiInstagram, FiMail, FiPhone, FiCheck } from "react-icons/fi";
 import { SiTiktok } from "react-icons/si";
 import { newsletterAPI } from "../../utils/api";
@@ -125,7 +126,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <Link
-                  to="/shop"
+                  href="/shop"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   Shop All
@@ -133,7 +134,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/shop/men"
+                  href="/shop/men"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   Men
@@ -141,7 +142,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/shop/women"
+                  href="/shop/women"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   Women
@@ -156,7 +157,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <Link
-                  to="/orders"
+                  href="/orders"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   Track Order
@@ -164,7 +165,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/faq"
+                  href="/faq"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   Shipping Info
@@ -172,7 +173,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/faq"
+                  href="/faq"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   Returns & Exchange
@@ -180,7 +181,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/faq"
+                  href="/faq"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   FAQs
@@ -188,7 +189,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/size-guide"
+                  href="/size-guide"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   Size Guide
@@ -196,7 +197,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/contact"
+                  href="/contact"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   Contact Us
@@ -229,13 +230,13 @@ const Footer = () => {
             © 2026 The Fashion Gallery. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm text-gray-300">
-            <Link to="/privacy" className="hover:text-white transition-colors">
+            <Link href="/privacy" className="hover:text-white transition-colors">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="hover:text-white transition-colors">
+            <Link href="/terms" className="hover:text-white transition-colors">
               Terms of Service
             </Link>
-            <Link to="/cookies" className="hover:text-white transition-colors">
+            <Link href="/cookies" className="hover:text-white transition-colors">
               Cookie Policy
             </Link>
           </div>
