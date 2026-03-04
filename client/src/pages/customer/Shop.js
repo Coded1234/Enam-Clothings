@@ -174,7 +174,7 @@ const Shop = () => {
       newParams.delete(key);
     }
     newParams.set("page", "1");
-    router.push('?' + newParams.toString());
+    router.push(`?${newParams.toString()}`);
   };
 
   const handleClearFilters = () => {
@@ -200,7 +200,7 @@ const Shop = () => {
     }
 
     newParams.set("page", "1");
-    router.push('?' + newParams.toString());
+    router.push(`?${newParams.toString()}`);
 
     dispatch(setFilters({ minPrice: tempMinPrice, maxPrice: tempMaxPrice }));
   }, [tempMinPrice, tempMaxPrice, searchParams, router, dispatch]);
@@ -208,7 +208,7 @@ const Shop = () => {
   const handlePageChange = (page) => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set("page", page.toString());
-    router.push('?' + newParams.toString());
+    router.push(`?${newParams.toString()}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

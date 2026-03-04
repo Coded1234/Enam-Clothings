@@ -86,7 +86,7 @@ const SearchResults = () => {
     } else {
       params.delete(key);
     }
-    router.push('?' + params.toString());
+    router.push(`?${params.toString()}`);
   };
 
   const clearFilters = () => {
@@ -96,7 +96,7 @@ const SearchResults = () => {
       maxPrice: "",
       sort: "relevance",
     });
-    router.push('?q=' + encodeURIComponent(query));
+    router.push(`?q=${encodeURIComponent(query)}`);
   };
 
   const hasActiveFilters =
