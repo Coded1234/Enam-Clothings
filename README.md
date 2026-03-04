@@ -49,27 +49,64 @@ A full-stack e-commerce clothing store built with React, Node.js, Express, and P
 
    Set up the following environment variables in your Vercel project settings:
 
-   **Server Environment Variables:**
+   **Required — Database & Server:**
    ```
+   NODE_ENV=production
    DATABASE_URL=your_postgresql_connection_string
-   JWT_SECRET=your_jwt_secret
+   JWT_SECRET=your_jwt_secret_key
+   JWT_EXPIRE=7d
    CLIENT_URL=https://your-vercel-domain.vercel.app
-   
-   # Cloudinary
+   ```
+
+   **Required — Cloudinary (image hosting):**
+   ```
    CLOUDINARY_CLOUD_NAME=your_cloud_name
    CLOUDINARY_API_KEY=your_api_key
    CLOUDINARY_API_SECRET=your_api_secret
-   
-   # Email (Nodemailer)
+   ```
+
+   **Required — Email (Nodemailer / Gmail SMTP):**
+   ```
    EMAIL_HOST=smtp.gmail.com
    EMAIL_PORT=587
    EMAIL_USER=your_email@gmail.com
-   EMAIL_PASSWORD=your_app_password
-   
-   # Paystack
+   EMAIL_PASS=your_gmail_app_password
+   ADMIN_EMAIL=your_admin_email@gmail.com
+   ```
+
+   **Required — Payment (Paystack):**
+   ```
    PAYSTACK_SECRET_KEY=your_paystack_secret_key
    PAYSTACK_PUBLIC_KEY=your_paystack_public_key
    ```
+
+   **Required — Frontend (Next.js public variables):**
+   ```
+   NEXT_PUBLIC_API_URL=https://your-vercel-domain.vercel.app/api
+   NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_oauth_client_id
+   ```
+
+   **Optional — Google & Facebook OAuth (server-side):**
+   ```
+   GOOGLE_CLIENT_ID=your_google_oauth_client_id
+   FACEBOOK_APP_SECRET=your_facebook_app_secret
+   ```
+
+   **Optional — Yango Delivery API:**
+   ```
+   YANGO_API_URL=https://b2b.yango.com/api/b2b
+   YANGO_API_KEY=your_yango_api_key
+   YANGO_CLIENT_ID=your_yango_client_id
+   STORE_LATITUDE=5.6037
+   STORE_LONGITUDE=-0.1870
+   STORE_ADDRESS=Accra, Ghana
+   ```
+
+   > **Notes:**
+   > - `DATABASE_URL` should be a full PostgreSQL connection string (e.g. from [Neon](https://neon.tech), [Supabase](https://supabase.com), or [Railway](https://railway.app)).
+   > - `EMAIL_PASS` must be a Gmail **App Password**, not your regular Gmail password. Enable 2FA on your Google account, then generate an App Password at <https://myaccount.google.com/apppasswords>.
+   > - `NEXT_PUBLIC_*` variables are exposed to the browser; never put secrets in them.
+   > - Yango variables are optional — the shipping calculator falls back to a distance-based estimate when they are absent.
 
 3. **Deploy to Vercel**
 
