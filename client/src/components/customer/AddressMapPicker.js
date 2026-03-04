@@ -1,7 +1,7 @@
+"use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import { FiMapPin, FiLoader, FiSearch, FiX } from "react-icons/fi";
 
 // Fix leaflet icon issue

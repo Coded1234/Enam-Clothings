@@ -1,16 +1,24 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 
 const AdminRoute = ({ children }) => {
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { isAuthenticated, user, loading } = useSelector((state) => state.auth);
+  const router = useRouter();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated) {
+        router.push("/login");
+      } else if (user?.role !== "admin") {
+        router.push("/");
+      }
+    }
+  }, [isAuthenticated, user, loading, router]);
 
-  if (user?.role !== "admin") {
-    return <Navigate to="/" replace />;
+  if (!isAuthenticated || user?.role !== "admin") {
+    return null;
   }
 
   return children;

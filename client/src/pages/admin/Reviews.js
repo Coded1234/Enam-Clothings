@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import {
   FiSearch,
   FiStar,
@@ -213,7 +214,7 @@ const Reviews = () => {
                             </div>
                             <div className="ml-3">
                               <Link
-                                to={`/admin/products/${review.productId}/edit`}
+                                href={`/admin/products/${review.productId}/edit`}
                                 className="text-sm font-medium text-gray-900 hover:text-primary-600"
                               >
                                 {review.product?.name || "Product"}

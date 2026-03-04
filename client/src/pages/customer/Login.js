@@ -1,5 +1,7 @@
+"use client";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   login,
@@ -22,14 +24,14 @@ const Login = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const { user, isAuthenticated, loading, error } = useSelector(
     (state) => state.auth,
   );
 
-  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       dispatch(googleLogin(tokenResponse.access_token))
@@ -56,18 +58,18 @@ const Login = () => {
     },
   });
 
-  const from = location.state?.from || "/";
+  const from = searchParams.get("from") || "/";
 
   useEffect(() => {
     if (isAuthenticated && user) {
       // Role-based redirect
       if (user.role === "admin") {
-        navigate("/admin", { replace: true });
+        router.replace("/admin");
       } else {
-        navigate(from, { replace: true });
+        router.replace(from);
       }
     }
-  }, [isAuthenticated, user, navigate, from]);
+  }, [isAuthenticated, user, router, from]);
 
   useEffect(() => {
     if (error) {
@@ -105,7 +107,7 @@ const Login = () => {
           <div>
             <p>{errMsg}</p>
             <Link
-              to="/resend-verification"
+              href="/resend-verification"
               className="underline text-white hover:text-gray-200"
             >
               Resend verification email
@@ -141,7 +143,7 @@ const Login = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           {/* Logo */}
-          <Link to="/" className="block text-center mb-8">
+          <Link href="/" className="block text-center mb-8">
             <img
               src="/images/loginlogo.png"
               alt="The Fashion Gallery"
@@ -155,7 +157,7 @@ const Login = () => {
             <p className="text-gray-600">
               Don't have an account?{" "}
               <Link
-                to="/register"
+                href="/register"
                 className="text-primary-500 hover:text-primary-600 font-medium"
               >
                 Sign Up
@@ -228,7 +230,7 @@ const Login = () => {
                 <span className="text-sm text-gray-600">Remember me</span>
               </label>
               <Link
-                to="/forgot-password"
+                href="/forgot-password"
                 className="text-sm text-primary-500 hover:text-primary-600 font-medium"
               >
                 Forgot Password?

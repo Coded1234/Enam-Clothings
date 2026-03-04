@@ -1,5 +1,7 @@
+"use client";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import React, { useState, useEffect, useCallback } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { getImageUrl } from "../../utils/imageUrl";
 import toast from "react-hot-toast";
@@ -23,7 +25,7 @@ import {
 
 const OrderDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -73,7 +75,7 @@ const OrderDetail = () => {
       }
     } catch (error) {
       toast.error("Failed to fetch order details");
-      navigate("/orders");
+      router.push("/orders");
     } finally {
       setLoading(false);
     }
@@ -217,7 +219,7 @@ const OrderDetail = () => {
       <div className="container mx-auto px-4">
         {/* Back Button */}
         <button
-          onClick={() => navigate("/orders")}
+          onClick={() => router.push("/orders")}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-6 transition-colors"
         >
           <FiArrowLeft />
@@ -423,7 +425,7 @@ const OrderDetail = () => {
                         <div className="flex-1">
                           {productId ? (
                             <Link
-                              to={`/product/${productId}`}
+                              href={`/product/${productId}`}
                               className="font-semibold text-gray-800 hover:text-primary-500 transition-colors"
                             >
                               {productName}

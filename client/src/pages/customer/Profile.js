@@ -1,6 +1,7 @@
+"use client";
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { updateProfile, logout } from "../../redux/slices/authSlice";
 import api from "../../utils/api";
 import { getImageUrl } from "../../utils/imageUrl";
@@ -27,7 +28,7 @@ import {
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { user, loading } = useSelector((state) => state.auth);
 
   const [activeTab, setActiveTab] = useState("profile");
@@ -130,7 +131,7 @@ const Profile = () => {
       });
       toast.success("Account deleted successfully");
       dispatch(logout());
-      navigate("/");
+      router.push("/");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete account");
     } finally {

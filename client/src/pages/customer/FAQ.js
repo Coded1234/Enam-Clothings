@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import {
   FiChevronDown,
   FiChevronUp,
@@ -336,7 +337,7 @@ const FAQ = () => {
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link
-                to="/contact"
+                href="/contact"
                 state={{
                   subject:
                     categories.find((c) => c.id === activeCategory)?.name ||

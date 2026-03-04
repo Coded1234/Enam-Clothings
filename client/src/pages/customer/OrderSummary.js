@@ -1,5 +1,6 @@
+"use client";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { fetchCart } from "../../redux/slices/cartSlice";
 import { getImageUrl } from "../../utils/imageUrl";
@@ -18,9 +19,9 @@ import {
 } from "react-icons/fi";
 
 const OrderSummary = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const dispatch = useDispatch();
+  const router = useRouter();
+    const dispatch = useDispatch();
+  const _oState = typeof window !== "undefined" ? JSON.parse(sessionStorage.getItem("orderSummaryState") || "{}") : {};
   const {
     orderData,
     items,
@@ -29,7 +30,7 @@ const OrderSummary = () => {
     couponDiscount,
     shippingCost: passedShippingCost,
     shippingDetails,
-  } = location.state || {};
+  } = _oState;
   const [loading, setLoading] = useState(false);
 
   // Personal information state
@@ -47,7 +48,7 @@ const OrderSummary = () => {
 
   // If no data, redirect back to checkout
   if (!orderData || !items) {
-    navigate("/checkout");
+    router.push("/checkout");
     return null;
   }
 
@@ -155,7 +156,7 @@ const OrderSummary = () => {
         // For COD and Bank Transfer, just refresh cart and redirect
         await dispatch(fetchCart());
         toast.success("Order confirmed successfully!");
-        navigate("/orders");
+        router.push("/orders");
       }
     } catch (error) {
       console.error("Order error:", error);
@@ -177,7 +178,7 @@ const OrderSummary = () => {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <button
-            onClick={() => navigate("/checkout")}
+            onClick={() => router.push("/checkout")}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <FiArrowLeft className="w-5 h-5" />

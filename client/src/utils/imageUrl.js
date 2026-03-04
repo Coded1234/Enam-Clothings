@@ -1,5 +1,5 @@
 const API_BASE =
-  process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:5000";
+  process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") || "http://localhost:5000";
 
 /**
  * Get the full URL for an image

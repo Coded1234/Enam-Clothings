@@ -1,5 +1,7 @@
+"use client";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   FiMail,
@@ -23,7 +25,7 @@ const Contact = () => {
     subject: "",
     message: "",
   });
-  const location = useLocation();
+  const searchParams = useSearchParams();
   const { user } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -59,7 +61,7 @@ const Contact = () => {
 
   useEffect(() => {
     // Prefill subject from navigation state (FAQ link)
-    if (location?.state?.subject) {
+    if (searchParams.get("subject")) {
       const subjectMap = {
         "Orders & Tracking": "Order Inquiry",
         "Shipping & Delivery": "Shipping",
@@ -71,7 +73,7 @@ const Contact = () => {
         Support: "Other",
       };
 
-      const incoming = location.state.subject;
+      const incoming = searchParams.get("subject");
       const mapped = subjectMap[incoming] || incoming;
       setFormData((prev) => ({ ...prev, subject: mapped }));
     }
@@ -98,7 +100,7 @@ const Contact = () => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, searchParams]);
 
   const contactInfo = [
     {
@@ -149,7 +151,7 @@ const Contact = () => {
                 Send Another Message
               </button>
               <Link
-                to="/"
+                href="/"
                 className="px-6 py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
               >
                 Back to Home
@@ -352,7 +354,7 @@ const Contact = () => {
                   questions.
                 </p>
                 <Link
-                  to="/faq"
+                  href="/faq"
                   className="inline-flex items-center gap-2 text-primary-500 font-medium hover:text-primary-600"
                 >
                   Visit FAQ Page →

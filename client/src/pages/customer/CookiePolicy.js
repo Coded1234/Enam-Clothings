@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React from "react";
-import { Link } from "react-router-dom";
 
 const CookiePolicy = () => {
   return (
@@ -59,7 +60,7 @@ This policy is a general template. Consult legal counsel to ensure compliance wi
           </section>
 
           <div className="mt-6">
-            <Link to="/" className="text-primary-500 hover:underline">
+            <Link href="/" className="text-primary-500 hover:underline">
               Back to Home
             </Link>
           </div>

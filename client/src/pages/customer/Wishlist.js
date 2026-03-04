@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { authAPI, cartAPI } from "../../utils/api";
 import { getProductImage } from "../../utils/imageUrl";
 import { getRecentlyViewed } from "../../utils/recentlyViewed";
@@ -205,7 +206,7 @@ const Wishlist = () => {
               They'll appear here for easy access later.
             </p>
             <Link
-              to="/shop"
+              href="/shop"
               className="inline-flex items-center gap-2 px-8 py-3 btn-gradient rounded-xl font-semibold text-base"
             >
               Explore Products
@@ -243,7 +244,7 @@ const Wishlist = () => {
                   >
                     {/* Image */}
                     <div className="relative aspect-[3/4] overflow-hidden">
-                      <Link to={`/product/${item.id}`}>
+                      <Link href={`/product/${item.id}`}>
                         <img
                           src={getProductImage(item)}
                           alt={item.name}
@@ -287,7 +288,7 @@ const Wishlist = () => {
 
                       {/* View Button */}
                       <Link
-                        to={`/product/${item.id}`}
+                        href={`/product/${item.id}`}
                         className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full text-sm font-medium text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2"
                       >
                         <FiEye size={16} />
@@ -298,7 +299,7 @@ const Wishlist = () => {
                     {/* Content */}
                     <div className="p-4">
                       <Link
-                        to={`/product/${item.id}`}
+                        href={`/product/${item.id}`}
                         className="font-semibold text-gray-800 hover:text-primary-500 transition-colors line-clamp-1"
                       >
                         {item.name}
@@ -367,7 +368,7 @@ const Wishlist = () => {
                     className="bg-white rounded-2xl shadow-sm p-4 flex flex-col sm:flex-row gap-4 hover:shadow-md transition-shadow"
                   >
                     {/* Image */}
-                    <Link to={`/product/${item.id}`} className="flex-shrink-0">
+                    <Link href={`/product/${item.id}`} className="flex-shrink-0">
                       <img
                         src={getProductImage(item)}
                         alt={item.name}
@@ -380,7 +381,7 @@ const Wishlist = () => {
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <Link
-                            to={`/product/${item.id}`}
+                            href={`/product/${item.id}`}
                             className="text-lg font-semibold text-gray-800 hover:text-primary-500 transition-colors"
                           >
                             {item.name}
@@ -490,7 +491,7 @@ const Wishlist = () => {
                     return (
                       <Link
                         key={product.id}
-                        to={`/product/${product.id}`}
+                        href={`/product/${product.id}`}
                         className="bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-md transition-shadow"
                       >
                         <div className="aspect-[3/4] bg-gray-100 overflow-hidden">

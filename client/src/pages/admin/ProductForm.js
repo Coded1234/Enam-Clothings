@@ -1,12 +1,13 @@
+"use client";
+import { useRouter, useParams } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import { FiUpload, FiX, FiSave, FiArrowLeft, FiImage } from "react-icons/fi";
 import { productsAPI, adminAPI } from "../../utils/api";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const ProductForm = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const isEditing = Boolean(id);
 
   const [loading, setLoading] = useState(false);
@@ -248,7 +249,7 @@ const ProductForm = () => {
         await adminAPI.createProduct(submitData);
       }
 
-      navigate("/admin/products", { state: { refresh: Date.now() } });
+      router.push("/admin/products");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save product");
     } finally {
@@ -268,7 +269,7 @@ const ProductForm = () => {
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
         <button
-          onClick={() => navigate("/admin/products")}
+          onClick={() => router.push("/admin/products")}
           className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <FiArrowLeft size={20} className="md:w-6 md:h-6" />
@@ -639,7 +640,7 @@ const ProductForm = () => {
         <div className="flex justify-end gap-3 md:gap-4">
           <button
             type="button"
-            onClick={() => navigate("/admin/products")}
+            onClick={() => router.push("/admin/products")}
             className="px-4 md:px-6 py-1.5 md:py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
           >
             Cancel

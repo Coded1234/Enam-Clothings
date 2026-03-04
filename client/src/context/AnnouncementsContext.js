@@ -1,3 +1,4 @@
+"use client";
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { announcementsAPI } from "../utils/api";
 
@@ -11,6 +12,7 @@ export const AnnouncementsProvider = ({ children }) => {
   const [activeAnnouncement, setActiveAnnouncement] = useState(null);
   const [dismissed, setDismissed] = useState(() => {
     try {
+      if (typeof window === "undefined") return [];
       return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     } catch {
       return [];
@@ -19,6 +21,7 @@ export const AnnouncementsProvider = ({ children }) => {
 
   const [seen, setSeen] = useState(() => {
     try {
+      if (typeof window === "undefined") return [];
       return JSON.parse(localStorage.getItem(SEEN_KEY)) || [];
     } catch {
       return [];

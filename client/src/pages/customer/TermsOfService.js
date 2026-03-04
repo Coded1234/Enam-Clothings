@@ -1,5 +1,6 @@
+"use client";
+import Link from "next/link";
 import React from "react";
-import { Link } from "react-router-dom";
 
 const TermsOfService = () => {
   return (
@@ -79,7 +80,7 @@ Note: This is a general-purpose template. Please review with legal counsel to en
           </section>
 
           <div className="mt-6">
-            <Link to="/" className="text-primary-500 hover:underline">
+            <Link href="/" className="text-primary-500 hover:underline">
               Back to Home
             </Link>
           </div>
