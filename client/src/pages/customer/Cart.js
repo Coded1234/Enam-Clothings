@@ -428,7 +428,7 @@ const Cart = () => {
                     imageUrl = imageStr.startsWith("http")
                       ? imageStr
                       : `${
-                          process.env.REACT_APP_API_URL ||
+                          process.env.NEXT_PUBLIC_API_URL ||
                           "http://localhost:5000"
                         }${imageStr}`;
                   }

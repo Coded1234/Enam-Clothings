@@ -47,7 +47,7 @@ const Register = () => {
 
   const { user, isAuthenticated, error } = useSelector((state) => state.auth);
 
-  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   const signupGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {

@@ -100,7 +100,7 @@ const Contact = () => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, searchParams]);
 
   const contactInfo = [
     {

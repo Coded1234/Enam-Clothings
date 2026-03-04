@@ -203,7 +203,7 @@ const Shop = () => {
     router.push('?' + newParams.toString());
 
     dispatch(setFilters({ minPrice: tempMinPrice, maxPrice: tempMaxPrice }));
-  }, [tempMinPrice, tempMaxPrice, searchParams, setSearchParams, dispatch]);
+  }, [tempMinPrice, tempMaxPrice, searchParams, router, dispatch]);
 
   const handlePageChange = (page) => {
     const newParams = new URLSearchParams(searchParams);
