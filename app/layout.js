@@ -3,8 +3,37 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata = {
-  title: "The Fashion Gallery - Premium Fashion",
-  description: "The Fashion Gallery - Premium Fashion & Clothing",
+  title: {
+    default: "The Fashion Gallery - Premium Fashion",
+    template: "%s - The Fashion Gallery",
+  },
+  description:
+    "Shop premium fashion and clothing at The Fashion Gallery. Discover the latest trends in women's and men's fashion.",
+  keywords: [
+    "fashion",
+    "clothing",
+    "premium fashion",
+    "online store",
+    "women's fashion",
+    "men's fashion",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "The Fashion Gallery",
+    title: "The Fashion Gallery - Premium Fashion",
+    description:
+      "Shop premium fashion and clothing at The Fashion Gallery. Discover the latest trends in women's and men's fashion.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Fashion Gallery - Premium Fashion",
+    description:
+      "Shop premium fashion and clothing at The Fashion Gallery. Discover the latest trends in women's and men's fashion.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({ children }) {
