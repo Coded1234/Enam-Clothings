@@ -119,8 +119,22 @@ const getSubscribers = async (req, res) => {
   }
 };
 
+// @desc    Check newsletter subscription status
+// @route   GET /api/newsletter/status?email=
+const getStatus = async (req, res) => {
+  try {
+    const { email } = req.query;
+    if (!email) return res.json({ isSubscribed: false });
+    const record = await Newsletter.findOne({ where: { email } });
+    res.json({ isSubscribed: !!(record && record.isSubscribed) });
+  } catch (error) {
+    res.json({ isSubscribed: false });
+  }
+};
+
 module.exports = {
   subscribe,
   unsubscribe,
   getSubscribers,
+  getStatus,
 };

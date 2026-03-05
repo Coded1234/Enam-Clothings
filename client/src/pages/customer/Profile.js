@@ -24,6 +24,7 @@ import {
   FiHeart,
   FiLogOut,
   FiTrash2,
+  FiCheckCircle,
 } from "react-icons/fi";
 
 const Profile = () => {
@@ -40,6 +41,8 @@ const Profile = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
 
   const [profileData, setProfileData] = useState({
     firstName: "",
@@ -73,6 +76,15 @@ const Profile = () => {
       });
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user?.email) {
+      api
+        .get(`/newsletter/status?email=${encodeURIComponent(user.email)}`)
+        .then(({ data }) => setNewsletterSubscribed(data.isSubscribed))
+        .catch(() => {});
+    }
+  }, [user?.email]);
 
   const handleProfileChange = (e) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
@@ -148,6 +160,28 @@ const Profile = () => {
     } catch (error) {
       // Revert on error
       setNotifications(notifications);
+    }
+  };
+
+  const handleNewsletterToggle = async () => {
+    if (!user?.email || newsletterLoading) return;
+    setNewsletterLoading(true);
+    try {
+      if (newsletterSubscribed) {
+        await api.post("/newsletter/unsubscribe", { email: user.email });
+        setNewsletterSubscribed(false);
+        toast.success("Unsubscribed from newsletter");
+      } else {
+        await api.post("/newsletter/subscribe", { email: user.email });
+        setNewsletterSubscribed(true);
+        toast.success("Subscribed to newsletter!");
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to update newsletter preference",
+      );
+    } finally {
+      setNewsletterLoading(false);
     }
   };
 
@@ -235,9 +269,10 @@ const Profile = () => {
   };
 
   const tabs = [
-    { id: "profile", label: "Profile", icon: FiUser },
+    { id: "profile", label: "Profile Info", icon: FiUser },
     { id: "security", label: "Security", icon: FiShield },
     { id: "notifications", label: "Notifications", icon: FiBell },
+    { id: "newsletter", label: "Newsletter", icon: FiMail },
   ];
 
   return (
@@ -245,135 +280,143 @@ const Profile = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
+          <div className="mb-6">
+            <h1 className="text-lg font-bold text-gray-800">
               Account Settings
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-sm text-gray-500 mt-0.5">
               Manage your account information and preferences
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Sidebar */}
+            {/* Sidebar - Unified Jumia-style */}
             <div className="lg:col-span-1">
-              {/* Profile Card */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-                <div className="text-center">
-                  <div className="relative inline-block">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 p-1">
-                      <div className="w-full h-full rounded-full bg-white p-1">
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                {/* Compact user info header */}
+                <div className="p-4 bg-gray-50 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
                         {uploadingAvatar ? (
-                          <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-                          </div>
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-500" />
                         ) : profileData.avatar ? (
                           <>
                             <img
                               src={getImageUrl(profileData.avatar)}
                               alt="Avatar"
-                              className="w-full h-full rounded-full object-cover"
+                              className="w-full h-full object-cover"
                               onError={(e) => {
-                                console.error(
-                                  "Avatar load error. URL:",
-                                  getImageUrl(profileData.avatar),
-                                );
                                 e.target.style.display = "none";
                                 e.target.nextSibling.style.display = "flex";
                               }}
                             />
                             <div
                               style={{ display: "none" }}
-                              className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center"
+                              className="w-full h-full items-center justify-center"
                             >
-                              <FiUser className="text-gray-400" size={32} />
+                              <FiUser className="text-gray-400" size={20} />
                             </div>
                           </>
                         ) : (
-                          <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center">
-                            <FiUser className="text-gray-400" size={32} />
-                          </div>
+                          <FiUser className="text-gray-400" size={20} />
                         )}
                       </div>
+                      <label
+                        className={`absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-primary-600 transition-colors ${
+                          uploadingAvatar ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                      >
+                        <FiCamera className="text-white" size={10} />
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png,image/webp"
+                          onChange={handleAvatarUpload}
+                          className="hidden"
+                          disabled={uploadingAvatar}
+                        />
+                      </label>
                     </div>
-                    <label
-                      className={`absolute bottom-0 right-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-primary-600 transition-colors ${
-                        uploadingAvatar ? "opacity-50 cursor-not-allowed" : ""
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm text-gray-800 truncate">
+                        {profileData.firstName} {profileData.lastName}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {profileData.email}
+                      </p>
+                      {profileData.avatar && (
+                        <button
+                          onClick={handleDeleteAvatar}
+                          disabled={uploadingAvatar}
+                          className="text-xs text-red-500 hover:text-red-600 disabled:opacity-50 mt-0.5"
+                        >
+                          Remove photo
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Navigation tabs */}
+                <div className="py-1">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
+                        activeTab === tab.id
+                          ? "bg-primary-50 text-primary-600 border-l-4 border-primary-500 font-medium"
+                          : "text-gray-600 hover:bg-gray-50"
                       }`}
                     >
-                      <FiCamera className="text-white" size={14} />
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/webp"
-                        onChange={handleAvatarUpload}
-                        className="hidden"
-                        disabled={uploadingAvatar}
-                      />
-                    </label>
-                  </div>
-                  <h3 className="font-bold text-gray-800 mt-4">
-                    {profileData.firstName} {profileData.lastName}
-                  </h3>
-                  <p className="text-sm text-gray-500">{profileData.email}</p>
-                  <p className="text-xs text-gray-400 mt-1 px-4">
-                    Click camera icon to upload
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    (JPEG, PNG, WebP - Max 2MB)
-                  </p>
-                  {profileData.avatar && (
-                    <button
-                      onClick={handleDeleteAvatar}
-                      disabled={uploadingAvatar}
-                      className="mt-2 text-xs text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Remove Avatar
+                      <tab.icon size={16} />
+                      {tab.label}
                     </button>
-                  )}
-                  <span className="inline-block mt-2 px-3 py-1 bg-primary-50 text-primary-600 text-sm font-medium rounded-full">
-                    {user?.role === "admin" ? "Administrator" : "Customer"}
-                  </span>
+                  ))}
                 </div>
-              </div>
 
-              {/* Navigation */}
-              <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
-                      activeTab === tab.id
-                        ? "bg-primary-50 text-primary-600 border-l-4 border-primary-500"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
+                <div className="border-t" />
+
+                {/* Account shortcut links */}
+                <div className="py-1">
+                  <a
+                    href="/orders"
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
                   >
-                    <tab.icon size={18} />
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
+                    <FiPackage size={16} />
+                    My Orders
+                  </a>
+                  <a
+                    href="/wishlist"
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                  >
+                    <FiHeart size={16} />
+                    Wishlist
+                  </a>
+                </div>
 
-              {/* Quick Links */}
-              <div className="bg-white rounded-2xl shadow-sm mt-6 overflow-hidden">
-                <a
-                  href="/orders"
-                  className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 transition-colors"
-                >
-                  <FiPackage size={18} />
-                  My Orders
-                </a>
-                <a
-                  href="/wishlist"
-                  className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 transition-colors"
-                >
-                  <FiHeart size={18} />
-                  Wishlist
-                </a>
-                <button className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 transition-colors">
-                  <FiLogOut size={18} />
-                  Sign Out
-                </button>
+                <div className="border-t" />
+
+                {/* Danger / Logout */}
+                <div className="py-1">
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                  >
+                    <FiTrash2 size={16} />
+                    Delete Account
+                  </button>
+                  <button
+                    onClick={() => {
+                      dispatch(logout());
+                      router.push("/");
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <FiLogOut size={16} />
+                    Sign Out
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -383,7 +426,7 @@ const Profile = () => {
               {activeTab === "profile" && (
                 <div className="bg-white rounded-2xl shadow-sm p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">
+                    <h2 className="text-base font-bold text-gray-800">
                       Personal Information
                     </h2>
                     {!isEditing ? (
@@ -499,7 +542,7 @@ const Profile = () => {
               {activeTab === "security" && (
                 <div className="space-y-6">
                   <div className="bg-white rounded-2xl shadow-sm p-6">
-                    <h2 className="text-xl font-bold text-gray-800 mb-6">
+                    <h2 className="text-base font-bold text-gray-800 mb-6">
                       Change Password
                     </h2>
                     <form onSubmit={handlePasswordSubmit} className="max-w-md">
@@ -596,7 +639,7 @@ const Profile = () => {
                   {/* Danger Zone */}
                   <div className="bg-white rounded-2xl shadow-sm p-6 border-2 border-red-100">
                     {" "}
-                    <h2 className="text-xl font-bold text-red-600 mb-4">
+                    <h2 className="text-base font-bold text-red-600 mb-4">
                       Danger Zone
                     </h2>
                     <p className="text-gray-600 mb-4">
@@ -617,7 +660,7 @@ const Profile = () => {
               {/* Notifications Tab */}
               {activeTab === "notifications" && (
                 <div className="bg-white rounded-2xl shadow-sm p-6">
-                  <h2 className="text-xl font-bold text-gray-800 mb-6">
+                  <h2 className="text-base font-bold text-gray-800 mb-6">
                     Notification Preferences
                   </h2>
                   <div className="space-y-4">
@@ -685,6 +728,75 @@ const Profile = () => {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Newsletter Tab */}
+              {activeTab === "newsletter" && (
+                <div className="bg-white rounded-2xl shadow-sm p-6">
+                  <h2 className="text-lg font-bold text-gray-800 mb-1">
+                    Newsletter
+                  </h2>
+                  <p className="text-sm text-gray-500 mb-6">
+                    Get weekly fashion tips, new arrivals and exclusive deals
+                    straight to your inbox.
+                  </p>
+                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-primary-300 transition-colors">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-gray-100 rounded-xl">
+                        <FiMail className="text-gray-600" size={20} />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-sm text-gray-800">
+                          Email Newsletter
+                        </h3>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {profileData.email}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`text-xs font-medium ${
+                          newsletterSubscribed
+                            ? "text-primary-600"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        {newsletterSubscribed ? "On" : "Off"}
+                      </span>
+                      <button
+                        onClick={handleNewsletterToggle}
+                        disabled={newsletterLoading}
+                        aria-label={
+                          newsletterSubscribed
+                            ? "Unsubscribe from newsletter"
+                            : "Subscribe to newsletter"
+                        }
+                        className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
+                          newsletterSubscribed ? "bg-primary-500" : "bg-gray-300"
+                        }`}
+                      >
+                        <span
+                          className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                            newsletterSubscribed
+                              ? "translate-x-6"
+                              : "translate-x-0"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                  <p
+                    className={`mt-4 text-sm flex items-center gap-2 ${
+                      newsletterSubscribed ? "text-green-600" : "text-gray-400"
+                    }`}
+                  >
+                    <FiCheckCircle size={14} />
+                    {newsletterSubscribed
+                      ? "You're subscribed. We'll send updates to your inbox."
+                      : "Toggle the switch above to subscribe."}
+                  </p>
                 </div>
               )}
             </div>

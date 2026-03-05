@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "../../redux/slices/authSlice";
 import api from "../../utils/api";
+import toast from "react-hot-toast";
 import {
   FiShoppingCart,
   FiHeart,
@@ -17,6 +18,7 @@ import {
   FiSun,
   FiMoon,
   FiBell,
+  FiMail,
 } from "react-icons/fi";
 import { useTheme } from "../../context/ThemeContext";
 import { useAnnouncements } from "../../context/AnnouncementsContext";
@@ -45,6 +47,8 @@ const Navbar = () => {
   const [bellOpen, setBellOpen] = useState(false);
   const [promoIndex, setPromoIndex] = useState(0);
   const [promoMessages, setPromoMessages] = useState(defaultPromoMessages);
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
   const dropdownRef = useRef(null);
   const bellRef = useRef(null);
 
@@ -106,6 +110,28 @@ const Navbar = () => {
     router.push("/login");
   };
 
+  const handleNewsletterToggle = async () => {
+    if (!user?.email || newsletterLoading) return;
+    setNewsletterLoading(true);
+    try {
+      if (newsletterSubscribed) {
+        await api.post("/newsletter/unsubscribe", { email: user.email });
+        setNewsletterSubscribed(false);
+        toast.success("Unsubscribed from newsletter");
+      } else {
+        await api.post("/newsletter/subscribe", { email: user.email });
+        setNewsletterSubscribed(true);
+        toast.success("Subscribed to newsletter!");
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to update newsletter preference",
+      );
+    } finally {
+      setNewsletterLoading(false);
+    }
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -153,6 +179,16 @@ const Navbar = () => {
       document.body.style.overflow = "";
     };
   }, [mobileMenuOpen]);
+
+  // Fetch newsletter status when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user?.email) {
+      api
+        .get(`/newsletter/status?email=${encodeURIComponent(user.email)}`)
+        .then(({ data }) => setNewsletterSubscribed(data.isSubscribed))
+        .catch(() => {});
+    }
+  }, [isAuthenticated, user?.email]);
 
   return (
     <nav className="bg-white dark:bg-surface shadow-md sticky top-0 z-50">
@@ -383,13 +419,23 @@ const Navbar = () => {
                     >
                       Wishlist
                     </Link>
-                    <Link
-                      href="/newsletter"
-                      className="block px-4 py-2 text-gray-700 dark:text-gold-light hover:bg-gray-100 dark:hover:bg-opacity-10"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      Newsletter
-                    </Link>
+                    <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-opacity-10">
+                      <span className="text-sm text-gray-700 dark:text-gold-light">Newsletter</span>
+                      <button
+                        onClick={handleNewsletterToggle}
+                        disabled={newsletterLoading}
+                        aria-label={newsletterSubscribed ? "Unsubscribe from newsletter" : "Subscribe to newsletter"}
+                        className={`relative w-9 h-5 rounded-full transition-colors flex-shrink-0 disabled:opacity-50 ${
+                          newsletterSubscribed ? "bg-primary-500" : "bg-gray-300"
+                        }`}
+                      >
+                        <span
+                          className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                            newsletterSubscribed ? "translate-x-4" : "translate-x-0"
+                          }`}
+                        />
+                      </button>
+                    </div>
                     <hr className="my-2" />
                     <button
                       onClick={handleLogout}
@@ -570,6 +616,26 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
+            <div className="flex items-center justify-between px-4 py-3 text-gray-700 dark:text-gold-light">
+              <div className="flex items-center font-medium">
+                <FiMail className="mr-2" size={18} />
+                Newsletter
+              </div>
+              <button
+                onClick={handleNewsletterToggle}
+                disabled={newsletterLoading}
+                aria-label="Toggle newsletter subscription"
+                className={`relative w-10 h-5 rounded-full transition-colors flex-shrink-0 disabled:opacity-50 ${
+                  newsletterSubscribed ? "bg-primary-500" : "bg-gray-300"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                    newsletterSubscribed ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
 
           {/* Logout Button */}
