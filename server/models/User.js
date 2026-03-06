@@ -87,6 +87,11 @@ const User = sequelize.define(
   {
     tableName: "users",
     underscored: true,
+    indexes: [
+      { unique: true, fields: ["email"] },
+      { fields: ["role"] },
+      { fields: ["is_active"] },
+    ],
     hooks: {
       beforeCreate: async (user) => {
         if (user.password) {
