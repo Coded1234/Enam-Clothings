@@ -2,7 +2,7 @@
   "buildCommand": "next build",
   "installCommand": "npm install && npm install --prefix server",
   "functions": {
-    "api/**/*.js": {
+    "pages/api/**/*.js": {
       "includeFiles": "server/**"
     }
   }
