@@ -42,7 +42,12 @@ const CouponUsage = sequelize.define(
     tableName: "coupon_usages",
     underscored: true,
     timestamps: true,
-  }
+    indexes: [
+      { fields: ["coupon_id"] },
+      { fields: ["user_id"] },
+      { fields: ["coupon_id", "user_id"] },
+    ],
+  },
 );
 
 module.exports = CouponUsage;

@@ -102,6 +102,13 @@ const Order = sequelize.define(
   {
     tableName: "orders",
     underscored: true,
+    indexes: [
+      { fields: ["user_id"] },
+      { fields: ["status"] },
+      { fields: ["payment_status"] },
+      { fields: ["created_at"] },
+      { unique: true, fields: ["order_number"] },
+    ],
     hooks: {
       beforeCreate: (order) => {
         // Generate order number
