@@ -64,19 +64,19 @@ const authLimiter = rateLimit({
 app.use(generalLimiter);
 
 // CORS
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  // Vercel auto-injects VERCEL_URL (without https://) for every deployment
-  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
-  "http://localhost:3000",
-].filter(Boolean);
-
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow same-origin / server-to-server calls (no Origin header)
+      // Allow no-origin requests (server-to-server, curl, Postman)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+      // Allow all Vercel deployment URLs and localhost
+      if (
+        origin === process.env.CLIENT_URL ||
+        /^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(origin) ||
+        /^http:\/\/localhost(:\d+)?$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
       callback(new Error(`CORS: origin ${origin} not allowed`));
     },
     credentials: true,
