@@ -3,7 +3,7 @@ import CustomerLayout from "../../client/src/layouts/CustomerLayout";
 import Shop from "../../client/src/pages/customer/Shop";
 
 export const metadata = {
-  title: "Shop - The Fashion Gallery",
+  title: "Shop",
   description: "Browse our full collection of premium fashion and clothing.",
 };
 

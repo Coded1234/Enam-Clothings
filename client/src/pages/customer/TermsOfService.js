@@ -21,7 +21,7 @@ Effective date: January 25, 2026
 
 1. Agreement to Terms
 
-These Terms of Service ("Terms") govern your access to and use of The Fashion Gallery website and services. By using our website, placing orders, or creating an account, you agree to these Terms.
+These Terms of Service ("Terms") govern your access to and use of Diamond Vogue Gallery website and services. By using our website, placing orders, or creating an account, you agree to these Terms.
 
 2. Eligibility
 
@@ -47,7 +47,7 @@ Our returns policy is outlined separately (Returns & Refunds). Items must meet t
 
 7. Intellectual Property
 
-All site content (text, images, logos, and designs) is the property of The Fashion Gallery or its licensors. You may not reproduce or use our content without permission.
+All site content (text, images, logos, and designs) is the property of Diamond Vogue Gallery or its licensors. You may not reproduce or use our content without permission.
 
 8. User Conduct
 
@@ -55,11 +55,11 @@ You agree not to use the Service for unlawful activities or to upload harmful co
 
 9. Limitation of Liability
 
-To the maximum extent permitted by law, The Fashion Gallery is not liable for indirect, incidental, or consequential damages arising from your use of the Service. Our aggregate liability for direct damages is limited to the amount paid by you for the order that gave rise to the claim.
+To the maximum extent permitted by law, Diamond Vogue Gallery is not liable for indirect, incidental, or consequential damages arising from your use of the Service. Our aggregate liability for direct damages is limited to the amount paid by you for the order that gave rise to the claim.
 
 10. Indemnification
 
-You agree to indemnify and hold harmless The Fashion Gallery and its affiliates from claims arising out of your violation of these Terms or your misuse of the Service.
+You agree to indemnify and hold harmless Diamond Vogue Gallery and its affiliates from claims arising out of your violation of these Terms or your misuse of the Service.
 
 11. Governing Law
 
@@ -71,7 +71,7 @@ We may revise these Terms. Continued use after changes indicates acceptance. We 
 
 13. Contact
 
-If you have questions about these Terms, contact us at support@thefashiongallery.com
+If you have questions about these Terms, contact us at diamondvoguegallery@gmail.com
 
 
 ---

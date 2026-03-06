@@ -1,7 +1,7 @@
 {
   "name": "the-fashion-gallery",
   "version": "1.0.0",
-  "description": "The Fashion Gallery E-commerce Store",
+  "description": "Diamond Vogue Gallery E-commerce Store",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

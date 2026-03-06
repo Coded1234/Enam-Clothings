@@ -4,16 +4,19 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === "undefined") return "light";
+  const [theme, setTheme] = useState("light");
+  const [mounted, setMounted] = useState(false);
+
+  // Read real theme from localStorage after mount (avoids hydration mismatch)
+  useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
-      return savedTheme;
+      setTheme(savedTheme);
+    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setTheme("dark");
     }
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  });
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -36,7 +39,7 @@ export const ThemeProvider = ({ children }) => {
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, mounted }}>
       {children}
     </ThemeContext.Provider>
   );

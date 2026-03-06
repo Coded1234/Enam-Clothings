@@ -244,7 +244,7 @@ const Newsletter = () => {
                       htmlFor="agree"
                       className="ml-3 text-sm text-gray-700 dark:text-gold"
                     >
-                      I agree to The Fashion Gallery terms and conditions. You
+                      I agree to Diamond Vogue Gallery terms and conditions. You
                       can unsubscribe at anytime.
                     </label>
                   </div>

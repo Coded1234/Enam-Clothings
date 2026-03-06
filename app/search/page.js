@@ -4,8 +4,8 @@ import CustomerLayout from "../../client/src/layouts/CustomerLayout";
 import SearchResults from "../../client/src/pages/customer/SearchResults";
 
 export const metadata = {
-  title: "Search - The Fashion Gallery",
-  description: "Search for premium fashion and clothing at The Fashion Gallery.",
+  title: "Search",
+  description: "Search for premium fashion and clothing at Diamond Vogue Gallery.",
 };
 
 export default function SearchPage() {

@@ -4,7 +4,7 @@ Effective date: January 25, 2026
 
 1. Introduction
 
-The Fashion Gallery ("we", "our", "us") values your privacy. This Privacy Policy explains what personal data we collect, why we collect it, how we use it, and your rights. It applies to visitors and customers who use our website and services at enam-s-clothings (the "Service").
+Diamond Vogue Gallery ("we", "our", "us") values your privacy. This Privacy Policy explains what personal data we collect, why we collect it, how we use it, and your rights. It applies to visitors and customers who use our website and services at enam-s-clothings (the "Service").
 
 2. Information We Collect
 
@@ -64,7 +64,7 @@ We may update this Privacy Policy. We will post the revised policy with an updat
 
 If you have questions or requests about this policy or your personal data, contact us:
 
-support@thefashiongallery.com
+diamondvoguegallery@gmail.com
 
 
 ---

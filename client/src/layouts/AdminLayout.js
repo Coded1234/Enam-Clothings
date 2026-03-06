@@ -79,7 +79,7 @@ const AdminLayout = ({ children }) => {
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 text-gray-700 transition-transform duration-300 flex flex-col`}>
         <div className="pt-4 pb-20 px-4 flex items-center justify-between border-b border-gray-200">
           <Link href="/admin" className="flex items-center">
-            <img src="/images/loginlogo.png" alt="The Fashion Gallery" className="h-10 w-auto object-contain" />
+            <img src="/images/loginlogo.png" alt="Diamond Vogue Gallery" className="h-10 w-auto object-contain" />
           </Link>
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg hover:bg-gray-50 lg:hidden">
             <FiX size={20} />

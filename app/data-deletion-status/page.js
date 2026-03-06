@@ -4,8 +4,8 @@ import CustomerLayout from "../../client/src/layouts/CustomerLayout";
 import DataDeletionStatus from "../../client/src/pages/customer/DataDeletionStatus";
 
 export const metadata = {
-  title: "Data Deletion Status - The Fashion Gallery",
-  description: "Check the status of your data deletion request at The Fashion Gallery.",
+  title: "Data Deletion Status",
+  description: "Check the status of your data deletion request at Diamond Vogue Gallery.",
 };
 
 export default function DataDeletionStatusPage() {

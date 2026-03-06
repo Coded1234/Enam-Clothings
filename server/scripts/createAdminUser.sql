@@ -1,6 +1,6 @@
 
 -- SQL Script to add Admin User to Neon Database
--- Email: thefashiongallery264@gmail.com
+-- Email: diamondvoguegallery@gmail.com
 -- Password: Admin@1234
 
 INSERT INTO users (
@@ -19,7 +19,7 @@ INSERT INTO users (
   gen_random_uuid(),
   'Admin', 
   'User', 
-  'thefashiongallery264@gmail.com', 
+  'diamondvoguegallery@gmail.com', 
   '$2a$10$3QF5GN5Mni1hl2TCrR7Ow.7xMUp53mXjvBgrfSKrARYayEYQsk1cu', -- Hashed 'Admin@1234'
   'admin', 
   true, 

@@ -4,9 +4,9 @@ import CustomerLayout from "../../client/src/layouts/CustomerLayout";
 import Contact from "../../client/src/pages/customer/Contact";
 
 export const metadata = {
-  title: "Contact Us - The Fashion Gallery",
+  title: "Contact Us",
   description:
-    "Get in touch with The Fashion Gallery. We're here to help with any questions about our products and services.",
+    "Get in touch with Diamond Vogue Gallery. We're here to help with any questions about our products and services.",
 };
 
 export default function ContactPage() {

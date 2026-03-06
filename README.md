@@ -1,4 +1,4 @@
-# The Fashion Gallery - E-commerce Store
+# Diamond Vogue Gallery - E-commerce Store
 
 A full-stack e-commerce clothing store built with React, Node.js, Express, and PostgreSQL.
 

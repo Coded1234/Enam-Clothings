@@ -1,51 +1,108 @@
-import CustomerLayout from "../../../client/src/layouts/CustomerLayout";
+﻿import CustomerLayout from "../../../client/src/layouts/CustomerLayout";
 import ProductDetail from "../../../client/src/pages/customer/ProductDetail";
+
+function getApiUrl() {
+  return (
+    process.env.NEXT_PUBLIC_API_URL ||
+    (process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}/api`
+      : "http://localhost:5000/api")
+  );
+}
+
+/** Extract a plain string URL from an image that may be a string or {url, public_id} object */
+function extractImageUrl(img) {
+  if (!img) return null;
+  if (typeof img === "string") return img;
+  if (img.url) return img.url;
+  return null;
+}
+
+/** Ensure data crossing the server→client boundary is plain JSON (no Sequelize decorations) */
+function toPlain(data) {
+  if (data == null) return data;
+  return JSON.parse(JSON.stringify(data));
+}
+
+async function getProduct(id) {
+  try {
+    const res = await fetch(`${getApiUrl()}/products/${id}`, {
+      next: { revalidate: 60 },
+    });
+    if (res.ok) return await res.json();
+  } catch {}
+  return null;
+}
+
+async function getRelatedProducts(id) {
+  try {
+    const res = await fetch(`${getApiUrl()}/products/${id}/related`, {
+      next: { revalidate: 60 },
+    });
+    if (res.ok) return await res.json();
+  } catch {}
+  return [];
+}
+
+async function getReviews(productId) {
+  try {
+    const res = await fetch(
+      `${getApiUrl()}/reviews/product/${productId}?limit=10&sort=newest`,
+      { next: { revalidate: 60 } },
+    );
+    if (res.ok) return await res.json();
+  } catch {}
+  return { reviews: [], total: 0, ratingDistribution: [] };
+}
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  try {
-    const apiUrl =
-      process.env.NEXT_PUBLIC_API_URL ||
-      (process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}/api`
-        : "http://localhost:5000/api");
-    const res = await fetch(`${apiUrl}/products/${id}`, {
-      next: { revalidate: 3600 },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const product = data.product || data;
-      return {
-        title: `${product.name} - The Fashion Gallery`,
-        description: product.description
-          ? product.description.slice(0, 160)
-          : `Shop ${product.name} at The Fashion Gallery.`,
-        openGraph: {
-          title: `${product.name} - The Fashion Gallery`,
-          description: product.description
-            ? product.description.slice(0, 160)
-            : `Shop ${product.name} at The Fashion Gallery.`,
-          images:
-            product.images && product.images.length > 0
-              ? [{ url: product.images[0] }]
-              : [],
-          type: "website",
-        },
-      };
-    }
-  } catch {
-    // fall through to default
+  const product = await getProduct(id);
+
+  if (product) {
+    const name = product.name || "Product";
+    const desc = product.description
+      ? product.description.slice(0, 160)
+      : `Shop ${name} at Diamond Vogue Gallery.`;
+    const imageUrl = extractImageUrl(product.images?.[0]);
+    return {
+      title: name,
+      description: desc,
+      openGraph: {
+        title: `${name} - Diamond Vogue Gallery`,
+        description: desc,
+        images: imageUrl ? [{ url: imageUrl }] : [],
+        type: "website",
+      },
+    };
   }
+
   return {
-    title: "Product - The Fashion Gallery",
-    description: "Shop premium fashion and clothing at The Fashion Gallery.",
+    title: "Product",
+    description: "Shop premium fashion and clothing at Diamond Vogue Gallery.",
   };
 }
 
-export default function ProductDetailPage() {
+export default async function ProductDetailPage({ params }) {
+  const { id } = await params;
+
+  const [product, relatedProducts, reviewsData] = await Promise.all([
+    getProduct(id),
+    getRelatedProducts(id),
+    getReviews(id),
+  ]);
+
   return (
     <CustomerLayout>
-      <ProductDetail />
+      <ProductDetail
+        initialProduct={toPlain(product)}
+        initialRelatedProducts={toPlain(relatedProducts)}
+        initialReviews={toPlain(reviewsData?.reviews || [])}
+        initialReviewsMeta={toPlain({
+          total: reviewsData?.total || 0,
+          ratingDistribution: reviewsData?.ratingDistribution || [],
+        })}
+      />
     </CustomerLayout>
   );
 }

@@ -270,7 +270,7 @@ const OrderDetail = () => {
   <div class="watermark wm-bottom"><img src="${logoUrl}" alt="" /></div>
   <div class="header">
     <div class="brand">
-      <img src="${logoUrl}" alt="The Fashion Gallery" />
+      <img src="${logoUrl}" alt="Diamond Vogue Gallery" />
       <div class="brand-sub">Premium Fashion &amp; Clothing · Accra, Ghana</div>
     </div>
     <div class="receipt-label">
@@ -331,7 +331,7 @@ const OrderDetail = () => {
   </div>
 
   <div class="footer">
-    <span>The Fashion Gallery · Accra, Ghana</span>
+    <span>Diamond Vogue Gallery · Accra, Ghana</span>
     <span>Thank you for your order!</span>
   </div>
 

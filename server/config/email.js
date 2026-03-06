@@ -27,14 +27,14 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async (to, subject, html) => {
   try {
     const mailOptions = {
-      from: `"The Fashion Gallery" <${process.env.EMAIL_USER}>`,
+      from: `"Diamond Vogue Gallery" <${process.env.EMAIL_USER}>`,
       replyTo: process.env.EMAIL_USER,
       to,
       subject,
       html,
       headers: {
         "X-Priority": "1",
-        "X-Mailer": "The Fashion Gallery Mailer",
+        "X-Mailer": "Diamond Vogue Gallery Mailer",
       },
     };
 
@@ -60,7 +60,7 @@ const sendBulkEmail = async (recipients, subject, html) => {
       const batch = recipientList.slice(i, i + batchSize);
       const promises = batch.map((email) => {
         const mailOptions = {
-          from: `"The Fashion Gallery" <${process.env.EMAIL_USER}>`,
+          from: `"Diamond Vogue Gallery" <${process.env.EMAIL_USER}>`,
           to: email,
           subject,
           html,
@@ -78,7 +78,7 @@ const sendBulkEmail = async (recipients, subject, html) => {
 };
 
 // Helper for consistent email layout
-const getEmailLayout = (content, title = "The Fashion Gallery") => `
+const getEmailLayout = (content, title = "Diamond Vogue Gallery") => `
   <!DOCTYPE html>
   <html>
   <head>
@@ -90,7 +90,7 @@ const getEmailLayout = (content, title = "The Fashion Gallery") => `
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 20px; margin-bottom: 20px;">
       <!-- Header -->
       <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); padding: 40px 20px; text-align: center; border-bottom: 2px solid #c9ad65;">
-        <img src="${process.env.CLIENT_URL}/images/loginlogo.png" alt="The Fashion Gallery" style="height: 40px; width: auto; object-fit: contain;" />
+        <img src="${process.env.CLIENT_URL}/images/loginlogo.png" alt="Diamond Vogue Gallery" style="height: 40px; width: auto; object-fit: contain;" />
       </div>
       
       <!-- Content -->
@@ -100,7 +100,7 @@ const getEmailLayout = (content, title = "The Fashion Gallery") => `
       
       <!-- Footer -->
       <div style="background-color: #333333; color: #888888; padding: 20px; text-align: center; font-size: 12px;">
-        <p style="margin: 0 0 10px 0;">&copy; ${new Date().getFullYear()} The Fashion Gallery. All rights reserved.</p>
+        <p style="margin: 0 0 10px 0;">&copy; ${new Date().getFullYear()} Diamond Vogue Gallery. All rights reserved.</p>
         <p style="margin: 0;">
           <a href="${process.env.CLIENT_URL}" style="color: #aaaaaa; text-decoration: none;">Visit Store</a> | 
           <a href="${process.env.CLIENT_URL}/contact" style="color: #aaaaaa; text-decoration: none;">Contact Us</a>
@@ -282,7 +282,7 @@ const emailTemplates = {
   welcomeEmail: (user) => {
     const content = `
       <h2 style="color: #333; margin-top: 0; text-align: center;">Welcome, ${user.firstName}!</h2>
-      <p style="text-align: center; color: #666; font-size: 16px;">We're thrilled to have you join the The Fashion Gallery family.</p>
+      <p style="text-align: center; color: #666; font-size: 16px;">We're thrilled to have you join the Diamond Vogue Gallery family.</p>
       
       <div style="margin: 30px 0; text-align: center;">
         <img src="https://img.icons8.com/clouds/200/000000/shopping-bag.png" alt="Shopping" style="width: 150px; height: auto;">
@@ -300,7 +300,7 @@ const emailTemplates = {
       </div>
     `;
     return {
-      subject: "Welcome to The Fashion Gallery!",
+      subject: "Welcome to Diamond Vogue Gallery!",
       html: getEmailLayout(content, "Welcome"),
     };
   },
@@ -376,7 +376,7 @@ const emailTemplates = {
       </div>
     `;
     return {
-      subject: "Welcome to The Fashion Gallery Newsletter!",
+      subject: "Welcome to Diamond Vogue Gallery Newsletter!",
       html: getEmailLayout(content, "Newsletter Subscription"),
     };
   },

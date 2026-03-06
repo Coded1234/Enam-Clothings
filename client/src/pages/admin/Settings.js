@@ -25,9 +25,9 @@ const Settings = () => {
 
   const [settings, setSettings] = useState({
     // General Settings
-    siteName: "The Fashion Gallery",
+    siteName: "Diamond Vogue Gallery",
     siteDescription: "Your one-stop shop for fashion",
-    contactEmail: "support@thefashiongallery.com",
+    contactEmail: "diamondvoguegallery@gmail.com",
     contactPhone: "+233 XX XXX XXXX",
     address: "Accra, Ghana",
 

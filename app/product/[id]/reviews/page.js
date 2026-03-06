@@ -1,4 +1,4 @@
-import CustomerLayout from "../../../../client/src/layouts/CustomerLayout";
+﻿import CustomerLayout from "../../../../client/src/layouts/CustomerLayout";
 import ProductReviews from "../../../../client/src/pages/customer/ProductReviews";
 
 export async function generateMetadata({ params }) {
@@ -16,16 +16,17 @@ export async function generateMetadata({ params }) {
       const data = await res.json();
       const product = data.product || data;
       return {
-        title: `Reviews for ${product.name} - The Fashion Gallery`,
-        description: `Read customer reviews for ${product.name} at The Fashion Gallery.`,
+        title: `Reviews for ${product.name}`,
+
+        description: `Read customer reviews for ${product.name} at Diamond Vogue Gallery.`,
       };
     }
   } catch {
     // fall through to default
   }
   return {
-    title: "Product Reviews - The Fashion Gallery",
-    description: "Read customer reviews at The Fashion Gallery.",
+    title: "Product Reviews",
+    description: "Read customer reviews at Diamond Vogue Gallery.",
   };
 }
 

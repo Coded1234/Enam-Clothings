@@ -265,7 +265,7 @@ const PaymentVerify = () => {
         <p className="text-sm text-gray-500 mt-8">
           Need help?{" "}
           <a
-            href="mailto:support@thefashiongallery.com"
+            href="mailto:diamondvoguegallery@gmail.com"
             className="text-primary-500 hover:underline"
           >
             Contact Support

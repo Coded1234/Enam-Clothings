@@ -146,8 +146,8 @@ const Login = () => {
           <Link href="/" className="block text-center mb-8">
             <img
               src="/images/loginlogo.png"
-              alt="The Fashion Gallery"
-              className="h-10 w-auto object-contain mx-auto"
+              alt="Diamond Vogue Gallery"
+              className="h-12 w-auto object-contain mx-auto"
             />
           </Link>
 

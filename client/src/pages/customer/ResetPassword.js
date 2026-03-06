@@ -97,7 +97,7 @@ const ResetPassword = () => {
             <Link href="/" className="inline-block mb-6">
               <img
                 src="/images/loginlogo.png"
-                alt="The Fashion Gallery"
+                alt="Diamond Vogue Gallery"
                 className="h-10 w-auto object-contain mx-auto"
               />
             </Link>

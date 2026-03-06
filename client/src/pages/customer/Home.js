@@ -457,14 +457,23 @@ const Home = () => {
               {" "}
               Follow Us on Instagram{" "}
             </h2>{" "}
-            <p className="text-gray-600">@thefashiongallery</p>{" "}
+            <a
+              href="https://www.instagram.com/diamondvoguegallery/?hl=it"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 hover:text-pink-500 transition-colors"
+            >
+              @diamondvoguegallery
+            </a>{" "}
           </div>{" "}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {" "}
             {IMAGES.instagram.map((img, index) => (
               <a
                 key={`instagram-${index}`}
-                href="https://instagram.com"
+                href="https://www.instagram.com/diamondvoguegallery/?hl=it"
+                target="_blank"
+                rel="noopener noreferrer"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`aspect-square rounded-xl overflow-hidden group ${index >= 4 ? "hidden md:block" : ""}`}

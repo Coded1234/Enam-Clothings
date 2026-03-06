@@ -21,7 +21,7 @@ Effective date: January 25, 2026
 
 1. Introduction
 
-This Cookie Policy explains how The Fashion Gallery ("we", "us", "our") uses cookies and similar tracking technologies on our website.
+This Cookie Policy explains how Diamond Vogue Gallery ("we", "us", "our") uses cookies and similar tracking technologies on our website.
 
 2. What are Cookies
 
@@ -52,7 +52,7 @@ We may update this Cookie Policy from time to time. We will post changes with a 
 
 8. Contact
 
-For questions about our Cookie Policy, contact support@thefashiongallery.com
+For questions about our Cookie Policy, contact diamondvoguegallery@gmail.com
 
 ---
 

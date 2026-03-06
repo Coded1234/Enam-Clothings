@@ -28,15 +28,27 @@ import {
   FiThumbsUp,
 } from "react-icons/fi";
 
-const ProductDetail = () => {
+const ProductDetail = ({
+  initialProduct = null,
+  initialRelatedProducts = null,
+  initialReviews = null,
+  initialReviewsMeta = null,
+}) => {
   const { id } = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const { product, relatedProducts, loading } = useSelector(
-    (state) => state.products,
-  );
+  const {
+    product: reduxProduct,
+    relatedProducts: reduxRelated,
+    loading,
+  } = useSelector((state) => state.products);
   const { isAuthenticated } = useSelector((state) => state.auth);
+
+  // Use SSR data immediately, then Redux takes over after client fetch
+  const product = reduxProduct || initialProduct;
+  const relatedProducts =
+    reduxRelated?.length > 0 ? reduxRelated : initialRelatedProducts || [];
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
@@ -45,9 +57,9 @@ const ProductDetail = () => {
   const [activeTab, setActiveTab] = useState("description");
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // Reviews state
-  const [reviews, setReviews] = useState([]);
-  const [reviewsLoading, setReviewsLoading] = useState(false);
+  // Reviews state — seed from SSR if available
+  const [reviews, setReviews] = useState(initialReviews || []);
+  const [reviewsLoading, setReviewsLoading] = useState(!initialReviews);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   const fetchReviews = useCallback(async () => {
@@ -232,7 +244,7 @@ const ProductDetail = () => {
       )
     : 0;
 
-  if (loading || !product) {
+  if ((loading && !initialProduct) || !product) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">

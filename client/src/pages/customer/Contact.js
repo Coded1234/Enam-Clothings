@@ -10,10 +10,9 @@ import {
   FiClock,
   FiSend,
   FiMessageSquare,
-  FiFacebook,
-  FiTwitter,
   FiInstagram,
 } from "react-icons/fi";
+import { SiTiktok } from "react-icons/si";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
 
@@ -111,7 +110,7 @@ const Contact = () => {
     {
       icon: FiMail,
       title: "Email Us",
-      details: ["thefashiongallery264@gmail.com"],
+      details: ["diamondvoguegallery@gmail.com"],
     },
   ];
 
@@ -378,19 +377,15 @@ const Contact = () => {
                 </p>
                 <div className="flex gap-4">
                   <a
-                    href="#"
-                    className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white hover:bg-blue-600 transition-colors"
+                    href="https://www.tiktok.com/@enamdiamond?_r=1&_t=ZS-9429LMlZZmE"
+                    className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors"
                   >
-                    <FiFacebook size={20} />
+                    <SiTiktok size={18} />
                   </a>
                   <a
-                    href="#"
-                    className="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center text-white hover:bg-sky-600 transition-colors"
-                  >
-                    <FiTwitter size={20} />
-                  </a>
-                  <a
-                    href="#"
+                    href="https://www.instagram.com/diamondvoguegallery/?hl=it"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity"
                   >
                     <FiInstagram size={20} />

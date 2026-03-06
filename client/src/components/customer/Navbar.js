@@ -31,7 +31,7 @@ const defaultPromoMessages = [
 ];
 
 const Navbar = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
   const {
     unread,
     unreadCount,
@@ -49,13 +49,8 @@ const Navbar = () => {
   const [promoMessages, setPromoMessages] = useState(defaultPromoMessages);
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
   const [newsletterLoading, setNewsletterLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef(null);
   const bellRef = useRef(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Fetch active coupon and add to promo messages
   useEffect(() => {
@@ -227,7 +222,7 @@ const Navbar = () => {
 
       {/* Main Navbar */}
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 md:h-20">
           {/* Mobile Menu Button - Left Side */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -241,8 +236,8 @@ const Navbar = () => {
           <Link href="/" className="flex items-center">
             <img
               src="/images/loginlogo.png"
-              alt="The Fashion Gallery"
-              className="h-10 w-auto object-contain"
+              alt="Diamond Vogue Gallery"
+              className="h-10 md:h-12 w-auto max-w-[220px] object-contain"
             />
           </Link>
 
@@ -525,8 +520,8 @@ const Navbar = () => {
             >
               <img
                 src="/images/loginlogo.png"
-                alt="The Fashion Gallery"
-                className="h-10 w-auto object-contain"
+                alt="Diamond Vogue Gallery"
+                className="h-8 md:h-12 w-auto max-w-[220px] object-contain"
               />
             </Link>
             <button
@@ -691,7 +686,15 @@ const Navbar = () => {
                 className="p-1.5 rounded-full bg-gray-100 dark:bg-secondary-600 text-gray-600 dark:text-gold hover:bg-gray-200 dark:hover:bg-secondary-700 transition-colors"
                 aria-label="Toggle theme"
               >
-                {theme === "dark" ? <FiSun size={16} /> : <FiMoon size={16} />}
+                {mounted ? (
+                  theme === "dark" ? (
+                    <FiSun size={16} />
+                  ) : (
+                    <FiMoon size={16} />
+                  )
+                ) : (
+                  <FiMoon size={16} />
+                )}
               </button>
             </div>
             <p className="text-xs text-gray-400 dark:text-primary-300 text-center">

@@ -2,9 +2,9 @@ import CustomerLayout from "../../client/src/layouts/CustomerLayout";
 import SizeGuide from "../../client/src/pages/customer/SizeGuide";
 
 export const metadata = {
-  title: "Size Guide - The Fashion Gallery",
+  title: "Size Guide",
   description:
-    "Find your perfect fit with our comprehensive size guide at The Fashion Gallery.",
+    "Find your perfect fit with our comprehensive size guide at Diamond Vogue Gallery.",
 };
 
 export default function SizeGuidePage() {

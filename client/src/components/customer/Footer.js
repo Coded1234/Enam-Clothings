@@ -89,7 +89,7 @@ const Footer = () => {
           <div className="text-center sm:text-left">
             <img
               src="/images/loginlogo.png"
-              alt="The Fashion Gallery"
+              alt="Diamond Vogue Gallery"
               className="h-10 w-auto object-contain mb-5 mx-auto sm:mx-0"
             />
             <p className="text-gray-300 mb-4">
@@ -98,7 +98,9 @@ const Footer = () => {
             </p>
             <div className="flex gap-4 justify-center sm:justify-start">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/diamondvoguegallery/?hl=it"
+                target="_blank"
+                rel="noopener noreferrer"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary-500 transition-colors"
@@ -216,7 +218,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3 text-gray-300 justify-center sm:justify-start">
                 <FiMail className="text-primary-500" />
-                <span>thefashiongallery264@gmail.com</span>
+                <span>diamondvoguegallery@gmail.com</span>
               </li>
             </ul>
           </div>
@@ -227,16 +229,22 @@ const Footer = () => {
       <div className="border-t border-gray-800 py-6">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-300 text-sm">
-            © 2026 The Fashion Gallery. All rights reserved.
+            © 2026 Diamond Vogue Gallery. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm text-gray-300">
-            <Link href="/privacy" className="hover:text-white transition-colors">
+            <Link
+              href="/privacy"
+              className="hover:text-white transition-colors"
+            >
               Privacy Policy
             </Link>
             <Link href="/terms" className="hover:text-white transition-colors">
               Terms of Service
             </Link>
-            <Link href="/cookies" className="hover:text-white transition-colors">
+            <Link
+              href="/cookies"
+              className="hover:text-white transition-colors"
+            >
               Cookie Policy
             </Link>
           </div>

@@ -4,11 +4,11 @@ import "./globals.css";
 
 export const metadata = {
   title: {
-    default: "The Fashion Gallery - Premium Fashion",
-    template: "%s - The Fashion Gallery",
+    default: "Diamond Vogue Gallery - Premium Fashion",
+    template: "%s - Diamond Vogue Gallery",
   },
   description:
-    "Shop premium fashion and clothing at The Fashion Gallery. Discover the latest trends in women's and men's fashion.",
+    "Shop premium fashion and clothing at Diamond Vogue Gallery. Discover the latest trends in women's and men's fashion.",
   keywords: [
     "fashion",
     "clothing",
@@ -19,16 +19,16 @@ export const metadata = {
   ],
   openGraph: {
     type: "website",
-    siteName: "The Fashion Gallery",
-    title: "The Fashion Gallery - Premium Fashion",
+    siteName: "Diamond Vogue Gallery",
+    title: "Diamond Vogue Gallery - Premium Fashion",
     description:
-      "Shop premium fashion and clothing at The Fashion Gallery. Discover the latest trends in women's and men's fashion.",
+      "Shop premium fashion and clothing at Diamond Vogue Gallery. Discover the latest trends in women's and men's fashion.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Fashion Gallery - Premium Fashion",
+    title: "Diamond Vogue Gallery - Premium Fashion",
     description:
-      "Shop premium fashion and clothing at The Fashion Gallery. Discover the latest trends in women's and men's fashion.",
+      "Shop premium fashion and clothing at Diamond Vogue Gallery. Discover the latest trends in women's and men's fashion.",
   },
   robots: {
     index: true,

@@ -186,7 +186,7 @@ const Register = () => {
           <Link href="/" className="block text-center mb-8">
             <img
               src="/images/loginlogo.png"
-              alt="The Fashion Gallery"
+              alt="Diamond Vogue Gallery"
               className="h-10 w-auto object-contain mx-auto"
             />
           </Link>
@@ -521,7 +521,7 @@ const Register = () => {
         <div className="absolute inset-0 bg-gradient-to-l from-primary-500/80 to-secondary-500/80 flex items-center justify-center">
           <div className="text-white text-center p-8 max-w-md">
             <h2 className="text-2xl font-bold mb-3">
-              Join The Fashion Gallery
+              Join Diamond Vogue Gallery
             </h2>
             <p className="text-base text-white/90 mb-8">
               Create an account and unlock exclusive benefits
