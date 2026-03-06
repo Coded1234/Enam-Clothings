@@ -1,3 +1,8 @@
+// Explicit static requires so Vercel's file tracer includes these in the lambda bundle.
+// Sequelize loads pg dynamically (require(dialectName)) which the tracer cannot detect.
+require("pg");
+require("pg-hstore");
+
 const { Sequelize } = require("sequelize");
 
 // Support both DATABASE_URL (for Vercel/Neon) and individual credentials
