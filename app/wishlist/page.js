@@ -1,7 +1,11 @@
-"use client";
 import CustomerLayout from "../../client/src/layouts/CustomerLayout";
 import ProtectedRoute from "../../client/src/components/ProtectedRoute";
 import Wishlist from "../../client/src/pages/customer/Wishlist";
+
+export const metadata = {
+  title: "My Wishlist - The Fashion Gallery",
+  description: "View and manage your saved items on The Fashion Gallery wishlist.",
+};
 
 export default function WishlistPage() {
   return (
