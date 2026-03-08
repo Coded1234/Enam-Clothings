@@ -304,8 +304,24 @@ const ProductDetail = ({
         <div className="grid lg:grid-cols-[400px,1fr] gap-8 mb-16">
           {/* Images */}
           <div className="space-y-4">
-            {/* Main Image */}
-            <div className="relative aspect-square bg-white rounded-xl overflow-hidden max-w-md">
+            {/* Main Image with swipe support */}
+            <div
+              className="relative aspect-square bg-white rounded-xl overflow-hidden max-w-md"
+              onTouchStart={(e) => {
+                const touch = e.touches[0];
+                e.currentTarget._touchStartX = touch.clientX;
+              }}
+              onTouchEnd={(e) => {
+                const dx =
+                  e.changedTouches[0].clientX -
+                  (e.currentTarget._touchStartX || 0);
+                const total = product.images?.length || 1;
+                if (Math.abs(dx) > 40) {
+                  if (dx < 0) setSelectedImage((prev) => (prev + 1) % total);
+                  else setSelectedImage((prev) => (prev - 1 + total) % total);
+                }
+              }}
+            >
               <img
                 src={getProductImage(product, selectedImage)}
                 alt={product.name}
@@ -315,6 +331,22 @@ const ProductDetail = ({
                 <span className="absolute top-4 left-4 bg-red-500 text-white text-sm font-medium px-3 py-1 rounded-full">
                   -{discountPercent}% OFF
                 </span>
+              )}
+              {/* Dot indicators */}
+              {product.images?.length > 1 && (
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+                  {product.images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImage(index)}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        selectedImage === index
+                          ? "bg-white scale-125"
+                          : "bg-white/50"
+                      }`}
+                    />
+                  ))}
+                </div>
               )}
             </div>
 

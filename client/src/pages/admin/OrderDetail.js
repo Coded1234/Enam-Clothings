@@ -34,6 +34,180 @@ const OrderDetail = () => {
     fetchOrder();
   }, [id]);
 
+  const formatDate = (date) =>
+    new Date(date).toLocaleDateString("en-GH", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+  const formatTime = (date) =>
+    new Date(date).toLocaleTimeString("en-GH", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  const handlePrint = () => {
+    if (!order) return;
+    const addr = order.shippingAddress || {};
+    const orderNum =
+      order.orderNumber || `#${(order.id || "").slice(-8).toUpperCase()}`;
+    const placedDate = formatDate(order.createdAt);
+    const placedTime = formatTime(order.createdAt);
+    const items = order.items || order.orderItems || [];
+    const subtotal = parseFloat(order.subtotal ?? order.itemsPrice ?? 0) || 0;
+    const shippingFee =
+      parseFloat(order.shippingFee ?? order.shippingCost ?? 0) || 0;
+    const tax = parseFloat(order.taxPrice ?? order.tax ?? 0) || 0;
+    const discount = parseFloat(order.discount ?? 0) || 0;
+    const total = parseFloat(order.totalAmount ?? order.totalPrice ?? 0) || 0;
+    const paymentMethod = order.paymentMethod;
+    const isPaid = (order.paymentStatus || "") === "paid";
+
+    const itemRows = items
+      .map((item) => {
+        const name = item.productName || item.product?.name || "—";
+        const size = item.size ? `Size: ${item.size}` : "";
+        const color = item.color
+          ? `Color: ${typeof item.color === "object" ? item.color.name : item.color}`
+          : "";
+        const meta = [size, color].filter(Boolean).join(" · ");
+        const qty = item.quantity || 1;
+        const unit = parseFloat(item.price ?? 0) || 0;
+        const line = unit * qty;
+        return `<tr>
+        <td>${name}${meta ? `<br/><small style="color:#888">${meta}</small>` : ""}</td>
+        <td style="text-align:center">${qty}</td>
+        <td style="text-align:right">GH₵${unit.toFixed(2)}</td>
+        <td style="text-align:right">GH₵${line.toFixed(2)}</td>
+      </tr>`;
+      })
+      .join("");
+
+    const payLabel = paymentMethod === "cod" ? "Pay on Delivery" : "Paystack";
+    const logoUrl = `${window.location.origin}/images/loginlogo.png`;
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Delivery Receipt – ${orderNum}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Open Sans', sans-serif; font-size: 13px; color: #111; background: #fff; padding: 32px 40px; max-width: 720px; margin: auto; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #111; padding-bottom: 16px; margin-bottom: 20px; }
+    .brand img { height: 48px; width: auto; object-fit: contain; display: block; }
+    .brand-sub { font-size: 11px; color: #666; margin-top: 4px; }
+    .receipt-label { text-align: right; }
+    .receipt-label h2 { font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+    .receipt-label p { font-size: 11px; color: #666; margin-top: 2px; }
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .meta-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 16px; }
+    .meta-box h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; margin-bottom: 8px; font-weight: 600; }
+    .meta-box p { font-size: 13px; line-height: 1.6; color: #111; }
+    .meta-box .highlight { font-weight: 700; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    thead tr { background: #111; color: #fff; }
+    thead th { padding: 9px 12px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    thead th:not(:first-child) { text-align: center; }
+    thead th:last-child { text-align: right; }
+    tbody tr:nth-child(even) { background: #f9fafb; }
+    tbody td { padding: 10px 12px; vertical-align: top; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
+    .totals { width: 280px; margin-left: auto; margin-bottom: 24px; }
+    .totals tr td { padding: 5px 0; font-size: 13px; }
+    .totals tr td:last-child { text-align: right; font-weight: 600; }
+    .totals .total-row td { border-top: 2px solid #111; padding-top: 10px; font-size: 16px; font-weight: 700; }
+    .discount-row td { color: #16a34a; }
+    .barcode-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 8px; }
+    .order-id-box { font-family: monospace; font-size: 15px; font-weight: 700; letter-spacing: 2px; color: #111; }
+    .footer { margin-top: 28px; border-top: 1px solid #e5e7eb; padding-top: 14px; display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af; }
+    .watermark { position: fixed; pointer-events: none; z-index: 0; }
+    .watermark img { width: 200px; height: auto; filter: grayscale(100%); opacity: 0.58; }
+    .wm-top { top: 10%; left: 10%; transform: rotate(-20deg); }
+    .wm-top-right { top: 10%; right: 10%; transform: rotate(20deg); }
+    .wm-center { top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); }
+    .wm-bottom-left { bottom: 10%; left: 10%; transform: rotate(20deg); }
+    .wm-bottom { bottom: 10%; right: 10%; transform: rotate(-20deg); }
+    @media print { body { padding: 16px 20px; } .no-print { display: none; } .watermark { position: fixed; } }
+  </style>
+</head>
+<body>
+  <div class="watermark wm-top"><img src="${logoUrl}" alt="" /></div>
+  <div class="watermark wm-top-right"><img src="${logoUrl}" alt="" /></div>
+  <div class="watermark wm-center"><img src="${logoUrl}" alt="" /></div>
+  <div class="watermark wm-bottom-left"><img src="${logoUrl}" alt="" /></div>
+  <div class="watermark wm-bottom"><img src="${logoUrl}" alt="" /></div>
+  <div class="header">
+    <div class="brand">
+      <img src="${logoUrl}" alt="Diamond Vogue Gallery" />
+      <div class="brand-sub">Premium Fashion &amp; Clothing · Accra, Ghana</div>
+    </div>
+    <div class="receipt-label">
+      <h2>Delivery Receipt</h2>
+      <p>${placedDate}</p>
+      <p>${placedTime}</p>
+    </div>
+  </div>
+  <div class="meta-grid">
+    <div class="meta-box">
+      <h4>Order Details</h4>
+      <p class="highlight">${orderNum}</p>
+      <p style="margin-top:6px">Payment: ${payLabel}</p>
+      <p style="margin-top:4px">Status: <strong>${isPaid ? "PAID" : "PENDING"}</strong></p>
+    </div>
+    <div class="meta-box">
+      <h4>Deliver To</h4>
+      <p class="highlight">${addr.firstName || ""} ${addr.lastName || ""}</p>
+      <p>${addr.address || ""}</p>
+      ${addr.addressDetails ? `<p>${addr.addressDetails}</p>` : ""}
+      <p>${addr.city || ""}${addr.country ? `, ${addr.country}` : ""}</p>
+      ${addr.phone ? `<p>📞 ${addr.phone}</p>` : ""}
+      ${addr.email ? `<p>✉ ${addr.email}</p>` : ""}
+    </div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th style="text-align:center">Qty</th>
+        <th style="text-align:right">Unit Price</th>
+        <th style="text-align:right">Total</th>
+      </tr>
+    </thead>
+    <tbody>${itemRows}</tbody>
+  </table>
+  <table class="totals">
+    <tr><td>Subtotal</td><td>GH₵${subtotal.toFixed(2)}</td></tr>
+    <tr><td>Shipping</td><td>${shippingFee === 0 ? "FREE" : `GH₵${shippingFee.toFixed(2)}`}</td></tr>
+    ${discount > 0 ? `<tr class="discount-row"><td>Discount</td><td>-GH₵${discount.toFixed(2)}</td></tr>` : ""}
+    ${tax > 0 ? `<tr><td>Tax</td><td>GH₵${tax.toFixed(2)}</td></tr>` : ""}
+    <tr class="total-row"><td>TOTAL</td><td>GH₵${total.toFixed(2)}</td></tr>
+  </table>
+  <div class="barcode-row">
+    <div>
+      <div class="order-id-box">${orderNum}</div>
+      <div style="font-size:10px;color:#9ca3af;margin-top:4px">Scan or quote this ID for enquiries</div>
+    </div>
+    <div style="text-align:right;font-size:11px;color:#6b7280">
+      <p>Items: ${items.length} &nbsp;·&nbsp; Qty: ${items.reduce((s, i) => s + (i.quantity || 1), 0)}</p>
+      <p>Printed: ${new Date().toLocaleDateString("en-GH", { year: "numeric", month: "short", day: "numeric" })}</p>
+    </div>
+  </div>
+  <div class="footer">
+    <span>Diamond Vogue Gallery · Accra, Ghana</span>
+    <span>Thank you for your order!</span>
+  </div>
+  <script>window.onload = function(){ window.print(); }<\/script>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank", "width=780,height=900");
+    win.document.write(html);
+    win.document.close();
+  };
+
   const fetchOrder = async () => {
     try {
       setLoading(true);
@@ -127,7 +301,7 @@ const OrderDetail = () => {
         </div>
         <div className="flex items-center gap-2 md:gap-4 flex-wrap">
           <button
-            onClick={() => window.print()}
+            onClick={handlePrint}
             className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
           >
             <FiPrinter size={16} className="md:w-[18px] md:h-[18px]" />
@@ -350,7 +524,9 @@ const OrderDetail = () => {
             <div className="space-y-2 text-gray-600 text-xs md:text-sm">
               <p>{order.shippingAddress?.address}</p>
               {order.shippingAddress?.addressDetails && (
-                <p className="text-gray-700">{order.shippingAddress.addressDetails}</p>
+                <p className="text-gray-700">
+                  {order.shippingAddress.addressDetails}
+                </p>
               )}
               {order.shippingAddress?.phone && (
                 <p>Phone: {order.shippingAddress?.phone}</p>

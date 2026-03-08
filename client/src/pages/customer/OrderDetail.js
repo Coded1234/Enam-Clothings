@@ -16,9 +16,7 @@ import {
   FiMail,
   FiCreditCard,
   FiCalendar,
-  FiDownload,
   FiRefreshCw,
-  FiPrinter,
   FiStar,
   FiX,
 } from "react-icons/fi";
@@ -408,13 +406,6 @@ const OrderDetail = () => {
                 >
                   {status}
                 </span>
-                <button
-                  onClick={handlePrint}
-                  className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  title="Print Receipt"
-                >
-                  <FiPrinter size={18} />
-                </button>
               </div>
               <p className="text-gray-600 flex items-center gap-2">
                 <FiCalendar size={16} />

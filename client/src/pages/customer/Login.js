@@ -37,12 +37,9 @@ const Login = () => {
       dispatch(googleLogin(tokenResponse.access_token))
         .unwrap()
         .then((userData) => {
-          // Check if profile is incomplete
-          if (
-            !userData.user?.firstName ||
-            !userData.user?.lastName ||
-            !userData.user?.phone
-          ) {
+          // Server returns flat object: { firstName, lastName, phone, ... }
+          const u = userData.user || userData;
+          if (!u?.firstName || !u?.lastName || !u?.phone) {
             setShowProfileModal(true);
             toast.success("Welcome! Please complete your profile.");
           } else {

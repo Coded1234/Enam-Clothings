@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 const AddressMapPicker = dynamic(
   () => import("../../components/customer/AddressMapPicker"),
-  { ssr: false }
+  { ssr: false },
 );
 import {
   FiMapPin,
@@ -21,11 +21,14 @@ import {
 
 const Checkout = () => {
   const router = useRouter();
-    const { items, totalAmount } = useSelector((state) => state.cart);
+  const { items, totalAmount } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.auth);
 
   // Get coupon data from Cart page if passed
-  const _checkoutState = typeof window !== "undefined" ? JSON.parse(sessionStorage.getItem("checkoutState") || "{}") : {};
+  const _checkoutState =
+    typeof window !== "undefined"
+      ? JSON.parse(sessionStorage.getItem("checkoutState") || "{}")
+      : {};
   const passedCoupon = _checkoutState.coupon || null;
   const passedDiscount = _checkoutState.couponDiscount || 0;
 
@@ -271,7 +274,10 @@ const Checkout = () => {
             shippingDetails: shippingDetails,
           };
           if (typeof window !== "undefined") {
-            sessionStorage.setItem("orderSummaryState", JSON.stringify(_orderSummaryData1));
+            sessionStorage.setItem(
+              "orderSummaryState",
+              JSON.stringify(_orderSummaryData1),
+            );
           }
           router.push("/order-summary");
         },
@@ -302,7 +308,10 @@ const Checkout = () => {
       shippingDetails: shippingDetails,
     };
     if (typeof window !== "undefined") {
-      sessionStorage.setItem("orderSummaryState", JSON.stringify(_orderSummaryData2));
+      sessionStorage.setItem(
+        "orderSummaryState",
+        JSON.stringify(_orderSummaryData2),
+      );
     }
     router.push("/order-summary");
   };
@@ -440,19 +449,6 @@ const Checkout = () => {
                 )}
               </div>
             </div>
-
-            {/* Save Address */}
-            <label className="flex items-center gap-3 mt-6 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={saveAddress}
-                onChange={(e) => setSaveAddress(e.target.checked)}
-                className="w-5 h-5 text-primary-500 rounded focus:ring-primary-500"
-              />
-              <span className="text-gray-600">
-                Save this address for future orders
-              </span>
-            </label>
 
             {/* Continue Button */}
             <button
