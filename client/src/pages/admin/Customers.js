@@ -113,7 +113,75 @@ const Customers = () => {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            {/* Mobile card list */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {filteredCustomers.length > 0 ? (
+                filteredCustomers.map((customer) => (
+                  <div
+                    key={customer.id}
+                    className="flex items-center gap-3 px-4 py-3"
+                  >
+                    <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-primary-700 font-semibold text-sm">
+                        {customer.firstName?.[0]}
+                        {customer.lastName?.[0]}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {customer.firstName} {customer.lastName}
+                      </p>
+                      <p className="text-xs text-gray-400 truncate">
+                        {customer.email}
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span
+                          className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${customer.isActive !== false ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+                        >
+                          {customer.isActive !== false ? "Active" : "Inactive"}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {customer.orderCount || 0} orders
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1 flex-shrink-0">
+                      <button
+                        onClick={() => setSelectedCustomer(customer)}
+                        className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"
+                      >
+                        <FiUser size={15} />
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleToggleStatus(
+                            customer.id,
+                            customer.isActive !== false,
+                          )
+                        }
+                        disabled={togglingId === customer.id}
+                        className={`p-1.5 rounded-lg ${customer.isActive !== false ? "text-green-600 hover:bg-green-50" : "text-red-600 hover:bg-red-50"}`}
+                      >
+                        {togglingId === customer.id ? (
+                          <LoadingSpinner size="small" />
+                        ) : customer.isActive !== false ? (
+                          <FiToggleRight size={16} />
+                        ) : (
+                          <FiToggleLeft size={16} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-sm text-gray-400 py-12">
+                  No customers found
+                </p>
+              )}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>

@@ -148,26 +148,118 @@ const Products = () => {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            {/* Mobile card list */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {products.length > 0 ? (
+                products.map((product) => (
+                  <div
+                    key={product.id}
+                    className="flex items-center gap-3 px-4 py-3"
+                  >
+                    {/* Image */}
+                    <div className="h-12 w-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                      {product.images?.[0]?.url || product.images?.[0] ? (
+                        <img
+                          src={getImageUrl(
+                            product.images[0]?.url || product.images[0],
+                          )}
+                          alt={product.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center">
+                          <FiImage className="text-gray-400" size={16} />
+                        </div>
+                      )}
+                    </div>
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {product.name}
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs font-semibold text-gray-700">
+                          {formatCurrency(
+                            product.discountPrice ||
+                              product.comparePrice ||
+                              product.price,
+                          )}
+                        </span>
+                        <span
+                          className={`text-xs font-medium ${
+                            (product.remainingStock ??
+                              product.totalStock ??
+                              product.stock) > 10
+                              ? "text-green-600"
+                              : (product.remainingStock ??
+                                    product.totalStock ??
+                                    product.stock) > 0
+                                ? "text-yellow-600"
+                                : "text-red-600"
+                          }`}
+                        >
+                          Stock:{" "}
+                          {product.remainingStock ??
+                            product.totalStock ??
+                            product.stock ??
+                            0}
+                        </span>
+                        {product.isActive ? (
+                          <span className="text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">
+                            Active
+                          </span>
+                        ) : (
+                          <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">
+                            Inactive
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {/* Actions */}
+                    <div className="flex flex-col gap-1 flex-shrink-0">
+                      <Link
+                        href={`/admin/products/${product.id}/edit`}
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      >
+                        <FiEdit2 size={15} />
+                      </Link>
+                      <button
+                        onClick={() => handleDeleteClick(product)}
+                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        <FiTrash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-sm text-gray-400 py-12">
+                  No products found
+                </p>
+              )}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full min-w-[900px]">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Product
                     </th>
-                    <th className="hidden sm:table-cell px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Category
                     </th>
-                    <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Price
                     </th>
-                    <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Stock
                     </th>
-                    <th className="px-2 md:px-6 pr-1 md:pr-3 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-2 md:px-6 pl-1 md:pl-3 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -176,9 +268,9 @@ const Products = () => {
                   {products.length > 0 ? (
                     products.map((product) => (
                       <tr key={product.id} className="hover:bg-gray-50">
-                        <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className="h-8 w-8 md:h-12 md:w-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                            <div className="h-12 w-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                               {product.images?.[0]?.url ||
                               product.images?.[0] ? (
                                 <img
@@ -197,23 +289,23 @@ const Products = () => {
                                 </div>
                               )}
                             </div>
-                            <div className="ml-2 md:ml-4">
-                              <div className="text-xs md:text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-none">
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">
                                 {product.name}
                               </div>
-                              <div className="text-xs text-gray-500 hidden md:block">
+                              <div className="text-xs text-gray-500">
                                 {product.brand}
                               </div>
                             </div>
                           </div>
                         </td>
-                        <td className="hidden sm:table-cell px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 capitalize">
                             {product.category}
                           </span>
                         </td>
-                        <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
-                          <div className="text-xs md:text-sm font-medium text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
                             {formatCurrency(
                               product.discountPrice ||
                                 product.comparePrice ||
@@ -223,12 +315,12 @@ const Products = () => {
                           {(product.discountPrice || product.comparePrice) &&
                             (product.discountPrice || product.comparePrice) <
                               product.price && (
-                              <div className="text-xs text-gray-500 line-through hidden md:block">
+                              <div className="text-xs text-gray-500 line-through">
                                 {formatCurrency(product.price)}
                               </div>
                             )}
                         </td>
-                        <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`text-sm font-medium ${
                               (product.remainingStock ??
@@ -248,7 +340,7 @@ const Products = () => {
                               0}
                           </span>
                         </td>
-                        <td className="px-2 md:px-6 pr-1 md:pr-3 py-2 md:py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           {product.isActive ? (
                             <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
                               <FiEye size={12} /> Active
@@ -259,21 +351,19 @@ const Products = () => {
                             </span>
                           )}
                         </td>
-                        <td className="px-2 md:px-6 pl-1 md:pl-3 py-2 md:py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex items-center justify-end gap-1 md:gap-2">
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                          <div className="flex items-center justify-end gap-2">
                             <Link
                               href={`/admin/products/${product.id}/edit`}
-                              className="p-1.5 md:p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="Edit"
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             >
-                              <FiEdit2 size={14} className="md:w-4 md:h-4" />
+                              <FiEdit2 size={16} />
                             </Link>
                             <button
                               onClick={() => handleDeleteClick(product)}
-                              className="p-1.5 md:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                              title="Delete"
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             >
-                              <FiTrash2 size={14} className="md:w-4 md:h-4" />
+                              <FiTrash2 size={16} />
                             </button>
                           </div>
                         </td>
@@ -283,7 +373,7 @@ const Products = () => {
                     <tr>
                       <td
                         colSpan="6"
-                        className="px-2 md:px-6 py-6 md:py-12 text-center text-xs md:text-sm text-gray-500"
+                        className="px-6 py-12 text-center text-sm text-gray-500"
                       >
                         No products found
                       </td>

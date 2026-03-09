@@ -118,7 +118,7 @@ const Wishlist = () => {
         <div className="container mx-auto px-4">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-48 mb-8"></div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="bg-white rounded-2xl p-4 h-72"></div>
               ))}
@@ -236,7 +236,7 @@ const Wishlist = () => {
 
             {/* Grid View */}
             {viewMode === "grid" && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {wishlistItems.map((item) => (
                   <div
                     key={item.id}
@@ -368,7 +368,10 @@ const Wishlist = () => {
                     className="bg-white rounded-2xl shadow-sm p-4 flex flex-col sm:flex-row gap-4 hover:shadow-md transition-shadow"
                   >
                     {/* Image */}
-                    <Link href={`/product/${item.id}`} className="flex-shrink-0">
+                    <Link
+                      href={`/product/${item.id}`}
+                      className="flex-shrink-0"
+                    >
                       <img
                         src={getProductImage(item)}
                         alt={item.name}
@@ -481,7 +484,7 @@ const Wishlist = () => {
                 <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-6">
                   You Also Viewed
                 </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {recentlyViewed.map((product) => {
                     const imageUrl = getProductImage(product);
                     const price = parseFloat(product.price) || 0;

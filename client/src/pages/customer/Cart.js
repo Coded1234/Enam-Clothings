@@ -494,7 +494,7 @@ const Cart = () => {
             You Also Viewed
           </h2>
           {recentlyViewed.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
               {recentlyViewed.map((product) => {
                 const images = Array.isArray(product.images)
                   ? product.images

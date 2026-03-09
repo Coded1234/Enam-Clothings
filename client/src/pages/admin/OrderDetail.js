@@ -442,21 +442,28 @@ const OrderDetail = () => {
                   </h3>
                   <div className="text-xs md:text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap">
                     {item.size && <span>Size: {item.size}</span>}
-                    {item.size && item.color && <span className="mx-2">•</span>}
-                    {item.color && (
-                      <span className="flex items-center gap-1">
-                        Color:
-                        {item.color?.code && (
-                          <span
-                            className="w-3 h-3 rounded-full border border-gray-300"
-                            style={{ backgroundColor: item.color.code }}
-                          ></span>
-                        )}
-                        {typeof item.color === "object"
-                          ? item.color.name
-                          : item.color}
-                      </span>
-                    )}
+                    {item.size && item.color && <span>•</span>}
+                    {item.color &&
+                      (() => {
+                        const colorName =
+                          typeof item.color === "object"
+                            ? item.color.name
+                            : item.color;
+                        const colorCode = item.color?.code;
+                        if (!colorName && !colorCode) return null;
+                        return (
+                          <span className="flex items-center gap-1">
+                            Color:
+                            {colorCode && (
+                              <span
+                                className="w-3 h-3 rounded-full border border-gray-300 inline-block"
+                                style={{ backgroundColor: colorCode }}
+                              />
+                            )}
+                            {colorName && <span>{colorName}</span>}
+                          </span>
+                        );
+                      })()}
                   </div>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-sm text-gray-500">

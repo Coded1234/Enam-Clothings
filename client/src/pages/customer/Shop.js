@@ -492,7 +492,7 @@ const Shop = () => {
             {/* Products Grid */}
             {loading ? (
               <div
-                className={`grid gap-2 ${
+                className={`grid gap-3 ${
                   viewMode === "grid"
                     ? "grid-cols-2 md:grid-cols-3"
                     : "grid-cols-1"

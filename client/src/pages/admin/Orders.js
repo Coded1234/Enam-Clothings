@@ -155,32 +155,100 @@ const Orders = () => {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            {/* Mobile card list */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => (
+                  <div key={order.id} className="px-4 py-3 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-gray-900">
+                        #{order.orderNumber}
+                      </span>
+                      <Link
+                        href={`/admin/orders/${order.id}`}
+                        className="p-1.5 text-primary-600 hover:bg-primary-50 rounded-lg"
+                      >
+                        <FiEye size={16} />
+                      </Link>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-500">
+                        {order.user?.firstName} {order.user?.lastName}
+                      </span>
+                      <span className="text-xs font-bold text-gray-800">
+                        {formatCurrency(order.totalAmount)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {order.status === "delivered" ||
+                      order.status === "cancelled" ? (
+                        <span
+                          className={`text-xs font-medium rounded-full px-2 py-0.5 ${getStatusColor(order.status)}`}
+                        >
+                          {order.status.charAt(0).toUpperCase() +
+                            order.status.slice(1)}
+                        </span>
+                      ) : (
+                        <select
+                          value={order.status}
+                          onChange={(e) =>
+                            handleStatusChange(order.id, e.target.value)
+                          }
+                          disabled={updatingStatus === order.id}
+                          className={`text-xs font-medium rounded-full px-2 py-0.5 border-0 cursor-pointer ${getStatusColor(order.status)}`}
+                        >
+                          {statuses.map((status) => (
+                            <option key={status} value={status}>
+                              {status.charAt(0).toUpperCase() + status.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      <span
+                        className={`text-xs font-medium rounded-full px-2 py-0.5 ${order.paymentStatus === "paid" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}
+                      >
+                        {order.paymentStatus || "pending"}
+                      </span>
+                      <span className="text-xs text-gray-400 ml-auto">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-sm text-gray-400 py-12">
+                  No orders found
+                </p>
+              )}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Order
                     </th>
-                    <th className="hidden sm:table-cell px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Customer
                     </th>
-                    <th className="hidden lg:table-cell px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Items
                     </th>
-                    <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Total
                     </th>
-                    <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="hidden md:table-cell px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Payment
                     </th>
-                    <th className="hidden lg:table-cell px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-2 md:px-6 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -189,22 +257,18 @@ const Orders = () => {
                   {filteredOrders.length > 0 ? (
                     filteredOrders.map((order) => (
                       <tr key={order.id} className="hover:bg-gray-50">
-                        <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
-                          <span className="text-xs md:text-sm font-medium text-gray-900">
-                            #{order.orderNumber}
-                          </span>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          #{order.orderNumber}
                         </td>
-                        <td className="hidden sm:table-cell px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
-                          <div>
-                            <div className="text-xs md:text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-none">
-                              {order.user?.firstName} {order.user?.lastName}
-                            </div>
-                            <div className="text-xs text-gray-500 hidden md:block truncate">
-                              {order.user?.email}
-                            </div>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            {order.user?.firstName} {order.user?.lastName}
+                          </div>
+                          <div className="text-xs text-gray-500 truncate max-w-[160px]">
+                            {order.user?.email}
                           </div>
                         </td>
-                        <td className="hidden lg:table-cell px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">
+                        <td className="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {order.totalItems ||
                             order.items?.reduce(
                               (sum, item) => sum + (item.quantity || 1),
@@ -214,19 +278,15 @@ const Orders = () => {
                             0}{" "}
                           items
                         </td>
-                        <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
-                          <span className="text-xs md:text-sm font-medium text-gray-900">
-                            {formatCurrency(order.totalAmount)}
-                          </span>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {formatCurrency(order.totalAmount)}
                         </td>
-                        <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1 md:gap-2">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
                             {order.status === "delivered" ||
                             order.status === "cancelled" ? (
                               <span
-                                className={`text-xs font-medium rounded-full px-1.5 md:px-2 py-0.5 md:py-1 ${getStatusColor(
-                                  order.status,
-                                )}`}
+                                className={`text-xs font-medium rounded-full px-2 py-1 ${getStatusColor(order.status)}`}
                               >
                                 {order.status.charAt(0).toUpperCase() +
                                   order.status.slice(1)}
@@ -238,9 +298,7 @@ const Orders = () => {
                                   handleStatusChange(order.id, e.target.value)
                                 }
                                 disabled={updatingStatus === order.id}
-                                className={`text-xs font-medium rounded-full px-1.5 md:px-2 py-0.5 md:py-1 border-0 cursor-pointer ${getStatusColor(
-                                  order.status,
-                                )}`}
+                                className={`text-xs font-medium rounded-full px-2 py-1 border-0 cursor-pointer ${getStatusColor(order.status)}`}
                               >
                                 {statuses.map((status) => (
                                   <option key={status} value={status}>
@@ -255,27 +313,23 @@ const Orders = () => {
                             )}
                           </div>
                         </td>
-                        <td className="hidden md:table-cell px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span
-                            className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              order.paymentStatus === "paid"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${order.paymentStatus === "paid" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}
                           >
                             {order.paymentStatus || "pending"}
                           </span>
                         </td>
-                        <td className="hidden lg:table-cell px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">
+                        <td className="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {new Date(order.createdAt).toLocaleDateString()}
                         </td>
-                        <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-right">
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
                           <Link
                             href={`/admin/orders/${order.id}`}
-                            className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-900 text-xs md:text-sm font-medium"
+                            className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-900 text-sm font-medium"
                           >
-                            <FiEye size={14} className="md:w-4 md:h-4" />
-                            <span className="hidden md:inline">View</span>
+                            <FiEye size={16} />
+                            <span>View</span>
                           </Link>
                         </td>
                       </tr>
@@ -284,7 +338,7 @@ const Orders = () => {
                     <tr>
                       <td
                         colSpan="8"
-                        className="px-2 md:px-6 py-6 md:py-12 text-center text-xs md:text-sm text-gray-500"
+                        className="px-6 py-12 text-center text-sm text-gray-500"
                       >
                         No orders found
                       </td>
