@@ -136,203 +136,261 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
         <h1 className="text-xl md:text-2xl font-bold text-gray-800">
           Dashboard
         </h1>
-        <div className="text-xs sm:text-sm text-gray-500">
-          Last updated: {new Date().toLocaleString()}
-        </div>
+        <p className="text-xs text-gray-400">
+          {new Date().toLocaleDateString("en-GH", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </p>
       </div>
 
       {error && (
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg">
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
           {error} (showing demo data)
         </div>
       )}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-        {statCards.map((stat, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-lg md:rounded-xl p-3 md:p-6 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center justify-between mb-2 md:mb-4">
-              <div className={`p-2 md:p-3 rounded-lg ${stat.color}`}>
-                <stat.icon className="text-white" size={16} />
+      <div className="-mx-4 px-4 md:mx-0 md:px-0 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex gap-3 md:grid md:grid-cols-4 w-max md:w-full">
+          {statCards.map((stat, index) => (
+            <div
+              key={index}
+              className="w-40 md:w-auto bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col gap-3 flex-shrink-0"
+            >
+              <div className="flex items-center justify-between">
+                <div
+                  className={`w-9 h-9 rounded-lg ${stat.color} flex items-center justify-center`}
+                >
+                  <stat.icon className="text-white" size={17} />
+                </div>
+                <span
+                  className={`flex items-center gap-0.5 text-xs font-semibold ${stat.change >= 0 ? "text-green-500" : "text-red-500"}`}
+                >
+                  {stat.change >= 0 ? (
+                    <FiArrowUp size={11} />
+                  ) : (
+                    <FiArrowDown size={11} />
+                  )}
+                  {Math.abs(stat.change)}%
+                </span>
               </div>
-              <div
-                className={`flex items-center text-xs md:text-sm font-medium ${
-                  stat.change >= 0 ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {stat.change >= 0 ? (
-                  <FiArrowUp size={12} />
-                ) : (
-                  <FiArrowDown size={12} />
-                )}
-                <span className="ml-1">{Math.abs(stat.change)}%</span>
+              <div>
+                <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide mb-0.5">
+                  {stat.title}
+                </p>
+                <p className="text-sm font-bold text-gray-800 leading-tight truncate">
+                  {stat.format === "currency"
+                    ? formatCurrency(stat.value)
+                    : stat.value.toLocaleString()}
+                </p>
               </div>
             </div>
-            <h3 className="text-base md:text-2xl font-bold text-gray-800 truncate">
-              {stat.format === "currency"
-                ? formatCurrency(stat.value)
-                : stat.value.toLocaleString()}
-            </h3>
-            <p className="text-xs md:text-base text-gray-500 truncate">
-              {stat.title}
-            </p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* Orders by Status */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-6">
-        <div className="bg-white rounded-lg md:rounded-xl p-3 md:p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-3 md:mb-6">
-            <h2 className="text-base md:text-lg font-bold text-gray-800">
+      {/* Orders by Status + Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
+        {/* Orders by Status */}
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-gray-800">
               Orders by Status
             </h2>
             <Link
               href="/admin/orders"
-              className="text-primary-600 hover:text-primary-700 text-xs md:text-sm font-medium"
+              className="text-xs text-primary-600 font-medium"
             >
               View All
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
+          <div className="space-y-2">
             {stats?.ordersByStatus &&
               Object.entries(stats.ordersByStatus).map(([status, count]) => (
                 <div
                   key={status}
-                  className="text-center p-2 md:p-4 rounded-lg bg-gray-50"
+                  className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-gray-50"
                 >
                   <span
-                    className={`inline-block px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-medium ${getStatusColor(
-                      status
-                    )} mb-1 md:mb-2`}
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-full ${getStatusColor(status)}`}
                   >
                     {status.charAt(0).toUpperCase() + status.slice(1)}
                   </span>
-                  <p className="text-lg md:text-2xl font-bold text-gray-800">
+                  <span className="text-sm font-bold text-gray-800">
                     {count}
-                  </p>
+                  </span>
                 </div>
               ))}
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg md:rounded-xl p-3 md:p-6 shadow-sm">
-          <h2 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-6">
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <h2 className="text-sm font-bold text-gray-800 mb-3">
             Quick Actions
           </h2>
-          <div className="grid grid-cols-2 gap-2 md:gap-4">
-            <Link
-              href="/admin/products/new"
-              className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 p-2 md:p-4 bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 transition-colors"
-            >
-              <FiPackage size={16} className="md:w-5 md:h-5" />
-              <span className="font-medium text-xs md:text-sm">
-                Add Product
-              </span>
-            </Link>
-            <Link
-              href="/admin/orders"
-              className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 p-2 md:p-4 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
-            >
-              <FiShoppingBag size={16} className="md:w-5 md:h-5" />
-              <span className="font-medium text-xs md:text-sm">
-                View Orders
-              </span>
-            </Link>
-            <Link
-              href="/admin/customers"
-              className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 p-2 md:p-4 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
-            >
-              <FiUsers size={16} className="md:w-5 md:h-5" />
-              <span className="font-medium text-xs md:text-sm">Customers</span>
-            </Link>
-            <Link
-              href="/admin/reviews"
-              className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 p-2 md:p-4 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
-            >
-              <FiTrendingUp size={16} className="md:w-5 md:h-5" />
-              <span className="font-medium text-xs md:text-sm">Reviews</span>
-            </Link>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              {
+                href: "/admin/products/new",
+                icon: FiPackage,
+                label: "Add Product",
+                bg: "bg-violet-50",
+                text: "text-violet-700",
+                border: "border-violet-100",
+                iconBg: "bg-violet-500",
+              },
+              {
+                href: "/admin/orders",
+                icon: FiShoppingBag,
+                label: "View Orders",
+                bg: "bg-blue-50",
+                text: "text-blue-700",
+                border: "border-blue-100",
+                iconBg: "bg-blue-500",
+              },
+              {
+                href: "/admin/customers",
+                icon: FiUsers,
+                label: "Customers",
+                bg: "bg-emerald-50",
+                text: "text-emerald-700",
+                border: "border-emerald-100",
+                iconBg: "bg-emerald-500",
+              },
+              {
+                href: "/admin/reviews",
+                icon: FiTrendingUp,
+                label: "Reviews",
+                bg: "bg-amber-50",
+                text: "text-amber-700",
+                border: "border-amber-100",
+                iconBg: "bg-amber-500",
+              },
+            ].map(({ href, icon: Icon, label, bg, text, border, iconBg }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`flex items-center gap-2 p-3 rounded-xl border ${bg} ${border} hover:opacity-80 transition-opacity`}
+              >
+                <div
+                  className={`w-8 h-8 rounded-lg ${iconBg} text-white flex items-center justify-center flex-shrink-0`}
+                >
+                  <Icon size={16} />
+                </div>
+                <span className={`font-semibold text-xs ${text}`}>{label}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Recent Orders */}
-      <div className="bg-white rounded-lg md:rounded-xl shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between p-3 md:p-6 border-b">
-          <h2 className="text-base md:text-lg font-bold text-gray-800">
-            Recent Orders
-          </h2>
+      {/* Recent Orders — cards on mobile, table on desktop */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <h2 className="text-sm font-bold text-gray-800">Recent Orders</h2>
           <Link
             href="/admin/orders"
-            className="text-primary-600 hover:text-primary-700 text-xs md:text-sm font-medium"
+            className="text-xs text-primary-600 font-medium"
           >
             View All
           </Link>
         </div>
-        <div className="overflow-x-auto">
+
+        {/* Mobile card list */}
+        <div className="md:hidden divide-y divide-gray-100">
+          {stats?.recentOrders?.length > 0 ? (
+            stats.recentOrders.map((order) => (
+              <div
+                key={order.id}
+                className="flex items-center justify-between px-4 py-3"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-gray-800 truncate">
+                    #{order.orderNumber}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {order.user?.firstName} {order.user?.lastName}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 ml-2">
+                  <span
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${getStatusColor(order.status)}`}
+                  >
+                    {order.status}
+                  </span>
+                  <p className="text-xs font-bold text-gray-800 w-16 text-right">
+                    {formatCurrency(order.totalAmount)}
+                  </p>
+                  <Link
+                    href={`/admin/orders/${order.id}`}
+                    className="text-primary-600 ml-1"
+                  >
+                    <FiEye size={15} />
+                  </Link>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-xs text-gray-400 py-8">
+              No recent orders
+            </p>
+          )}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Order ID
-                </th>
-                <th className="hidden sm:table-cell px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer
-                </th>
-                <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="hidden md:table-cell px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-2 md:px-6 py-2 md:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Action
-                </th>
+                {["Order ID", "Customer", "Amount", "Status", "Date", ""].map(
+                  (h) => (
+                    <th
+                      key={h}
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      {h}
+                    </th>
+                  ),
+                )}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-gray-100">
               {stats?.recentOrders?.length > 0 ? (
                 stats.recentOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       #{order.orderNumber}
                     </td>
-                    <td className="hidden sm:table-cell px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {order.user?.firstName} {order.user?.lastName}
                     </td>
-                    <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 font-medium">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       {formatCurrency(order.totalAmount)}
                     </td>
-                    <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
+                    <td className="px-6 py-4">
                       <span
-                        className={`px-1.5 md:px-2 py-0.5 md:py-1 text-xs font-medium rounded-full ${getStatusColor(
-                          order.status
-                        )}`}
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}
                       >
                         {order.status}
                       </span>
                     </td>
-                    <td className="hidden md:table-cell px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-right text-sm">
+                    <td className="px-6 py-4 text-right">
                       <Link
                         href={`/admin/orders/${order.id}`}
                         className="text-primary-600 hover:text-primary-900"
                       >
-                        <FiEye size={16} className="md:w-[18px] md:h-[18px]" />
+                        <FiEye size={18} />
                       </Link>
                     </td>
                   </tr>
@@ -341,7 +399,7 @@ const Dashboard = () => {
                 <tr>
                   <td
                     colSpan="6"
-                    className="px-2 md:px-6 py-4 md:py-8 text-center text-xs md:text-sm text-gray-500"
+                    className="px-6 py-8 text-center text-sm text-gray-400"
                   >
                     No recent orders
                   </td>

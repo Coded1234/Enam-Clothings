@@ -162,7 +162,73 @@ const Reviews = () => {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            {/* Mobile card list */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {filteredReviews.length > 0 ? (
+                filteredReviews.map((review) => (
+                  <div
+                    key={review.id}
+                    className="flex items-start gap-3 px-4 py-3"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {review.user?.firstName} {review.user?.lastName}
+                        </p>
+                        <span
+                          className={`text-xs font-medium px-1.5 py-0.5 rounded-full flex-shrink-0 ${review.isApproved ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}
+                        >
+                          {review.isApproved ? "Approved" : "Pending"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        {renderStars(review.rating)}
+                      </div>
+                      {review.product?.name && (
+                        <p className="text-xs text-gray-400 mt-0.5 truncate">
+                          {review.product.name}
+                        </p>
+                      )}
+                      {review.comment && (
+                        <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                          {review.comment}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1 flex-shrink-0 mt-0.5">
+                      <button
+                        onClick={() => setSelectedReview(review)}
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"
+                      >
+                        <FiEye size={15} />
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleToggleApproval(review.id, review.isApproved)
+                        }
+                        disabled={togglingId === review.id}
+                        className={`p-1.5 rounded-lg ${review.isApproved ? "text-red-600 hover:bg-red-50" : "text-green-600 hover:bg-green-50"}`}
+                      >
+                        {togglingId === review.id ? (
+                          <LoadingSpinner size="small" />
+                        ) : review.isApproved ? (
+                          <FiX size={15} />
+                        ) : (
+                          <FiCheck size={15} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-sm text-gray-400 py-12">
+                  No reviews found
+                </p>
+              )}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>

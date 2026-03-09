@@ -21,7 +21,17 @@ const Login = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+
+  // Pre-fill email if previously remembered
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setFormData((prev) => ({ ...prev, email: savedEmail }));
+      setRememberMe(true);
+    }
+  }, []);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -89,6 +99,11 @@ const Login = () => {
 
     try {
       await dispatch(login(formData)).unwrap();
+      if (rememberMe) {
+        localStorage.setItem("rememberedEmail", formData.email);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+      }
       toast.success("Welcome!");
     } catch (err) {
       // Safely derive an error message string to avoid runtime crashes
@@ -222,6 +237,8 @@ const Login = () => {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="w-4 h-4 text-primary-500 rounded focus:ring-primary-500"
                 />
                 <span className="text-sm text-gray-600">Remember me</span>

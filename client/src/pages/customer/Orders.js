@@ -185,7 +185,7 @@ const Orders = () => {
                   setFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-11 pr-8 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 appearance-none bg-white min-w-[160px]"
+                className="pl-11 pr-8 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 appearance-none bg-white w-full md:min-w-[160px]"
               >
                 {filterOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -337,7 +337,7 @@ const Orders = () => {
                 <button
                   key={i + 1}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm rounded-lg font-medium transition-colors ${
+                  className={`w-10 h-10 text-sm rounded-lg font-medium transition-colors ${
                     currentPage === i + 1
                       ? "bg-primary-500 text-white"
                       : "border border-gray-300 text-gray-600 hover:bg-gray-50"

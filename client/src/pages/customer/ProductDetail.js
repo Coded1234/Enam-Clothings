@@ -350,9 +350,9 @@ const ProductDetail = ({
               )}
             </div>
 
-            {/* Thumbnails */}
+            {/* Thumbnails — hidden on mobile, swipe+dots handle it */}
             {product.images?.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
+              <div className="hidden sm:flex gap-2 overflow-x-auto pb-2">
                 {product.images.map((image, index) => (
                   <button
                     key={index}
@@ -585,12 +585,12 @@ const ProductDetail = ({
         <div className="bg-white rounded-2xl shadow-sm mb-16">
           {/* Tab Headers */}
           <div className="border-b">
-            <div className="flex gap-8 px-6">
+            <div className="flex justify-between sm:justify-start sm:gap-8 px-4 sm:px-6">
               {["description", "reviews", "shipping"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`py-4 font-medium capitalize border-b-2 transition-colors ${
+                  className={`py-4 text-sm sm:text-base font-medium capitalize border-b-2 transition-colors ${
                     activeTab === tab
                       ? "border-primary-500 text-primary-500"
                       : "border-transparent text-gray-600 hover:text-gray-800"

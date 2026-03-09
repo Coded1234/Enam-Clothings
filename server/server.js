@@ -55,7 +55,7 @@ const generalLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20,
+  max: process.env.NODE_ENV === "production" ? 100 : 50,
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: "Too many auth attempts, please try again later." },
