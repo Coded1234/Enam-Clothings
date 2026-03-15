@@ -25,6 +25,7 @@ import {
   FiPlus,
   FiStar,
   FiChevronRight,
+  FiChevronLeft,
   FiCheck,
   FiThumbsUp,
 } from "react-icons/fi";
@@ -340,6 +341,34 @@ const ProductDetail = ({
                   -{discountPercent}% OFF
                 </span>
               )}
+
+              {/* Navigation Arrows */}
+              {product.images?.length > 1 && (
+                <>
+                  <button
+                    onClick={() => {
+                      const total = product.images?.length || 1;
+                      setSelectedImage((prev) => (prev - 1 + total) % total);
+                    }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95 z-10"
+                    aria-label="Previous image"
+                  >
+                    <FiChevronLeft size={24} />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const total = product.images?.length || 1;
+                      setSelectedImage((prev) => (prev + 1) % total);
+                    }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95 z-10"
+                    aria-label="Next image"
+                  >
+                    <FiChevronRight size={24} />
+                  </button>
+                </>
+              )}
+
               {/* Dot indicators */}
               {product.images?.length > 1 && (
                 <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
