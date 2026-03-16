@@ -1,6 +1,6 @@
 # Diamond Vogue Gallery - E-commerce Store
 
-A full-stack e-commerce clothing store built with React, Node.js, Express, and PostgreSQL.
+A full-stack e-commerce clothing store built with Next.js, Node.js, Express, and PostgreSQL.
 
 ## Features
 
@@ -19,21 +19,34 @@ A full-stack e-commerce clothing store built with React, Node.js, Express, and P
 ## Tech Stack
 
 ### Frontend
-- React
-- Redux Toolkit
-- React Router
-- Axios
-- Tailwind CSS
-- React Hot Toast
+- **Next.js 15** (App Router) — React framework for server-side rendering and routing
+- **React 18** — UI library
+- **Redux Toolkit** — State management
+- **Tailwind CSS** — Utility-first CSS styling
+- **Framer Motion** — Animations
+- **Axios** — HTTP client
+- **React Icons** — Icon library
+- **React Leaflet** — Interactive maps
+- **React Hot Toast** — Toast notifications
+- **Google OAuth** (`@react-oauth/google`) — Social login
 
 ### Backend
-- Node.js
-- Express
-- PostgreSQL
-- Sequelize ORM
-- JWT Authentication
-- Cloudinary (Image hosting)
-- Nodemailer
+- **Node.js** — JavaScript runtime
+- **Express 4** — Web framework
+- **PostgreSQL** — Relational database
+- **Sequelize ORM** — Database modeling and migrations
+- **JWT** (`jsonwebtoken`) — Authentication
+- **bcryptjs** — Password hashing
+- **Cloudinary** — Image hosting and management
+- **Nodemailer** — Email sending (Gmail SMTP)
+- **Multer** — File upload handling
+- **Helmet** — HTTP security headers
+- **express-rate-limit** — API rate limiting
+- **Swagger / OpenAPI** (`swagger-jsdoc`, `swagger-ui-express`) — API documentation
+- **nodemon** — Development auto-restart
+
+### Deployment & Infrastructure
+- **Vercel** — Hosting (Next.js frontend + Express via serverless functions)
 
 ## Deployment
 
@@ -175,13 +188,13 @@ A full-stack e-commerce clothing store built with React, Node.js, Express, and P
 ## Project Structure
 
 ```
-├── client/                 # React frontend
-│   ├── public/
-│   └── src/
-│       ├── components/
-│       ├── pages/
-│       ├── redux/
-│       └── utils/
+├── app/                    # Next.js App Router (pages & layouts)
+│   ├── layout.js           # Root layout
+│   ├── page.js             # Home page
+│   └── ...                 # Other routes
+├── pages/
+│   └── api/                # Next.js API routes (proxies to Express in production)
+├── public/                 # Static assets
 ├── server/                 # Express backend
 │   ├── config/
 │   ├── controllers/
@@ -189,7 +202,15 @@ A full-stack e-commerce clothing store built with React, Node.js, Express, and P
 │   ├── models/
 │   ├── routes/
 │   └── scripts/
-└── vercel.json            # Vercel configuration
+├── client/                 # Legacy Create React App (development reference)
+│   └── src/
+│       ├── components/
+│       ├── pages/
+│       ├── redux/
+│       └── utils/
+├── next.config.js          # Next.js configuration
+├── tailwind.config.js      # Tailwind CSS configuration
+└── vercel.json             # Vercel deployment configuration
 ```
 
 ## API Documentation
