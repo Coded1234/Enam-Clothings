@@ -47,8 +47,18 @@ A full-stack e-commerce clothing store built with Next.js, Node.js, Express, and
 
 ### Deployment & Infrastructure
 - **Vercel** — Hosting (Next.js frontend + Express via serverless functions)
+- **Hostinger VPS** — Alternative self-hosted deployment using Nginx + PM2 (see [HOSTINGER_DEPLOYMENT.md](./HOSTINGER_DEPLOYMENT.md))
 
 ## Deployment
+
+> **Hosting options at a glance**
+>
+> | Platform | Best for | Guide |
+> |----------|----------|-------|
+> | **Vercel** | Quickest setup, free tier available | [See below](#vercel-deployment) |
+> | **Hostinger VPS** | Full control, custom domains, Node.js VPS | [HOSTINGER_DEPLOYMENT.md](./HOSTINGER_DEPLOYMENT.md) |
+>
+> Hostinger's standard **shared web hosting** plans do **not** support Node.js and are **not** compatible with this project. You must use a **Hostinger VPS** (KVM) plan.
 
 ### Vercel Deployment
 
@@ -149,6 +159,18 @@ A full-stack e-commerce clothing store built with Next.js, Node.js, Express, and
    ```bash
    node server/scripts/createDatabase.js
    ```
+
+### Hostinger VPS Deployment
+
+For a full step-by-step guide on deploying to **Hostinger VPS** (Nginx + PM2 + Let's Encrypt), see [HOSTINGER_DEPLOYMENT.md](./HOSTINGER_DEPLOYMENT.md).
+
+**Quick overview:**
+1. Provision a Hostinger **KVM VPS** (Ubuntu 22.04, ≥ 2 GB RAM).
+2. Install Node.js 20, PostgreSQL, PM2, and Nginx on the VPS.
+3. Clone the repo, install dependencies, and fill in `server/.env` and `.env.local`.
+4. Run `npm run build` then `pm2 start ecosystem.config.js`.
+5. Configure Nginx to proxy traffic from port 80/443 → port 3000.
+6. Obtain a free SSL certificate with Certbot (`certbot --nginx`).
 
 ## Local Development
 
