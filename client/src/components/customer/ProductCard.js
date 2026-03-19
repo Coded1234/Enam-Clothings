@@ -25,6 +25,9 @@ const ProductCard = ({
   const [isWishlisted, setIsWishlisted] = useState(externalWishlisted || false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
 
+  const displayStock = product?.remainingStock ?? product?.totalStock ?? 0;
+  const isOutOfStock = displayStock === 0;
+
   useEffect(() => {
     // Check if product is in user's wishlist
     if (user?.wishlist && product?.id) {
@@ -177,15 +180,13 @@ const ProductCard = ({
         <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={handleAddToCart}
-            disabled={product.remainingStock === 0}
+            disabled={isOutOfStock}
             className={`w-full py-1.5 bg-white dark:bg-surface text-gray-900 dark:text-gold-light rounded text-xs font-medium flex items-center justify-center gap-1 hover:bg-primary-500 hover:text-white transition-colors ${
-              product.remainingStock === 0
-                ? "opacity-50 cursor-not-allowed"
-                : ""
+              isOutOfStock ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             <FiShoppingCart size={14} />
-            {product.remainingStock === 0 ? "Out of Stock" : "Add"}
+            {isOutOfStock ? "Out of Stock" : "Add"}
           </button>
         </div>
       </div>
@@ -212,12 +213,10 @@ const ProductCard = ({
           </div>
 
           {/* Stock Status */}
-          {product.remainingStock <= 10 && product.remainingStock > 0 && (
-            <p className="text-xs text-orange-500 mt-1">
-              {product.remainingStock} left
-            </p>
+          {displayStock <= 10 && displayStock > 0 && (
+            <p className="text-xs text-orange-500 mt-1">{displayStock} left</p>
           )}
-          {product.remainingStock === 0 && (
+          {isOutOfStock && (
             <p className="text-xs text-red-500 mt-1">Out of stock</p>
           )}
         </div>

@@ -8,11 +8,27 @@ const axios = require("axios");
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+const STRONG_PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+const STRONG_PASSWORD_MESSAGE =
+  "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.";
+
+const isStrongPassword = (password) =>
+  typeof password === "string" && STRONG_PASSWORD_REGEX.test(password);
+
 // @desc    Register new user
 // @route   POST /api/auth/register
 const register = async (req, res) => {
   try {
     const { firstName, lastName, email, password, phone, role } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({ message: STRONG_PASSWORD_MESSAGE });
+    }
 
     // Check if user exists
     const userExists = await User.findOne({ where: { email } });
@@ -165,6 +181,14 @@ const updateProfile = async (req, res) => {
 const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({ message: "New password is required" });
+    }
+
+    if (!isStrongPassword(newPassword)) {
+      return res.status(400).json({ message: STRONG_PASSWORD_MESSAGE });
+    }
 
     const user = await User.findByPk(req.user.id);
 
@@ -368,6 +392,14 @@ const resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({ message: STRONG_PASSWORD_MESSAGE });
+    }
 
     // Hash the token to compare with stored hash
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");

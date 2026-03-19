@@ -421,7 +421,26 @@ const updateStock = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    product.sizes = sizes;
+    const normalizedSizes = Array.isArray(sizes) ? sizes : [];
+
+    // Normalize to objects with stock numbers.
+    const sanitizedSizes = normalizedSizes.map((s) => {
+      if (typeof s === "string") return { size: s, stock: 0 };
+      return {
+        ...s,
+        stock: Number.isFinite(Number(s?.stock)) ? Number(s.stock) : 0,
+      };
+    });
+
+    const newRemainingStock = sanitizedSizes.reduce(
+      (sum, s) => sum + Math.max(0, Number(s.stock) || 0),
+      0,
+    );
+
+    product.sizes = sanitizedSizes;
+    product.remainingStock = newRemainingStock;
+    product.totalStock = newRemainingStock + (product.soldCount || 0);
+
     await product.save();
 
     res.json(product);
@@ -723,6 +742,30 @@ const getAllCustomers = async (req, res) => {
       limit: Number(limit),
     });
 
+    const customerEmails = customers
+      .map((c) => c.email)
+      .filter(Boolean)
+      .map((e) => String(e).toLowerCase());
+
+    const newsletterRows = customerEmails.length
+      ? await Newsletter.findAll({
+          where: {
+            email: {
+              [Op.in]: customerEmails,
+            },
+          },
+          attributes: ["email", "isSubscribed"],
+          raw: true,
+        })
+      : [];
+
+    const newsletterByEmail = new Map(
+      newsletterRows.map((row) => [
+        String(row.email).toLowerCase(),
+        Boolean(row.isSubscribed),
+      ]),
+    );
+
     // Get order counts for each customer
     const customersWithOrders = await Promise.all(
       customers.map(async (customer) => {
@@ -741,6 +784,11 @@ const getAllCustomers = async (req, res) => {
           ...customer.toJSON(),
           orderCount,
           totalSpent: parseFloat(totalSpentResult[0]?.total) || 0,
+          newsletterSubscribed: newsletterByEmail.get(
+            String(customer.email || "").toLowerCase(),
+          )
+            ? true
+            : false,
         };
       }),
     );

@@ -6,7 +6,8 @@ import {
   FiToggleLeft,
   FiToggleRight,
   FiUser,
-  FiShoppingBag,
+  FiCheck,
+  FiX,
 } from "react-icons/fi";
 import { adminAPI } from "../../utils/api";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
@@ -141,7 +142,12 @@ const Customers = () => {
                           {customer.isActive !== false ? "Active" : "Inactive"}
                         </span>
                         <span className="text-xs text-gray-400">
-                          {customer.orderCount || 0} orders
+                          Newsletter:{" "}
+                          {customer.newsletterSubscribed ? (
+                            <FiCheck className="inline text-green-600" />
+                          ) : (
+                            <FiX className="inline text-red-600" />
+                          )}
                         </span>
                       </div>
                     </div>
@@ -192,7 +198,7 @@ const Customers = () => {
                       Contact
                     </th>
                     <th className="hidden lg:table-cell px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Orders
+                      Newsletter
                     </th>
                     <th className="hidden md:table-cell px-2 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Total Spent
@@ -245,9 +251,17 @@ const Customers = () => {
                           </div>
                         </td>
                         <td className="hidden lg:table-cell px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1 text-sm text-gray-600">
-                            <FiShoppingBag size={14} />
-                            {customer.orderCount || 0}
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            {customer.newsletterSubscribed ? (
+                              <FiCheck className="text-green-600" />
+                            ) : (
+                              <FiX className="text-red-600" />
+                            )}
+                            <span className="text-xs md:text-sm">
+                              {customer.newsletterSubscribed
+                                ? "Subscribed"
+                                : "Not subscribed"}
+                            </span>
                           </div>
                         </td>
                         <td className="hidden md:table-cell px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">

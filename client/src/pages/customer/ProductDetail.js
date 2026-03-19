@@ -118,7 +118,13 @@ const ProductDetail = ({
 
   useEffect(() => {
     if (product?.sizes?.length > 0) {
-      setSelectedSize(product.sizes[0]);
+      // Prefer the first in-stock size when size-level stock is present.
+      const firstInStock = product.sizes.find(
+        (s) => typeof s === "object" && (s.stock ?? 0) > 0,
+      );
+      setSelectedSize(firstInStock || product.sizes[0]);
+    } else {
+      setSelectedSize("");
     }
     if (product?.colors?.length > 0) {
       // Handle both string colors (old format) and object colors (new format)
@@ -136,6 +142,10 @@ const ProductDetail = ({
     }
   }, [product]);
 
+  const isVariantProduct =
+    Array.isArray(product?.sizes) && product.sizes.length > 0;
+  const globalStock = product?.remainingStock ?? product?.totalStock ?? 0;
+
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
       toast.error("Please login to add items to cart");
@@ -143,7 +153,7 @@ const ProductDetail = ({
       return;
     }
 
-    if (!selectedSize) {
+    if (isVariantProduct && !selectedSize) {
       toast.error("Please select a size");
       return;
     }
@@ -153,10 +163,11 @@ const ProductDetail = ({
         addToCart({
           productId: id,
           quantity,
-          size:
-            typeof selectedSize === "string"
+          size: isVariantProduct
+            ? typeof selectedSize === "string"
               ? selectedSize
-              : selectedSize?.size,
+              : selectedSize?.size
+            : "N/A",
           color: selectedColor,
         }),
       ).unwrap();
@@ -219,7 +230,15 @@ const ProductDetail = ({
   };
 
   const getStockForSize = (size) => {
-    if (!size || !product?.sizes) return 0;
+    if (!product) return 0;
+
+    // Products without size variants use global stock.
+    if (!Array.isArray(product.sizes) || product.sizes.length === 0) {
+      return globalStock;
+    }
+
+    // Variant product: if no size chosen yet, treat as unavailable.
+    if (!size) return 0;
 
     // Handle both string and object size formats
     const sizeValue = typeof size === "string" ? size : size.size;
@@ -232,10 +251,33 @@ const ProductDetail = ({
     }
 
     // Fallback to total stock
-    return product?.remainingStock ?? product?.totalStock ?? 0;
+    return globalStock;
   };
 
   const selectedSizeStock = getStockForSize(selectedSize);
+  const effectiveStock = isVariantProduct ? selectedSizeStock : globalStock;
+
+  // If the page is showing out-of-stock, keep stock fresh so buttons re-enable after admin restock.
+  useEffect(() => {
+    if (!id) return;
+    if (effectiveStock > 0) return;
+
+    const intervalId = setInterval(() => {
+      dispatch(fetchProductById(id));
+    }, 15000);
+
+    return () => clearInterval(intervalId);
+  }, [dispatch, id, effectiveStock]);
+
+  // Keep quantity within available stock.
+  useEffect(() => {
+    if (effectiveStock > 0 && quantity > effectiveStock) {
+      setQuantity(effectiveStock);
+    }
+    if (effectiveStock === 0 && quantity < 1) {
+      setQuantity(1);
+    }
+  }, [effectiveStock, quantity]);
   const discountPercent = product?.comparePrice
     ? Math.round(
         ((Number(product.comparePrice) - Number(product.price)) /
@@ -563,9 +605,11 @@ const ProductDetail = ({
                   </span>
                   <button
                     onClick={() =>
-                      setQuantity(Math.min(selectedSizeStock, quantity + 1))
+                      setQuantity(Math.min(effectiveStock, quantity + 1))
                     }
-                    disabled={quantity >= selectedSizeStock}
+                    disabled={
+                      effectiveStock === 0 || quantity >= effectiveStock
+                    }
                     className="p-3 hover:bg-gray-100 transition-colors disabled:opacity-50"
                   >
                     <FiPlus />
@@ -578,14 +622,14 @@ const ProductDetail = ({
             <div className="flex gap-2 sm:gap-4">
               <button
                 onClick={handleAddToCart}
-                disabled={selectedSizeStock === 0}
+                disabled={effectiveStock === 0}
                 className="flex-1 py-2 sm:py-4 text-sm sm:text-base border-2 border-primary-500 text-primary-500 rounded-lg sm:rounded-xl font-semibold hover:bg-primary-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add to Cart
               </button>
               <button
                 onClick={handleBuyNow}
-                disabled={selectedSizeStock === 0}
+                disabled={effectiveStock === 0}
                 className="flex-1 py-2 sm:py-4 text-sm sm:text-base btn-gradient rounded-lg sm:rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Buy Now
