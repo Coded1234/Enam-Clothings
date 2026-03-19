@@ -24,13 +24,50 @@ const Contact = () => {
     subject: "",
     message: "",
   });
+  const [attachments, setAttachments] = useState([]);
   const searchParams = useSearchParams();
   const { user } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  const MAX_ATTACHMENT_SIZE_BYTES = 5 * 1024 * 1024;
+  const allowedAttachmentTypes = new Set([
+    "image/jpeg",
+    "image/png",
+    "application/pdf",
+  ]);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleAttachmentsChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const validFiles = [];
+    for (const file of files) {
+      if (!allowedAttachmentTypes.has(file.type)) {
+        toast.error("Only JPG, PNG, or PDF files are allowed");
+        continue;
+      }
+      if (file.size > MAX_ATTACHMENT_SIZE_BYTES) {
+        toast.error("Each attachment must be 5MB or less");
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    if (validFiles.length > 0) {
+      setAttachments((prev) => [...prev, ...validFiles]);
+    }
+
+    // Allow re-selecting the same file after removal.
+    e.target.value = "";
+  };
+
+  const removeAttachmentAtIndex = (index) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -48,7 +85,17 @@ const Contact = () => {
 
     setLoading(true);
     try {
-      await api.post("/contact", formData);
+      const payload = new FormData();
+      payload.append("name", formData.name);
+      payload.append("email", formData.email);
+      payload.append("phone", formData.phone);
+      payload.append("subject", formData.subject);
+      payload.append("message", formData.message);
+      attachments.forEach((file) => payload.append("attachments", file));
+
+      await api.post("/contact", payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       setSubmitted(true);
       toast.success("Message sent successfully!");
     } catch (error) {
@@ -144,6 +191,7 @@ const Contact = () => {
                     subject: "",
                     message: "",
                   });
+                  setAttachments([]);
                 }}
                 className="px-6 py-3 border border-gray-300 dark:border-primary-700 rounded-lg text-gray-700 dark:text-gold-light hover:bg-gray-50 dark:hover:bg-opacity-5 transition-colors"
               >
@@ -303,6 +351,49 @@ const Contact = () => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none text-black placeholder-black bg-white"
                     required
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gold mb-2">
+                    Attachments (optional)
+                  </label>
+                  <input
+                    type="file"
+                    multiple
+                    accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
+                    onChange={handleAttachmentsChange}
+                    className="w-full text-sm text-gray-700 dark:text-gold file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                  />
+                  <p className="mt-2 text-xs text-gray-500 dark:text-white/60">
+                    Allowed: JPG, PNG, PDF. Max 5MB per file.
+                  </p>
+
+                  {attachments.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      {attachments.map((file, index) => (
+                        <div
+                          key={`${file.name}-${index}`}
+                          className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3 py-2"
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm text-gray-800 dark:text-gold-light truncate">
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-white/60">
+                              {(file.size / (1024 * 1024)).toFixed(2)}MB
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeAttachmentAtIndex(index)}
+                            className="text-xs font-medium text-red-600 hover:underline"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <button

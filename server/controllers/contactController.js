@@ -32,6 +32,14 @@ const submitContact = async (req, res) => {
 
     // Optionally send notification to admin
     try {
+      const attachments = Array.isArray(req.files)
+        ? req.files.map((file) => ({
+            filename: file.originalname,
+            content: file.buffer,
+            contentType: file.mimetype,
+          }))
+        : [];
+
       await sendEmail(
         process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
         `New Contact Form Submission: ${subject}`,
@@ -44,6 +52,7 @@ const submitContact = async (req, res) => {
           <p><strong>Message:</strong></p>
           <p>${message}</p>
         `,
+        attachments.length > 0 ? { attachments } : undefined,
       );
     } catch (emailError) {
       console.error("Admin notification email failed:", emailError);

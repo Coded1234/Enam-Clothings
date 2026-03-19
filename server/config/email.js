@@ -24,7 +24,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmail = async (to, subject, html) => {
+const sendEmail = async (to, subject, html, options = {}) => {
   try {
     const mailOptions = {
       from: `"Diamond Vogue Gallery" <${process.env.EMAIL_USER}>`,
@@ -32,9 +32,11 @@ const sendEmail = async (to, subject, html) => {
       to,
       subject,
       html,
+      ...options,
       headers: {
         "X-Priority": "1",
         "X-Mailer": "Diamond Vogue Gallery Mailer",
+        ...(options.headers || {}),
       },
     };
 
