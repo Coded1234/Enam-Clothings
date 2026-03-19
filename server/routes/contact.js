@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const {
+  contactAttachmentsUpload,
+} = require("../middleware/contactAttachmentsUpload");
+const {
   submitContact,
   getMessages,
   updateMessage,
@@ -9,7 +12,7 @@ const {
 const { protect, adminOnly } = require("../middleware/auth");
 
 // Public routes
-router.post("/", submitContact);
+router.post("/", contactAttachmentsUpload, submitContact);
 
 // Admin routes
 router.get("/messages", protect, adminOnly, getMessages);
