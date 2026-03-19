@@ -23,7 +23,6 @@ import Profile from "./pages/customer/Profile";
 import Login from "./pages/customer/Login";
 import Register from "./pages/customer/Register";
 import FAQ from "./pages/customer/FAQ";
-import SizeGuidePage from "./pages/customer/SizeGuide";
 import ForgotPassword from "./pages/customer/ForgotPassword";
 import ResetPassword from "./pages/customer/ResetPassword";
 import Contact from "./pages/customer/Contact";
@@ -75,7 +74,6 @@ function App() {
         <Route path="verify-email" element={<VerifyEmail />} />
         <Route path="resend-verification" element={<ResendVerification />} />
         <Route path="faq" element={<FAQ />} />
-        <Route path="size-guide" element={<SizeGuidePage />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="reset-password/:token" element={<ResetPassword />} />
         <Route path="contact" element={<Contact />} />

@@ -148,6 +148,14 @@ const Footer = () => {
                   Women
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/shop/perfumes"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  Perfumes
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -189,14 +197,6 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/size-guide"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Size Guide
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/contact"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
@@ -216,7 +216,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3 text-gray-300 justify-center sm:justify-start">
                 <FiMail className="text-primary-500" />
-                <span>diamondvoguegallery@gmail.com</span>
+                <span>diamondauragallery@gmail.com</span>
               </li>
             </ul>
           </div>

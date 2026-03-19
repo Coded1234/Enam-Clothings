@@ -5,13 +5,16 @@ import DataDeletionStatus from "../../client/src/pages/customer/DataDeletionStat
 
 export const metadata = {
   title: "Data Deletion Status",
-  description: "Check the status of your data deletion request at Diamond Vogue Gallery.",
+  description:
+    "Check the status of your data deletion request at Diamond Aura Gallery.",
 };
 
 export default function DataDeletionStatusPage() {
   return (
     <CustomerLayout>
-      <Suspense><DataDeletionStatus /></Suspense>
+      <Suspense>
+        <DataDeletionStatus />
+      </Suspense>
     </CustomerLayout>
   );
 }

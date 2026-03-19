@@ -4,7 +4,7 @@ import Orders from "../../client/src/pages/customer/Orders";
 
 export const metadata = {
   title: "My Orders",
-  description: "View and track your orders at Diamond Vogue Gallery.",
+  description: "View and track your orders at Diamond Aura Gallery.",
 };
 
 export default function OrdersPage() {

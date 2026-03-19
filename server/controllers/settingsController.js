@@ -3,7 +3,7 @@ const { Settings } = require("../models");
 // Default settings
 const defaultSettings = {
   storeName: "StyleStore",
-  storeEmail: "info@stylestore.com",
+  storeEmail: "diamondauragallery@gmail.com",
   storePhone: "+233 XX XXX XXXX",
   storeAddress: "Accra, Ghana",
   currency: "GHS",

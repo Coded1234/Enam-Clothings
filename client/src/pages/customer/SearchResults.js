@@ -27,6 +27,7 @@ const SearchResults = () => {
     { value: "", label: "All Categories" },
     { value: "men", label: "Men" },
     { value: "women", label: "Women" },
+    { value: "perfumes", label: "Perfumes" },
   ];
 
   const sortOptions = [

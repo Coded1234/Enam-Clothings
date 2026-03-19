@@ -3,7 +3,7 @@ import ForgotPassword from "../../client/src/pages/customer/ForgotPassword";
 
 export const metadata = {
   title: "Forgot Password",
-  description: "Reset your Diamond Vogue Gallery account password.",
+  description: "Reset your Diamond Aura Gallery account password.",
 };
 
 export default function ForgotPasswordPage() {

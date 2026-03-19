@@ -4,7 +4,7 @@ import FAQ from "../../client/src/pages/customer/FAQ";
 export const metadata = {
   title: "FAQ",
   description:
-    "Frequently asked questions about shopping, shipping, returns, and more at Diamond Vogue Gallery.",
+    "Frequently asked questions about shopping, shipping, returns, and more at Diamond Aura Gallery.",
 };
 
 export default function FAQPage() {

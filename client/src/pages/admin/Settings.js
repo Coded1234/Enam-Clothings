@@ -27,7 +27,7 @@ const Settings = () => {
     // General Settings
     siteName: "Diamond Vogue Gallery",
     siteDescription: "Your one-stop shop for fashion",
-    contactEmail: "diamondvoguegallery@gmail.com",
+    contactEmail: "diamondauragallery@gmail.com",
     contactPhone: "+233 XX XXX XXXX",
     address: "Accra, Ghana",
 

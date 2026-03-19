@@ -40,7 +40,7 @@ const Coupons = () => {
     applicable_categories: [],
   });
 
-  const categories = ["men", "women"];
+  const categories = ["men", "women", "perfumes"];
 
   useEffect(() => {
     fetchCoupons();

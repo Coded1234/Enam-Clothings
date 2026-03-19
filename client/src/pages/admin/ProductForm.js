@@ -36,6 +36,20 @@ const ProductForm = () => {
   const [newSize, setNewSize] = useState("");
   const [newColor, setNewColor] = useState({ name: "", code: "#000000" });
 
+  const isPerfumesCategory = formData.category === "perfumes";
+
+  // If switching to perfumes, strip out variant fields.
+  useEffect(() => {
+    if (!isPerfumesCategory) return;
+    setFormData((prev) => {
+      if ((prev.sizes?.length || 0) === 0 && (prev.colors?.length || 0) === 0) {
+        return prev;
+      }
+      return { ...prev, sizes: [], colors: [] };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPerfumesCategory]);
+
   const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   const availableColors = [
     { name: "Black", code: "#000000" },
@@ -60,6 +74,10 @@ const ProductForm = () => {
     {
       value: "women",
       label: "Women",
+    },
+    {
+      value: "perfumes",
+      label: "Perfumes",
     },
   ];
 
@@ -168,6 +186,7 @@ const ProductForm = () => {
   };
 
   const addSize = (size) => {
+    if (isPerfumesCategory) return;
     if (size && !formData.sizes.find((s) => (s.size || s) === size)) {
       const sizeObj = { size: size, stock: parseInt(formData.totalStock) || 0 };
       setFormData((prev) => ({
@@ -185,6 +204,7 @@ const ProductForm = () => {
   };
 
   const addColor = (color) => {
+    if (isPerfumesCategory) return;
     if (color && !formData.colors.find((c) => (c.name || c) === color.name)) {
       setFormData((prev) => ({
         ...prev,
@@ -230,8 +250,14 @@ const ProductForm = () => {
       submitData.append("featured", formData.featured);
 
       // Add sizes and colors as JSON strings
-      submitData.append("sizes", JSON.stringify(formData.sizes));
-      submitData.append("colors", JSON.stringify(formData.colors));
+      submitData.append(
+        "sizes",
+        JSON.stringify(isPerfumesCategory ? [] : formData.sizes),
+      );
+      submitData.append(
+        "colors",
+        JSON.stringify(isPerfumesCategory ? [] : formData.colors),
+      );
 
       // Add existing images as JSON string
       if (existingImages.length > 0) {
@@ -395,123 +421,125 @@ const ProductForm = () => {
         </div>
 
         {/* Sizes & Colors */}
-        <div className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 shadow-sm">
-          <h2 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4">
-            Variants
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <div>
-              <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">
-                Sizes
-              </label>
-              <div className="flex gap-2 mb-2">
-                <select
-                  value=""
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      addSize(e.target.value);
-                      e.target.value = "";
-                    }
-                  }}
-                  className="flex-1 px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="">Select size to add</option>
-                  {availableSizes
-                    .filter((size) => !formData.sizes.includes(size))
-                    .map((size) => (
-                      <option key={size} value={size}>
-                        {size}
-                      </option>
-                    ))}
-                </select>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {formData.sizes.map((size, index) => {
-                  const sizeValue = size.size || size;
-                  return (
-                    <span
-                      key={index}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-                    >
-                      {sizeValue}
-                      <button
-                        type="button"
-                        onClick={() => removeSize(sizeValue)}
-                        className="hover:text-red-600"
-                      >
-                        <FiX size={14} />
-                      </button>
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Colors
-              </label>
-              <div className="flex gap-2 mb-2">
-                <select
-                  value=""
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      const selectedColor = availableColors.find(
-                        (c) => c.name === e.target.value,
-                      );
-                      if (selectedColor) {
-                        addColor(selectedColor);
+        {!isPerfumesCategory && (
+          <div className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 shadow-sm">
+            <h2 className="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4">
+              Variants
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div>
+                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">
+                  Sizes
+                </label>
+                <div className="flex gap-2 mb-2">
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        addSize(e.target.value);
                         e.target.value = "";
                       }
-                    }
-                  }}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="">Select color to add</option>
-                  {availableColors
-                    .filter(
-                      (color) =>
-                        !formData.colors.find(
-                          (c) => (c.name || c) === color.name,
-                        ),
-                    )
-                    .map((color) => (
-                      <option key={color.name} value={color.name}>
-                        {color.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {formData.colors.map((color, index) => {
-                  const colorObj =
-                    typeof color === "string"
-                      ? { name: color, code: "#000000" }
-                      : color;
-                  return (
-                    <span
-                      key={index}
-                      className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-                    >
+                    }}
+                    className="flex-1 px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Select size to add</option>
+                    {availableSizes
+                      .filter((size) => !formData.sizes.includes(size))
+                      .map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {formData.sizes.map((size, index) => {
+                    const sizeValue = size.size || size;
+                    return (
                       <span
-                        className="w-4 h-4 rounded-full border border-gray-300"
-                        style={{ backgroundColor: colorObj.code }}
-                      />
-                      {colorObj.name}
-                      <button
-                        type="button"
-                        onClick={() => removeColor(color)}
-                        className="hover:text-red-600"
+                        key={index}
+                        className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
                       >
-                        <FiX size={14} />
-                      </button>
-                    </span>
-                  );
-                })}
+                        {sizeValue}
+                        <button
+                          type="button"
+                          onClick={() => removeSize(sizeValue)}
+                          className="hover:text-red-600"
+                        >
+                          <FiX size={14} />
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Colors
+                </label>
+                <div className="flex gap-2 mb-2">
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        const selectedColor = availableColors.find(
+                          (c) => c.name === e.target.value,
+                        );
+                        if (selectedColor) {
+                          addColor(selectedColor);
+                          e.target.value = "";
+                        }
+                      }
+                    }}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Select color to add</option>
+                    {availableColors
+                      .filter(
+                        (color) =>
+                          !formData.colors.find(
+                            (c) => (c.name || c) === color.name,
+                          ),
+                      )
+                      .map((color) => (
+                        <option key={color.name} value={color.name}>
+                          {color.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {formData.colors.map((color, index) => {
+                    const colorObj =
+                      typeof color === "string"
+                        ? { name: color, code: "#000000" }
+                        : color;
+                    return (
+                      <span
+                        key={index}
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                      >
+                        <span
+                          className="w-4 h-4 rounded-full border border-gray-300"
+                          style={{ backgroundColor: colorObj.code }}
+                        />
+                        {colorObj.name}
+                        <button
+                          type="button"
+                          onClick={() => removeColor(color)}
+                          className="hover:text-red-600"
+                        >
+                          <FiX size={14} />
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Images */}
         <div className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 shadow-sm">

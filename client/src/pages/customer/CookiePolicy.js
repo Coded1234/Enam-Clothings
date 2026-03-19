@@ -52,7 +52,7 @@ We may update this Cookie Policy from time to time. We will post changes with a 
 
 8. Contact
 
-For questions about our Cookie Policy, contact diamondvoguegallery@gmail.com
+  For questions about our Cookie Policy, contact diamondauragallery@gmail.com
 
 ---
 

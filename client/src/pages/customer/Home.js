@@ -62,6 +62,11 @@ const Home = () => {
       images: IMAGES.categorySlides?.women || [IMAGES.categories.women],
       path: "/shop/women",
     },
+    {
+      name: "Perfumes",
+      images: IMAGES.categorySlides?.perfumes || [IMAGES.categories.perfumes],
+      path: "/shop/perfumes",
+    },
   ];
 
   useEffect(() => {
@@ -171,21 +176,21 @@ const Home = () => {
               Browse our wide selection of clothing for men and women{" "}
             </p>{" "}
           </div>{" "}
-          <div className="grid grid-cols-2 gap-4 max-w-4xl mx-auto motion-safe-stagger">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-4xl mx-auto motion-safe-stagger">
             {" "}
             {categories.map((category, index) => (
               <Link
                 key={category.name}
                 href={category.path}
-                className="group relative h-80 rounded-2xl overflow-hidden card-hover"
+                className="group relative h-40 sm:h-80 rounded-2xl overflow-hidden card-hover"
                 style={{ "--reveal-delay": `${index * 120}ms` }}
               >
                 <div className="absolute inset-0">
                   {category.images.map((image, index) => {
-                    const isActive =
-                      index ===
-                      categoryImageIndexes[category.name] %
-                        category.images.length;
+                    const activeIndex =
+                      (categoryImageIndexes[category.name] ?? 0) %
+                      category.images.length;
+                    const isActive = index === activeIndex;
                     return (
                       <img
                         key={`${category.name}-${index}`}
@@ -199,13 +204,13 @@ const Home = () => {
                   })}
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>{" "}
-                <div className="absolute bottom-0 left-0 right-0 p-6">
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-6">
                   {" "}
-                  <h3 className="text-base sm:text-xl md:text-2xl font-bold text-white mb-2">
+                  <h3 className="text-sm sm:text-xl md:text-2xl font-bold text-white mb-1 sm:mb-2">
                     {" "}
                     {category.name}{" "}
                   </h3>{" "}
-                  <span className="text-white/80 flex items-center gap-4 group-hover:text-primary-400 transition-colors">
+                  <span className="text-white/80 text-xs sm:text-base flex items-center gap-2 sm:gap-4 group-hover:text-primary-400 transition-colors">
                     {" "}
                     Shop Now{" "}
                     <FiArrowRight className="group-hover:translate-x-2 transition-transform" />{" "}
@@ -246,11 +251,11 @@ const Home = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {" "}
               {[...Array(4)].map((_, i) => (
-                <div key={`skeleton-${i}`} className="animate-pulse">
-                  {" "}
-                  <div className="bg-gray-200 aspect-[3/4] rounded-xl mb-4"></div>{" "}
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>{" "}
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>{" "}
+                <div
+                  key={`skeleton-${i}`}
+                  className="animate-pulse h-40 sm:h-80 rounded-2xl overflow-hidden bg-gray-200"
+                >
+                  <div className="w-full h-full" />
                 </div>
               ))}{" "}
             </div>
@@ -261,6 +266,9 @@ const Home = () => {
                 <ProductCard
                   key={product.id || product._id}
                   product={product}
+                  className="h-40 sm:h-80 rounded-2xl"
+                  imageWrapperClassName="flex-1 min-h-0"
+                  infoOverlay
                 />
               ))}{" "}
             </div>
@@ -389,9 +397,9 @@ const Home = () => {
               Fresh picks and top-rated styles curated for you
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-5xl mx-auto motion-safe-stagger">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-4xl mx-auto motion-safe-stagger">
             <div
-              className="relative h-80 rounded-2xl overflow-hidden group border border-white/10"
+              className="relative h-40 sm:h-80 rounded-2xl overflow-hidden group card-hover"
               style={{ "--reveal-delay": "0ms" }}
             >
               <img
@@ -400,23 +408,23 @@ const Home = () => {
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
-              <div className="absolute inset-0 flex flex-col justify-end text-white p-4 md:p-7">
-                <p className="text-[10px] md:text-xs uppercase tracking-[0.18em] text-amber-200 mb-2">
+              <div className="absolute inset-0 flex flex-col justify-end text-white p-3 sm:p-6">
+                <p className="text-[10px] sm:text-xs uppercase tracking-[0.18em] text-amber-200 mb-2">
                   Just Arrived
                 </p>
-                <h3 className="text-base md:text-3xl font-bold mb-3 md:mb-4">
+                <h3 className="text-sm sm:text-xl md:text-2xl font-bold mb-2 sm:mb-4">
                   New Arrivals
                 </h3>
                 <Link
                   href="/shop?sort=newest"
-                  className="inline-flex w-fit items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm rounded-full bg-white text-gray-900 font-semibold hover:bg-amber-100 transition-colors"
+                  className="inline-flex w-fit items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm rounded-full bg-white text-gray-900 font-semibold hover:bg-amber-100 transition-colors"
                 >
                   Explore Now <FiArrowRight />
                 </Link>
               </div>
             </div>
             <div
-              className="relative h-80 rounded-2xl overflow-hidden group border border-white/10"
+              className="relative h-40 sm:h-80 rounded-2xl overflow-hidden group card-hover"
               style={{ "--reveal-delay": "130ms" }}
             >
               <img
@@ -425,16 +433,16 @@ const Home = () => {
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
-              <div className="absolute inset-0 flex flex-col justify-end text-white p-4 md:p-7">
-                <p className="text-[10px] md:text-xs uppercase tracking-[0.18em] text-amber-200 mb-2">
+              <div className="absolute inset-0 flex flex-col justify-end text-white p-3 sm:p-6">
+                <p className="text-[10px] sm:text-xs uppercase tracking-[0.18em] text-amber-200 mb-2">
                   Top Rated
                 </p>
-                <h3 className="text-base md:text-3xl font-bold mb-3 md:mb-4">
+                <h3 className="text-sm sm:text-xl md:text-2xl font-bold mb-2 sm:mb-4">
                   Best Sellers
                 </h3>
                 <Link
                   href="/shop?sort=rating"
-                  className="inline-flex w-fit items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm rounded-full bg-white text-gray-900 font-semibold hover:bg-amber-100 transition-colors"
+                  className="inline-flex w-fit items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm rounded-full bg-white text-gray-900 font-semibold hover:bg-amber-100 transition-colors"
                 >
                   Shop Now <FiArrowRight />
                 </Link>

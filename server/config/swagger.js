@@ -10,7 +10,7 @@ const options = {
         "Complete API documentation for StyleStore clothing e-commerce platform",
       contact: {
         name: "API Support",
-        email: "support@stylestore.com",
+        email: "diamondauragallery@gmail.com",
       },
     },
     servers: [

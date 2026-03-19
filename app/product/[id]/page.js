@@ -63,13 +63,13 @@ export async function generateMetadata({ params }) {
     const name = product.name || "Product";
     const desc = product.description
       ? product.description.slice(0, 160)
-      : `Shop ${name} at Diamond Vogue Gallery.`;
+      : `Shop ${name} at Diamond Aura Gallery.`;
     const imageUrl = extractImageUrl(product.images?.[0]);
     return {
       title: name,
       description: desc,
       openGraph: {
-        title: `${name} - Diamond Vogue Gallery`,
+        title: `${name} - Diamond Aura Gallery`,
         description: desc,
         images: imageUrl ? [{ url: imageUrl }] : [],
         type: "website",
@@ -79,7 +79,7 @@ export async function generateMetadata({ params }) {
 
   return {
     title: "Product",
-    description: "Shop premium fashion and clothing at Diamond Vogue Gallery.",
+    description: "Shop premium fashion and clothing at Diamond Aura Gallery.",
   };
 }
 

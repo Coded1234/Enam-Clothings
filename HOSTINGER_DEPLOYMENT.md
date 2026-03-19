@@ -157,9 +157,9 @@ CLOUDINARY_API_SECRET=your_api_secret
 # Email (Gmail SMTP)
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
-EMAIL_USER=your_email@gmail.com
+EMAIL_USER=diamondauragallery@gmail.com
 EMAIL_PASS=your_gmail_app_password
-ADMIN_EMAIL=your_admin_email@gmail.com
+ADMIN_EMAIL=diamondauragallery@gmail.com
 
 # Paystack
 # Use sk_test_/pk_test_ keys during initial setup and testing.

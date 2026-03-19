@@ -4,7 +4,7 @@ import TermsOfService from "../../client/src/pages/customer/TermsOfService";
 export const metadata = {
   title: "Terms of Service",
   description:
-    "Read the Terms of Service for Diamond Vogue Gallery. Learn about our policies, user agreements, and usage guidelines.",
+    "Read the Terms of Service for Diamond Aura Gallery. Learn about our policies, user agreements, and usage guidelines.",
 };
 
 export default function TermsOfServicePage() {

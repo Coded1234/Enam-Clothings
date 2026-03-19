@@ -15,6 +15,9 @@ const ProductCard = ({
   onToggleWishlist,
   isWishlisted: externalWishlisted,
   showFullDescription = false,
+  className = "",
+  imageWrapperClassName = "",
+  infoOverlay = false,
 }) => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -98,16 +101,45 @@ const ProductCard = ({
   };
 
   return (
-    <div className="group bg-white dark:bg-surface rounded-lg shadow-sm overflow-hidden card-hover w-full">
+    <div
+      className={`group bg-white dark:bg-surface rounded-lg shadow-sm overflow-hidden card-hover w-full flex flex-col ${className}`}
+    >
       {/* Image */}
-      <div className="relative img-zoom aspect-square">
-        <Link href={`/product/${product.id}`}>
+      <div
+        className={`relative img-zoom w-full ${
+          imageWrapperClassName || "aspect-square"
+        }`}
+      >
+        <Link href={`/product/${product.id}`} className="block w-full h-full">
           <img
             src={getProductImage(product)}
             alt={product.name}
             className="w-full h-full object-cover"
           />
         </Link>
+
+        {infoOverlay && (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 p-3">
+              <Link href={`/product/${product.id}`}>
+                <h3 className="font-semibold text-white text-xs sm:text-sm mb-1 line-clamp-2 leading-tight">
+                  {product.name}
+                </h3>
+              </Link>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-white font-bold text-sm sm:text-base">
+                  GH₵{Math.round(product.price)}
+                </span>
+                {product.comparePrice && (
+                  <span className="text-white/70 text-[10px] sm:text-xs line-through">
+                    GH₵{Math.round(product.comparePrice)}
+                  </span>
+                )}
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
@@ -159,35 +191,37 @@ const ProductCard = ({
       </div>
 
       {/* Info */}
-      <div className="p-3">
-        <Link href={`/product/${product.id}`}>
-          <h3 className="font-medium text-gray-800 dark:text-gold-light text-sm mb-1 hover:text-primary-500 transition-colors line-clamp-2 leading-tight">
-            {product.name}
-          </h3>
-        </Link>
+      {!infoOverlay && (
+        <div className="p-3">
+          <Link href={`/product/${product.id}`}>
+            <h3 className="font-medium text-gray-800 dark:text-gold-light text-sm mb-1 hover:text-primary-500 transition-colors line-clamp-2 leading-tight">
+              {product.name}
+            </h3>
+          </Link>
 
-        {/* Price */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-base font-bold text-gray-900 dark:text-gold-light">
-            GH₵{Math.round(product.price)}
-          </span>
-          {product.comparePrice && (
-            <span className="text-xs text-gray-400 dark:text-primary-400 line-through">
-              GH₵{Math.round(product.comparePrice)}
+          {/* Price */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-base font-bold text-gray-900 dark:text-gold-light">
+              GH₵{Math.round(product.price)}
             </span>
+            {product.comparePrice && (
+              <span className="text-xs text-gray-400 dark:text-primary-400 line-through">
+                GH₵{Math.round(product.comparePrice)}
+              </span>
+            )}
+          </div>
+
+          {/* Stock Status */}
+          {product.remainingStock <= 10 && product.remainingStock > 0 && (
+            <p className="text-xs text-orange-500 mt-1">
+              {product.remainingStock} left
+            </p>
+          )}
+          {product.remainingStock === 0 && (
+            <p className="text-xs text-red-500 mt-1">Out of stock</p>
           )}
         </div>
-
-        {/* Stock Status */}
-        {product.remainingStock <= 10 && product.remainingStock > 0 && (
-          <p className="text-xs text-orange-500 mt-1">
-            {product.remainingStock} left
-          </p>
-        )}
-        {product.remainingStock === 0 && (
-          <p className="text-xs text-red-500 mt-1">Out of stock</p>
-        )}
-      </div>
+      )}
     </div>
   );
 };

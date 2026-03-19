@@ -4,7 +4,7 @@ import Checkout from "../../client/src/pages/customer/Checkout";
 
 export const metadata = {
   title: "Checkout",
-  description: "Complete your purchase at Diamond Vogue Gallery.",
+  description: "Complete your purchase at Diamond Aura Gallery.",
 };
 
 export default function CheckoutPage() {

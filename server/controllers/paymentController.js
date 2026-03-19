@@ -191,7 +191,7 @@ const verifyPayment = async (req, res) => {
                     order.user,
                   );
                   await sendEmail(
-                    process.env.ADMIN_EMAIL || "diamondvoguegallery@gmail.com",
+                    process.env.ADMIN_EMAIL || "diamondauragallery@gmail.com",
                     adminTemplate.subject,
                     adminTemplate.html,
                   );

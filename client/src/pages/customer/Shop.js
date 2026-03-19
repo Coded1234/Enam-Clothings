@@ -68,6 +68,7 @@ const Shop = () => {
     { value: "", label: "All Categories" },
     { value: "men", label: "Men" },
     { value: "women", label: "Women" },
+    { value: "perfumes", label: "Perfumes" },
   ];
 
   const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
@@ -150,7 +151,7 @@ const Shop = () => {
   }, [filters.minPrice, filters.maxPrice]);
 
   const handleFilterChange = (key, value) => {
-    // Category is driven by the route (/shop, /shop/men, /shop/women)
+    // Category is driven by the route (/shop, /shop/men, /shop/women, /shop/perfumes)
     if (key === "category") {
       dispatch(setFilters({ category: value }));
 

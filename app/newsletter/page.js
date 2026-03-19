@@ -3,7 +3,8 @@ import Newsletter from "../../client/src/pages/customer/Newsletter";
 
 export const metadata = {
   title: "Newsletter",
-  description: "Subscribe to Diamond Vogue Gallery newsletter for the latest trends and exclusive offers.",
+  description:
+    "Subscribe to Diamond Aura Gallery newsletter for the latest trends and exclusive offers.",
 };
 
 export default function NewsletterPage() {

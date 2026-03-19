@@ -5,13 +5,16 @@ import Login from "../../client/src/pages/customer/Login";
 
 export const metadata = {
   title: "Sign In",
-  description: "Sign in to your Diamond Vogue Gallery account to access your orders, wishlist, and more.",
+  description:
+    "Sign in to your Diamond Aura Gallery account to access your orders, wishlist, and more.",
 };
 
 export default function LoginPage() {
   return (
     <CustomerLayout>
-      <Suspense><Login /></Suspense>
+      <Suspense>
+        <Login />
+      </Suspense>
     </CustomerLayout>
   );
 }

@@ -6,7 +6,7 @@ export async function generateMetadata({ params }) {
   const category = params.category;
   return {
     title: `${category.charAt(0).toUpperCase() + category.slice(1)}`,
-    description: `Shop ${category} at Diamond Vogue Gallery.`,
+    description: `Shop ${category} at Diamond Aura Gallery.`,
   };
 }
 
@@ -15,7 +15,9 @@ export const dynamic = "force-dynamic";
 export default function ShopCategoryPage() {
   return (
     <CustomerLayout>
-      <Suspense><Shop /></Suspense>
+      <Suspense>
+        <Shop />
+      </Suspense>
     </CustomerLayout>
   );
 }

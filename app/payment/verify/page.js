@@ -6,14 +6,16 @@ import PaymentVerify from "../../../client/src/pages/customer/PaymentVerify";
 
 export const metadata = {
   title: "Payment Verification",
-  description: "Verifying your payment at Diamond Vogue Gallery.",
+  description: "Verifying your payment at Diamond Aura Gallery.",
 };
 
 export default function PaymentVerifyPage() {
   return (
     <CustomerLayout>
       <ProtectedRoute>
-        <Suspense><PaymentVerify /></Suspense>
+        <Suspense>
+          <PaymentVerify />
+        </Suspense>
       </ProtectedRoute>
     </CustomerLayout>
   );

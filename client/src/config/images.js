@@ -23,6 +23,7 @@ const IMAGES = {
   categories: {
     men: "/images/men.jpg?w=500",
     women: "/images/women.jpg?w=500",
+    perfumes: "/images/bestsellers.jpg?w=500",
   },
 
   // Rotating category card images (homepage)
@@ -36,6 +37,11 @@ const IMAGES = {
       "/images/women.jpg?w=500",
       "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=500",
       "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500",
+    ],
+    perfumes: [
+      "/images/bestsellers.jpg?w=500",
+      "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500",
+      "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=500",
     ],
   },
 

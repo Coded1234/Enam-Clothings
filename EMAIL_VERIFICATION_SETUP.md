@@ -80,7 +80,7 @@ Make sure these are set in your `.env` file:
 # Email Configuration
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
-EMAIL_USER=your-email@gmail.com
+EMAIL_USER=diamondauragallery@gmail.com
 EMAIL_PASS=your-app-password
 
 # Frontend URL for verification links

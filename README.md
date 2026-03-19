@@ -92,9 +92,9 @@ A full-stack e-commerce clothing store built with Next.js, Node.js, Express, and
    ```
    EMAIL_HOST=smtp.gmail.com
    EMAIL_PORT=587
-   EMAIL_USER=your_email@gmail.com
+   EMAIL_USER=diamondauragallery@gmail.com
    EMAIL_PASS=your_gmail_app_password
-   ADMIN_EMAIL=your_admin_email@gmail.com
+   ADMIN_EMAIL=diamondauragallery@gmail.com
    ```
 
    **Required — Payment (Paystack):**

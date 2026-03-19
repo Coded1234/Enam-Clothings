@@ -10,7 +10,6 @@ import {
 } from "../../redux/slices/productSlice";
 import { addToCart } from "../../redux/slices/cartSlice";
 import ProductCard from "../../components/customer/ProductCard";
-import SizeGuide from "../../components/customer/SizeGuide";
 import { reviewsAPI, authAPI } from "../../utils/api";
 import { getProductImage } from "../../utils/imageUrl";
 import { addToRecentlyViewed } from "../../utils/recentlyViewed";
@@ -62,7 +61,6 @@ const ProductDetail = ({
   // Reviews state — seed from SSR if available
   const [reviews, setReviews] = useState(initialReviews || []);
   const [reviewsLoading, setReviewsLoading] = useState(!initialReviews);
-  const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   const fetchReviews = useCallback(async () => {
     try {
@@ -513,12 +511,6 @@ const ProductDetail = ({
                         : selectedSize?.size}
                     </span>
                   </p>
-                  <button
-                    onClick={() => setShowSizeGuide(true)}
-                    className="text-sm text-primary-500 hover:underline"
-                  >
-                    Size Guide
-                  </button>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   {product.sizes.map((size, index) => {
@@ -883,13 +875,6 @@ const ProductDetail = ({
           </div>
         )}
       </div>
-
-      {/* Size Guide Modal */}
-      <SizeGuide
-        isOpen={showSizeGuide}
-        onClose={() => setShowSizeGuide(false)}
-        category={product?.category}
-      />
     </div>
   );
 };

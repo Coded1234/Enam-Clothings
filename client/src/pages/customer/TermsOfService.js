@@ -71,7 +71,7 @@ We may revise these Terms. Continued use after changes indicates acceptance. We 
 
 13. Contact
 
-If you have questions about these Terms, contact us at diamondvoguegallery@gmail.com
+If you have questions about these Terms, contact us at diamondauragallery@gmail.com
 
 
 ---

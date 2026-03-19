@@ -6,13 +6,16 @@ export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Verify Email",
-  description: "Verify your email address for your Diamond Vogue Gallery account.",
+  description:
+    "Verify your email address for your Diamond Aura Gallery account.",
 };
 
 export default function VerifyEmailPage() {
   return (
     <CustomerLayout>
-      <Suspense><VerifyEmail /></Suspense>
+      <Suspense>
+        <VerifyEmail />
+      </Suspense>
     </CustomerLayout>
   );
 }

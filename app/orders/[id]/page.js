@@ -4,7 +4,7 @@ import OrderDetail from "../../../client/src/pages/customer/OrderDetail";
 
 export const metadata = {
   title: "Order Details",
-  description: "View order details at Diamond Vogue Gallery.",
+  description: "View order details at Diamond Aura Gallery.",
 };
 
 export default function OrderDetailPage() {

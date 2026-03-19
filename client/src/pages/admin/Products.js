@@ -28,7 +28,7 @@ const Products = () => {
   const [productToDelete, setProductToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  const categories = ["men", "women"];
+  const categories = ["men", "women", "perfumes"];
 
   useEffect(() => {
     fetchProducts();

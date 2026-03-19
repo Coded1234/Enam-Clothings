@@ -9,15 +9,33 @@ const {
 const { sendEmail, emailTemplates } = require("../config/email");
 
 // Pay on Delivery is only allowed for Greater Accra
-const GREATER_ACCRA_REGIONS = ["greater accra", "greater accra region", "accra"];
-const GREATER_ACCRA_CITIES = ["accra", "tema", "achiaman", "adenta", "madina", "dodowa", "weija", "gbawe"];
+const GREATER_ACCRA_REGIONS = [
+  "greater accra",
+  "greater accra region",
+  "accra",
+];
+const GREATER_ACCRA_CITIES = [
+  "accra",
+  "tema",
+  "achiaman",
+  "adenta",
+  "madina",
+  "dodowa",
+  "weija",
+  "gbawe",
+];
 
 function isGreaterAccra(address) {
   if (!address) return false;
   const region = (address.region || "").toLowerCase().trim();
   const city = (address.city || "").toLowerCase().trim();
-  if (region && GREATER_ACCRA_REGIONS.some((r) => region.includes(r))) return true;
-  if (city && GREATER_ACCRA_CITIES.some((c) => city.includes(c) || c.includes(city))) return true;
+  if (region && GREATER_ACCRA_REGIONS.some((r) => region.includes(r)))
+    return true;
+  if (
+    city &&
+    GREATER_ACCRA_CITIES.some((c) => city.includes(c) || c.includes(city))
+  )
+    return true;
   return false;
 }
 
@@ -148,7 +166,7 @@ const createOrder = async (req, res) => {
           req.user,
         );
         await sendEmail(
-          process.env.ADMIN_EMAIL || "diamondvoguegallery@gmail.com",
+          process.env.ADMIN_EMAIL || "diamondauragallery@gmail.com",
           adminTemplate.subject,
           adminTemplate.html,
         );
@@ -310,7 +328,7 @@ const cancelOrder = async (req, res) => {
         reason,
       );
       await sendEmail(
-        process.env.ADMIN_EMAIL || "diamondvoguegallery@gmail.com",
+        process.env.ADMIN_EMAIL || "diamondauragallery@gmail.com",
         adminTemplate.subject,
         adminTemplate.html,
       );

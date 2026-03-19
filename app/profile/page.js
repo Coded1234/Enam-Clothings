@@ -4,7 +4,8 @@ import Profile from "../../client/src/pages/customer/Profile";
 
 export const metadata = {
   title: "My Profile",
-  description: "Manage your profile and account settings at Diamond Vogue Gallery.",
+  description:
+    "Manage your profile and account settings at Diamond Aura Gallery.",
 };
 
 export default function ProfilePage() {

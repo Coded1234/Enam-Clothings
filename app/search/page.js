@@ -5,13 +5,16 @@ import SearchResults from "../../client/src/pages/customer/SearchResults";
 
 export const metadata = {
   title: "Search",
-  description: "Search for premium fashion and clothing at Diamond Vogue Gallery.",
+  description:
+    "Search for premium fashion and clothing at Diamond Aura Gallery.",
 };
 
 export default function SearchPage() {
   return (
     <CustomerLayout>
-      <Suspense><SearchResults /></Suspense>
+      <Suspense>
+        <SearchResults />
+      </Suspense>
     </CustomerLayout>
   );
 }

@@ -38,7 +38,7 @@ We may update this Cookie Policy. We will post changes here with an updated effe
 
 8. Contact
 
-Questions about cookies or this policy: diamondvoguegallery@gmail.com
+Questions about cookies or this policy: diamondauragallery@gmail.com
 
 
 ---

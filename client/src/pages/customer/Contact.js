@@ -110,7 +110,7 @@ const Contact = () => {
     {
       icon: FiMail,
       title: "Email Us",
-      details: ["diamondvoguegallery@gmail.com"],
+      details: ["diamondauragallery@gmail.com"],
     },
   ];
 

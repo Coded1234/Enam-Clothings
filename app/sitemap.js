@@ -10,13 +10,13 @@ export default async function sitemap() {
     "/shop",
     "/shop/women",
     "/shop/men",
+    "/shop/perfumes",
     "/shop/accessories",
     "/contact",
     "/faq",
     "/privacy",
     "/terms",
     "/cookies",
-    "/size-guide",
     "/login",
     "/register",
     "/forgot-password",
@@ -60,7 +60,9 @@ export default async function sitemap() {
 
     productRoutes = allProducts.map((product) => ({
       url: `${baseUrl}/product/${product.id}`,
-      lastModified: new Date(product.updatedAt || product.createdAt || Date.now()),
+      lastModified: new Date(
+        product.updatedAt || product.createdAt || Date.now(),
+      ),
       changeFrequency: "weekly",
       priority: 0.9,
     }));

@@ -6,7 +6,7 @@ async function createAdmin() {
     await sequelize.authenticate();
     console.log("✅ Database connected successfully");
 
-    const adminEmail = "diamondvoguegallery@gmail.com";
+    const adminEmail = "diamondauragallery@gmail.com";
     const adminPassword = process.env.ADMIN_PASSWORD || "[REDACTED_ADMIN_PWD]";
     const adminData = {
       firstName: "Admin",

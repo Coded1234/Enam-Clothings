@@ -3,7 +3,7 @@ import ResendVerification from "../../client/src/pages/customer/ResendVerificati
 
 export const metadata = {
   title: "Resend Verification Email",
-  description: "Resend your email verification link for Diamond Vogue Gallery.",
+  description: "Resend your email verification link for Diamond Aura Gallery.",
 };
 
 export default function ResendVerificationPage() {

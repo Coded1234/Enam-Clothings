@@ -5,13 +5,16 @@ import Register from "../../client/src/pages/customer/Register";
 
 export const metadata = {
   title: "Create Account",
-  description: "Create a free account at Diamond Vogue Gallery to start shopping premium fashion and clothing.",
+  description:
+    "Create a free account at Diamond Aura Gallery to start shopping premium fashion and clothing.",
 };
 
 export default function RegisterPage() {
   return (
     <CustomerLayout>
-      <Suspense><Register /></Suspense>
+      <Suspense>
+        <Register />
+      </Suspense>
     </CustomerLayout>
   );
 }

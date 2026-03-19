@@ -18,7 +18,7 @@ export async function generateMetadata({ params }) {
       return {
         title: `Reviews for ${product.name}`,
 
-        description: `Read customer reviews for ${product.name} at Diamond Vogue Gallery.`,
+        description: `Read customer reviews for ${product.name} at Diamond Aura Gallery.`,
       };
     }
   } catch {
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }) {
   }
   return {
     title: "Product Reviews",
-    description: "Read customer reviews at Diamond Vogue Gallery.",
+    description: "Read customer reviews at Diamond Aura Gallery.",
   };
 }
 

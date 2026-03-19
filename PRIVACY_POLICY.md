@@ -64,7 +64,7 @@ We may update this Privacy Policy. We will post the revised policy with an updat
 
 If you have questions or requests about this policy or your personal data, contact us:
 
-diamondvoguegallery@gmail.com
+diamondauragallery@gmail.com
 
 
 ---

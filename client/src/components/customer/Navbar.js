@@ -94,6 +94,7 @@ const Navbar = () => {
   const categories = [
     { name: "Men", path: "/shop/men" },
     { name: "Women", path: "/shop/women" },
+    { name: "Perfumes", path: "/shop/perfumes" },
   ];
 
   const handleSearch = (e) => {

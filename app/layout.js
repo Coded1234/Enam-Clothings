@@ -3,12 +3,15 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
+  ),
   title: {
-    default: "Diamond Vogue Gallery - Premium Fashion",
-    template: "%s - Diamond Vogue Gallery",
+    default: "Diamond Aura Gallery - Premium Fashion",
+    template: `%s | Diamond Aura Gallery`,
   },
   description:
-    "Shop premium fashion and clothing at Diamond Vogue Gallery. Discover the latest trends in women's and men's fashion.",
+    "Diamond Aura Gallery is a premium fashion and clothing brand. We sell high-quality products at affordable prices.",
   keywords: [
     "fashion",
     "clothing",
@@ -19,16 +22,16 @@ export const metadata = {
   ],
   openGraph: {
     type: "website",
-    siteName: "Diamond Vogue Gallery",
-    title: "Diamond Vogue Gallery - Premium Fashion",
+    siteName: "Diamond Aura Gallery",
+    title: "Diamond Aura Gallery - Premium Fashion",
     description:
-      "Shop premium fashion and clothing at Diamond Vogue Gallery. Discover the latest trends in women's and men's fashion.",
+      "Diamond Aura Gallery is a premium fashion and clothing brand. We sell high-quality products at affordable prices.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Diamond Vogue Gallery - Premium Fashion",
+    title: "Diamond Aura Gallery - Premium Fashion",
     description:
-      "Shop premium fashion and clothing at Diamond Vogue Gallery. Discover the latest trends in women's and men's fashion.",
+      "Diamond Aura Gallery is a premium fashion and clothing brand. We sell high-quality products at affordable prices.",
   },
   robots: {
     index: true,
