@@ -326,7 +326,7 @@ const emailTemplates = {
     const approvedNextSteps =
       status === "approved"
         ? `
-      <div style="margin: 0 0 30px; text-align: center;">
+      <div style="margin: 0 0 30px; text-align: left;">
         <p style="color: #555; font-size: 15px; line-height: 1.6; margin: 0;">
           We will call you shortly to direct you on how to return the product.
         </p>
@@ -336,22 +336,45 @@ const emailTemplates = {
 
     const content = `
       <h2 style="color: #333; margin-top: 0; text-align: center;">Return Request Update</h2>
-      <p style="text-align: center; color: #666; font-size: 16px;">Hi ${
-        user.firstName
-      }, there is an update on your return request.</p>
+      <p style="text-align: center; color: #666; font-size: 16px;">Hi ${user.firstName}, there is an update on your return request.</p>
 
-      <div style="text-align: center; margin: 40px 0;">
-        <p style="color: #999; margin-bottom: 10px; font-size: 14px;">Order #${
-          order.orderNumber || order.id?.slice(-8).toUpperCase()
-        }</p>
-        <div style="display: inline-block; background-color: ${pillBg}; color: ${pillText}; padding: 10px 30px; border-radius: 50px; font-size: 18px; font-weight: 700; letter-spacing: 1px;">
-          ${statusLabel}
-        </div>
+      <div style="margin: 40px 0; padding: 20px; background: #f9f9f9; border-radius: 12px; max-width: 500px; margin-left: auto; margin-right: auto;">
+        <h3 style="color: #222; margin-bottom: 16px; text-align: left;">Order Details</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="color: #999; font-size: 14px; padding: 8px 0;">Order Number:</td>
+            <td style="color: #333; font-size: 14px; padding: 8px 0;">${order.orderNumber || order.id?.slice(-8).toUpperCase()}</td>
+          </tr>
+          <tr>
+            <td style="color: #999; font-size: 14px; padding: 8px 0;">Status:</td>
+            <td style="padding: 8px 0;">
+              <span style="display: inline-block; background-color: ${pillBg}; color: ${pillText}; padding: 6px 18px; border-radius: 50px; font-size: 15px; font-weight: 700; letter-spacing: 1px;">${statusLabel}</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="margin: 40px 0; padding: 20px; background: #f1f5f9; border-radius: 12px; max-width: 500px; margin-left: auto; margin-right: auto;">
+        <h3 style="color: #222; margin-bottom: 16px; text-align: left;">Return Request Info</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="color: #999; font-size: 14px; padding: 8px 0;">Product:</td>
+            <td style="color: #333; font-size: 14px; padding: 8px 0;">${order.productName || "-"}</td>
+          </tr>
+          <tr>
+            <td style="color: #999; font-size: 14px; padding: 8px 0;">Reason:</td>
+            <td style="color: #333; font-size: 14px; padding: 8px 0;">${order.returnReason || "-"}</td>
+          </tr>
+          <tr>
+            <td style="color: #999; font-size: 14px; padding: 8px 0;">Requested On:</td>
+            <td style="color: #333; font-size: 14px; padding: 8px 0;">${order.returnRequestedAt ? new Date(order.returnRequestedAt).toLocaleString() : "-"}</td>
+          </tr>
+        </table>
       </div>
 
       ${approvedNextSteps}
 
-      <div style="text-align: center;">
+      <div style="text-align: center; margin-top: 30px;">
         <a href="${process.env.CLIENT_URL}/orders/${order.id}"
            style="background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); color: #c9ad65; border: 1px solid #c9ad65; padding: 14px 30px; text-decoration: none; border-radius: 30px; font-weight: 600; display: inline-block;">
           View Order
