@@ -1,11 +1,79 @@
-const { ContactMessage } = require("../models");
+const { ContactMessage, Order, User } = require("../models");
 const { sendEmail, emailTemplates } = require("../config/email");
+const {
+  validateEmail,
+  validateGhanaPhone,
+} = require("../utils/inputValidation");
 
 // @desc    Submit contact form
 // @route   POST /api/contact
 const submitContact = async (req, res) => {
   try {
-    const { name, email, phone, subject, message } = req.body;
+    const { name, email, phone, subject, message, orderId } = req.body;
+
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.ok) {
+      return res.status(400).json({ message: emailCheck.message });
+    }
+
+    const phoneCheck = validateGhanaPhone(phone, { required: false });
+    if (!phoneCheck.ok) {
+      return res.status(400).json({ message: phoneCheck.message });
+    }
+
+    const isReturnRequest =
+      typeof subject === "string" && subject.toLowerCase().includes("return");
+
+    // If this is a return request with an orderId, prevent duplicate requests.
+    // Basic safeguard: only enforce if the order belongs to the same email.
+    let returnOrder = null;
+    if (isReturnRequest && orderId) {
+      try {
+        returnOrder = await Order.findByPk(orderId, {
+          include: [
+            {
+              model: User,
+              as: "user",
+              attributes: ["id", "email"],
+            },
+          ],
+        });
+
+        if (returnOrder) {
+          const orderEmail = String(returnOrder.user?.email || "").toLowerCase();
+          const requesterEmail = String(emailCheck.email || "").toLowerCase();
+          const isOwner =
+            Boolean(orderEmail) &&
+            Boolean(requesterEmail) &&
+            orderEmail === requesterEmail;
+
+          if (isOwner) {
+            const currentStatus = String(
+              returnOrder.returnApprovalStatus || "",
+            )
+              .toLowerCase()
+              .trim();
+
+            if (currentStatus === "not_approved") {
+              return res.status(403).json({
+                message:
+                  "This return request was not approved and cannot be requested again for this order.",
+              });
+            }
+
+            if (returnOrder.returnRequestedAt) {
+              return res.status(409).json({
+                message:
+                  "A return request has already been submitted for this order.",
+              });
+            }
+          }
+        }
+      } catch (returnCheckError) {
+        console.error("Return request pre-check failed:", returnCheckError);
+        // Don't block general contact form if the check fails.
+      }
+    }
 
     if (!name || !email || !subject || !message) {
       return res
@@ -15,17 +83,52 @@ const submitContact = async (req, res) => {
 
     const contact = await ContactMessage.create({
       name,
-      email,
-      phone,
+      email: emailCheck.email,
+      phone: phoneCheck.phone || phone,
       subject,
       message,
     });
+
+    // If this is a return request with an orderId, mark the order as return-requested.
+    // Basic safeguard: only update if the order belongs to the same email.
+    try {
+      if (isReturnRequest && orderId) {
+        const order =
+          returnOrder ||
+          (await Order.findByPk(orderId, {
+            include: [
+              {
+                model: User,
+                as: "user",
+                attributes: ["id", "email"],
+              },
+            ],
+          }));
+
+        if (order) {
+          const orderEmail = String(order.user?.email || "").toLowerCase();
+          const requesterEmail = String(emailCheck.email || "").toLowerCase();
+          if (orderEmail && requesterEmail && orderEmail === requesterEmail) {
+            order.returnRequestedAt = new Date();
+            order.returnApprovalStatus = "pending";
+            await order.save();
+          } else {
+            console.warn(
+              "Return request ignored: email mismatch for order",
+              orderId,
+            );
+          }
+        }
+      }
+    } catch (returnUpdateError) {
+      console.error("Return request marking failed:", returnUpdateError);
+    }
 
     // Send confirmation email to user
     try {
       const { subject: emailSubject, html } =
         emailTemplates.contactConfirmation(contact);
-      await sendEmail(email, emailSubject, html);
+      await sendEmail(emailCheck.email, emailSubject, html);
     } catch (emailError) {
       console.error("Contact confirmation email failed:", emailError);
     }
@@ -127,7 +230,7 @@ const updateMessage = async (req, res) => {
           `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); padding: 30px; text-align: center; border-bottom: 2px solid #c9ad65;">
-                <h1 style="color: #c9ad65; margin: 0; letter-spacing: 2px; text-transform: uppercase;">Diamond Vogue Gallery Support</h1>
+                <h1 style="color: #c9ad65; margin: 0; letter-spacing: 2px; text-transform: uppercase;">Diamond Aura Gallery Support</h1>
               </div>
               <div style="padding: 30px; background: #f9f9f9;">
                 <h2 style="color: #333;">Hi ${message.name},</h2>

@@ -459,20 +459,25 @@ const OrderSummary = () => {
                           {item.product?.name}
                         </h3>
                         <div className="mt-1 space-y-1">
-                          <p className="text-sm text-gray-500">
-                            Size: {item.size}
-                          </p>
-                          {getColorName() && (
-                            <p className="text-sm text-gray-500 flex items-center gap-2">
-                              Color:
-                              {getColorCode() && (
-                                <span
-                                  className="w-4 h-4 rounded-full border border-gray-300"
-                                  style={{ backgroundColor: getColorCode() }}
-                                ></span>
+                          {String(item.product?.category || "").toLowerCase() !==
+                            "perfumes" && (
+                            <>
+                              <p className="text-sm text-gray-500">
+                                Size: {item.size}
+                              </p>
+                              {getColorName() && (
+                                <p className="text-sm text-gray-500 flex items-center gap-2">
+                                  Color:
+                                  {getColorCode() && (
+                                    <span
+                                      className="w-4 h-4 rounded-full border border-gray-300"
+                                      style={{ backgroundColor: getColorCode() }}
+                                    ></span>
+                                  )}
+                                  {getColorName()}
+                                </p>
                               )}
-                              {getColorName()}
-                            </p>
+                            </>
                           )}
                           <p className="text-sm text-gray-500">
                             Quantity: {item.quantity}

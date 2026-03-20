@@ -7,6 +7,12 @@ const fs = require("fs");
 const axios = require("axios");
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const {
+  validateEmail,
+  validateGhanaPhone,
+  normalizeEmail,
+  validateAllowedSignupEmailDomain,
+} = require("../utils/inputValidation");
 
 const STRONG_PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
@@ -22,6 +28,23 @@ const register = async (req, res) => {
   try {
     const { firstName, lastName, email, password, phone, role } = req.body;
 
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.ok) {
+      return res.status(400).json({ message: emailCheck.message });
+    }
+
+    const allowedDomainCheck = validateAllowedSignupEmailDomain(
+      emailCheck.email,
+    );
+    if (!allowedDomainCheck.ok) {
+      return res.status(400).json({ message: allowedDomainCheck.message });
+    }
+
+    const phoneCheck = validateGhanaPhone(phone, { required: false });
+    if (!phoneCheck.ok) {
+      return res.status(400).json({ message: phoneCheck.message });
+    }
+
     if (!password) {
       return res.status(400).json({ message: "Password is required" });
     }
@@ -31,7 +54,9 @@ const register = async (req, res) => {
     }
 
     // Check if user exists
-    const userExists = await User.findOne({ where: { email } });
+    const userExists = await User.findOne({
+      where: { email: emailCheck.email },
+    });
     if (userExists) {
       return res
         .status(400)
@@ -46,9 +71,9 @@ const register = async (req, res) => {
     const user = await User.create({
       firstName,
       lastName,
-      email,
+      email: emailCheck.email,
       password,
-      phone,
+      phone: phoneCheck.phone || null,
       role: userRole,
     });
 
@@ -88,8 +113,13 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.ok) {
+      return res.status(400).json({ message: emailCheck.message });
+    }
+
     // Find user
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email: emailCheck.email } });
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
@@ -155,7 +185,13 @@ const updateProfile = async (req, res) => {
 
     if (firstName) user.firstName = firstName;
     if (lastName) user.lastName = lastName;
-    if (phone) user.phone = phone;
+    if (phone !== undefined) {
+      const phoneCheck = validateGhanaPhone(phone, { required: false });
+      if (!phoneCheck.ok) {
+        return res.status(400).json({ message: phoneCheck.message });
+      }
+      user.phone = phoneCheck.phone ? phoneCheck.phone : null;
+    }
     if (address) user.address = address;
 
     await user.save();
@@ -337,7 +373,12 @@ const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
-    const user = await User.findOne({ where: { email } });
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.ok) {
+      return res.status(400).json({ message: emailCheck.message });
+    }
+
+    const user = await User.findOne({ where: { email: emailCheck.email } });
     if (!user) {
       // Don't reveal if email exists or not for security
       return res.json({
@@ -501,7 +542,12 @@ const verifyEmail = async (req, res) => {
       return res.status(400).json({ message: "Email and OTP are required" });
     }
 
-    const user = await User.findOne({ where: { email } });
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.ok) {
+      return res.status(400).json({ message: emailCheck.message });
+    }
+
+    const user = await User.findOne({ where: { email: emailCheck.email } });
     if (!user) {
       return res.status(400).json({ message: "Invalid email or OTP" });
     }
@@ -569,8 +615,13 @@ const resendVerificationEmail = async (req, res) => {
       return res.status(400).json({ message: "Email is required" });
     }
 
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.ok) {
+      return res.status(400).json({ message: emailCheck.message });
+    }
+
     // Find user by email
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email: emailCheck.email } });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -624,11 +675,17 @@ const googleLogin = async (req, res) => {
 
     const { name, email, sub: googleId, picture } = googleResponse.data;
 
+    const googleEmail = normalizeEmail(email);
+    const emailCheck = validateEmail(googleEmail);
+    if (!emailCheck.ok) {
+      return res.status(400).json({ message: emailCheck.message });
+    }
+
     // Split name into first and last
     const [firstName, ...lastNameParts] = name.split(" ");
     const lastName = lastNameParts.join(" ") || "";
 
-    let user = await User.findOne({ where: { email } });
+    let user = await User.findOne({ where: { email: emailCheck.email } });
 
     if (user) {
       // User exists, update googleId if not present
@@ -643,7 +700,7 @@ const googleLogin = async (req, res) => {
       user = await User.create({
         firstName,
         lastName: lastName || "User",
-        email,
+        email: emailCheck.email,
         password: randomPassword,
         googleId,
         emailVerified: true,
@@ -695,17 +752,23 @@ const facebookLogin = async (req, res) => {
       });
     }
 
+    const fbEmail = normalizeEmail(email);
+    const emailCheck = validateEmail(fbEmail);
+    if (!emailCheck.ok) {
+      return res.status(400).json({ message: emailCheck.message });
+    }
+
     const [firstName, ...lastNameParts] = name.split(" ");
     const lastName = lastNameParts.join(" ") || "";
 
-    let user = await User.findOne({ where: { email } });
+    let user = await User.findOne({ where: { email: emailCheck.email } });
 
     if (!user) {
       const randomPassword = crypto.randomBytes(16).toString("hex");
       user = await User.create({
         firstName,
         lastName: lastName || "User",
-        email,
+        email: emailCheck.email,
         password: randomPassword,
         emailVerified: true,
         isActive: true,

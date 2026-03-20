@@ -59,7 +59,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <Providers>
           {children}
           <Toaster

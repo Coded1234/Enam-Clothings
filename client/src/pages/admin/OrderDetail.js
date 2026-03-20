@@ -21,6 +21,13 @@ const OrderDetail = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [updatingReturn, setUpdatingReturn] = useState(false);
+
+  const isPerfumeItem = (item) => {
+    const category =
+      item?.product?.category || item?.productCategory || item?.category;
+    return String(category || "").toLowerCase() === "perfumes";
+  };
 
   const statuses = [
     "pending",
@@ -68,10 +75,11 @@ const OrderDetail = () => {
     const itemRows = items
       .map((item) => {
         const name = item.productName || item.product?.name || "—";
-        const size = item.size ? `Size: ${item.size}` : "";
-        const color = item.color
-          ? `Color: ${typeof item.color === "object" ? item.color.name : item.color}`
-          : "";
+        const showVariants = !isPerfumeItem(item);
+        const size = showVariants && item.size ? `Size: ${item.size}` : "";
+        const colorName =
+          typeof item.color === "object" ? item.color?.name : item.color;
+        const color = showVariants && colorName ? `Color: ${colorName}` : "";
         const meta = [size, color].filter(Boolean).join(" · ");
         const qty = item.quantity || 1;
         const unit = parseFloat(item.price ?? 0) || 0;
@@ -141,7 +149,7 @@ const OrderDetail = () => {
   <div class="watermark wm-bottom"><img src="${logoUrl}" alt="" /></div>
   <div class="header">
     <div class="brand">
-      <img src="${logoUrl}" alt="Diamond Vogue Gallery" />
+      <img src="${logoUrl}" alt="Diamond Aura Gallery" />
       <div class="brand-sub">Premium Fashion &amp; Clothing · Accra, Ghana</div>
     </div>
     <div class="receipt-label">
@@ -196,7 +204,7 @@ const OrderDetail = () => {
     </div>
   </div>
   <div class="footer">
-    <span>Diamond Vogue Gallery · Accra, Ghana</span>
+    <span>Diamond Aura Gallery · Accra, Ghana</span>
     <span>Thank you for your order!</span>
   </div>
   <script>window.onload = function(){ window.print(); }<\/script>
@@ -230,6 +238,24 @@ const OrderDetail = () => {
       alert("Failed to update order status");
     } finally {
       setUpdatingStatus(false);
+    }
+  };
+
+  const handleReturnApprovalChange = async (newStatus) => {
+    try {
+      setUpdatingReturn(true);
+      await adminAPI.updateReturnApproval(id, {
+        returnApprovalStatus: newStatus,
+      });
+      setOrder((prev) => ({
+        ...prev,
+        returnApprovalStatus: newStatus,
+      }));
+    } catch (err) {
+      console.error("Failed to update return approval:", err);
+      alert("Failed to update return approval status");
+    } finally {
+      setUpdatingReturn(false);
     }
   };
 
@@ -333,6 +359,24 @@ const OrderDetail = () => {
                 ))}
               </select>
             )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs md:text-sm text-gray-500">Return:</span>
+            <select
+              value={order.returnApprovalStatus || ""}
+              onChange={(e) => handleReturnApprovalChange(e.target.value)}
+              disabled={updatingReturn}
+              className="px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm font-medium rounded-lg border cursor-pointer bg-white text-gray-800 border-gray-200"
+            >
+              <option value="" disabled>
+                {order.returnRequestedAt ? "Select" : "No request"}
+              </option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="not_approved">Not approved</option>
+            </select>
+            {updatingReturn && <LoadingSpinner size="small" />}
           </div>
         </div>
       </div>
@@ -441,9 +485,14 @@ const OrderDetail = () => {
                     {item.productName || item.product?.name || "Product"}
                   </h3>
                   <div className="text-xs md:text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap">
-                    {item.size && <span>Size: {item.size}</span>}
-                    {item.size && item.color && <span>•</span>}
-                    {item.color &&
+                    {!isPerfumeItem(item) && item.size && (
+                      <span>Size: {item.size}</span>
+                    )}
+                    {!isPerfumeItem(item) && item.size && item.color && (
+                      <span>•</span>
+                    )}
+                    {!isPerfumeItem(item) &&
+                      item.color &&
                       (() => {
                         const colorName =
                           typeof item.color === "object"

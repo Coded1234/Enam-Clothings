@@ -1,5 +1,6 @@
 const { Newsletter } = require("../models");
 const { sendEmail, emailTemplates } = require("../config/email");
+const { validateEmail } = require("../utils/inputValidation");
 
 // @desc    Subscribe to newsletter
 // @route   POST /api/newsletter/subscribe
@@ -7,12 +8,15 @@ const subscribe = async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.ok) {
+      return res.status(400).json({ message: emailCheck.message });
     }
 
     // Check if already subscribed
-    const existing = await Newsletter.findOne({ where: { email } });
+    const existing = await Newsletter.findOne({
+      where: { email: emailCheck.email },
+    });
 
     if (existing) {
       if (existing.isSubscribed) {
@@ -33,13 +37,15 @@ const subscribe = async (req, res) => {
     }
 
     // Create new subscription
-    await Newsletter.create({ email });
+    await Newsletter.create({ email: emailCheck.email });
 
     // Send welcome email
     try {
       // To Subscriber
-      const { subject, html } = emailTemplates.newsletterWelcome(email);
-      await sendEmail(email, subject, html);
+      const { subject, html } = emailTemplates.newsletterWelcome(
+        emailCheck.email,
+      );
+      await sendEmail(emailCheck.email, subject, html);
 
       // To Admin
       const adminTemplate = emailTemplates.adminNewsletterSubscription(email);
@@ -67,7 +73,14 @@ const unsubscribe = async (req, res) => {
   try {
     const { email } = req.body;
 
-    const subscription = await Newsletter.findOne({ where: { email } });
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.ok) {
+      return res.status(400).json({ message: emailCheck.message });
+    }
+
+    const subscription = await Newsletter.findOne({
+      where: { email: emailCheck.email },
+    });
 
     if (!subscription) {
       return res
@@ -125,7 +138,11 @@ const getStatus = async (req, res) => {
   try {
     const { email } = req.query;
     if (!email) return res.json({ isSubscribed: false });
-    const record = await Newsletter.findOne({ where: { email } });
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.ok) return res.json({ isSubscribed: false });
+    const record = await Newsletter.findOne({
+      where: { email: emailCheck.email },
+    });
     res.json({ isSubscribed: !!(record && record.isSubscribed) });
   } catch (error) {
     res.json({ isSubscribed: false });

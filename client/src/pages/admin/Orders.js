@@ -161,8 +161,20 @@ const Orders = () => {
                 filteredOrders.map((order) => (
                   <div key={order.id} className="px-4 py-3 space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-gray-900">
-                        #{order.orderNumber}
+                      <span className="text-sm font-semibold text-gray-900 inline-flex items-center gap-2">
+                        <span>#{order.orderNumber}</span>
+                        {order.returnRequestedAt &&
+                          String(
+                            order.returnApprovalStatus || "",
+                          ).toLowerCase() === "pending" && (
+                            <span
+                              className="relative flex h-2.5 w-2.5"
+                              aria-label="Return requested"
+                            >
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
+                              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600" />
+                            </span>
+                          )}
                       </span>
                       <Link
                         href={`/admin/orders/${order.id}`}
@@ -258,7 +270,21 @@ const Orders = () => {
                     filteredOrders.map((order) => (
                       <tr key={order.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          #{order.orderNumber}
+                          <span className="inline-flex items-center gap-2">
+                            <span>#{order.orderNumber}</span>
+                            {order.returnRequestedAt &&
+                              String(
+                                order.returnApprovalStatus || "",
+                              ).toLowerCase() === "pending" && (
+                                <span
+                                  className="relative flex h-2.5 w-2.5"
+                                  aria-label="Return requested"
+                                >
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
+                                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600" />
+                                </span>
+                              )}
+                          </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">

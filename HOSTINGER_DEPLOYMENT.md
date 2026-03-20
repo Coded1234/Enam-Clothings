@@ -1,6 +1,6 @@
 # Hostinger Deployment Guide
 
-This guide explains how to host the Diamond Vogue Gallery on **Hostinger VPS** (e.g., KVM 1 or higher).
+This guide explains how to host the Diamond Aura Gallery on **Hostinger VPS** (e.g., KVM 1 or higher).
 
 > **Shared Web Hosting vs VPS**
 >

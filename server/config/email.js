@@ -24,18 +24,39 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const htmlToText = (html) => {
+  const raw = String(html || "");
+  return raw
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/?(p|div|h1|h2|h3|h4|li|ul|ol|table|tr|td|th)[^>]*>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+};
+
 const sendEmail = async (to, subject, html, options = {}) => {
   try {
+    const fromValue =
+      process.env.EMAIL_FROM ||
+      `"Diamond Aura Gallery" <${process.env.EMAIL_USER}>`;
+    const replyToValue = process.env.EMAIL_REPLY_TO || process.env.EMAIL_USER;
+
     const mailOptions = {
-      from: `"Diamond Vogue Gallery" <${process.env.EMAIL_USER}>`,
-      replyTo: process.env.EMAIL_USER,
+      from: fromValue,
+      replyTo: replyToValue,
       to,
       subject,
       html,
+      text: options.text || htmlToText(html),
       ...options,
       headers: {
-        "X-Priority": "1",
-        "X-Mailer": "Diamond Vogue Gallery Mailer",
+        "X-Mailer": "Diamond Aura Gallery Mailer",
         ...(options.headers || {}),
       },
     };
@@ -62,7 +83,7 @@ const sendBulkEmail = async (recipients, subject, html) => {
       const batch = recipientList.slice(i, i + batchSize);
       const promises = batch.map((email) => {
         const mailOptions = {
-          from: `"Diamond Vogue Gallery" <${process.env.EMAIL_USER}>`,
+          from: `"Diamond Aura Gallery" <${process.env.EMAIL_USER}>`,
           to: email,
           subject,
           html,
@@ -80,7 +101,7 @@ const sendBulkEmail = async (recipients, subject, html) => {
 };
 
 // Helper for consistent email layout
-const getEmailLayout = (content, title = "Diamond Vogue Gallery") => `
+const getEmailLayout = (content, title = "Diamond Aura Gallery") => `
   <!DOCTYPE html>
   <html>
   <head>
@@ -92,7 +113,7 @@ const getEmailLayout = (content, title = "Diamond Vogue Gallery") => `
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 20px; margin-bottom: 20px;">
       <!-- Header -->
       <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); padding: 40px 20px; text-align: center; border-bottom: 2px solid #c9ad65;">
-        <img src="${process.env.CLIENT_URL}/images/loginlogo.png" alt="Diamond Vogue Gallery" style="height: 40px; width: auto; object-fit: contain;" />
+        <img src="${process.env.CLIENT_URL}/images/loginlogo.png" alt="Diamond Aura Gallery" style="height: 40px; width: auto; object-fit: contain;" />
       </div>
       
       <!-- Content -->
@@ -102,7 +123,7 @@ const getEmailLayout = (content, title = "Diamond Vogue Gallery") => `
       
       <!-- Footer -->
       <div style="background-color: #333333; color: #888888; padding: 20px; text-align: center; font-size: 12px;">
-        <p style="margin: 0 0 10px 0;">&copy; ${new Date().getFullYear()} Diamond Vogue Gallery. All rights reserved.</p>
+        <p style="margin: 0 0 10px 0;">&copy; ${new Date().getFullYear()} Diamond Aura Gallery. All rights reserved.</p>
         <p style="margin: 0;">
           <a href="${process.env.CLIENT_URL}" style="color: #aaaaaa; text-decoration: none;">Visit Store</a> | 
           <a href="${process.env.CLIENT_URL}/contact" style="color: #aaaaaa; text-decoration: none;">Contact Us</a>
@@ -281,10 +302,74 @@ const emailTemplates = {
     };
   },
 
+  returnApprovalUpdate: (order, user) => {
+    const status = String(order.returnApprovalStatus || "").toLowerCase();
+    const statusLabel =
+      status === "approved"
+        ? "APPROVED"
+        : status === "not_approved"
+          ? "NOT APPROVED"
+          : "PENDING";
+    const pillBg =
+      status === "approved"
+        ? "#dcfce7"
+        : status === "not_approved"
+          ? "#fee2e2"
+          : "#fef9c3";
+    const pillText =
+      status === "approved"
+        ? "#166534"
+        : status === "not_approved"
+          ? "#991b1b"
+          : "#854d0e";
+
+    const approvedNextSteps =
+      status === "approved"
+        ? `
+      <div style="margin: 0 0 30px; text-align: center;">
+        <p style="color: #555; font-size: 15px; line-height: 1.6; margin: 0;">
+          We will call you shortly to direct you on how to return the product.
+        </p>
+      </div>
+    `
+        : "";
+
+    const content = `
+      <h2 style="color: #333; margin-top: 0; text-align: center;">Return Request Update</h2>
+      <p style="text-align: center; color: #666; font-size: 16px;">Hi ${
+        user.firstName
+      }, there is an update on your return request.</p>
+
+      <div style="text-align: center; margin: 40px 0;">
+        <p style="color: #999; margin-bottom: 10px; font-size: 14px;">Order #${
+          order.orderNumber || order.id?.slice(-8).toUpperCase()
+        }</p>
+        <div style="display: inline-block; background-color: ${pillBg}; color: ${pillText}; padding: 10px 30px; border-radius: 50px; font-size: 18px; font-weight: 700; letter-spacing: 1px;">
+          ${statusLabel}
+        </div>
+      </div>
+
+      ${approvedNextSteps}
+
+      <div style="text-align: center;">
+        <a href="${process.env.CLIENT_URL}/orders/${order.id}"
+           style="background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); color: #c9ad65; border: 1px solid #c9ad65; padding: 14px 30px; text-decoration: none; border-radius: 30px; font-weight: 600; display: inline-block;">
+          View Order
+        </a>
+      </div>
+    `;
+    return {
+      subject: `Return Request ${statusLabel} - #${
+        order.orderNumber || order.id?.slice(-8).toUpperCase()
+      }`,
+      html: getEmailLayout(content, "Return Request Update"),
+    };
+  },
+
   welcomeEmail: (user) => {
     const content = `
       <h2 style="color: #333; margin-top: 0; text-align: center;">Welcome, ${user.firstName}!</h2>
-      <p style="text-align: center; color: #666; font-size: 16px;">We're thrilled to have you join the Diamond Vogue Gallery family.</p>
+      <p style="text-align: center; color: #666; font-size: 16px;">We're thrilled to have you join the Diamond Aura Gallery family.</p>
       
       <div style="margin: 30px 0; text-align: center;">
         <img src="https://img.icons8.com/clouds/200/000000/shopping-bag.png" alt="Shopping" style="width: 150px; height: auto;">
@@ -302,7 +387,7 @@ const emailTemplates = {
       </div>
     `;
     return {
-      subject: "Welcome to Diamond Vogue Gallery!",
+      subject: "Welcome to Diamond Aura Gallery!",
       html: getEmailLayout(content, "Welcome"),
     };
   },
@@ -378,7 +463,7 @@ const emailTemplates = {
       </div>
     `;
     return {
-      subject: "Welcome to Diamond Vogue Gallery Newsletter!",
+      subject: "Welcome to Diamond Aura Gallery Newsletter!",
       html: getEmailLayout(content, "Newsletter Subscription"),
     };
   },

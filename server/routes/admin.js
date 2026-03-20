@@ -11,6 +11,7 @@ const {
   deleteProductImage,
   getAllOrders,
   updateOrderStatus,
+  updateReturnApproval,
   getAllUsers,
   getAllCustomers,
   toggleCustomerStatus,
@@ -45,6 +46,7 @@ router.delete("/products/:id/images/:publicId", deleteProductImage);
 // Orders
 router.get("/orders", getAllOrders);
 router.put("/orders/:id/status", updateOrderStatus);
+router.put("/orders/:id/return-approval", updateReturnApproval);
 
 // Users
 router.get("/users", getAllUsers);

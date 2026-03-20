@@ -1,6 +1,7 @@
 const https = require("https");
 const { sendEmail, emailTemplates } = require("../config/email");
 const { Order, OrderItem, Product, User } = require("../models");
+const { validateEmail } = require("../utils/inputValidation");
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
 
@@ -36,6 +37,11 @@ const initializePayment = async (req, res) => {
       });
     }
 
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.ok) {
+      return res.status(400).json({ status: false, message: emailCheck.message });
+    }
+
     if (amount <= 0) {
       return res.status(400).json({
         status: false,
@@ -44,7 +50,7 @@ const initializePayment = async (req, res) => {
     }
 
     const params = JSON.stringify({
-      email,
+      email: emailCheck.email,
       amount: Math.round(amount * 100), // Convert to kobo and ensure integer
       metadata,
       callback_url: `${process.env.CLIENT_URL}/payment/verify`,

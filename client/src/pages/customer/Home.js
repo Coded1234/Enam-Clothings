@@ -1,19 +1,12 @@
 "use client";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFeaturedProducts } from "../../redux/slices/productSlice";
 import ProductCard from "../../components/customer/ProductCard";
 import IMAGES from "../../config/images";
-import {
-  FiTruck,
-  FiRefreshCw,
-  FiShield,
-  FiHeadphones,
-  FiArrowRight,
-} from "react-icons/fi";
+import { FiTruck, FiShield, FiHeadphones, FiArrowRight } from "react-icons/fi";
 import api from "../../utils/api";
 const Home = () => {
   const dispatch = useDispatch();
@@ -51,23 +44,26 @@ const Home = () => {
       console.error("Error fetching active coupon:", error);
     }
   };
-  const categories = [
-    {
-      name: "Men",
-      images: IMAGES.categorySlides?.men || [IMAGES.categories.men],
-      path: "/shop/men",
-    },
-    {
-      name: "Women",
-      images: IMAGES.categorySlides?.women || [IMAGES.categories.women],
-      path: "/shop/women",
-    },
-    {
-      name: "Perfumes",
-      images: IMAGES.categorySlides?.perfumes || [IMAGES.categories.perfumes],
-      path: "/shop/perfumes",
-    },
-  ];
+  const categories = useMemo(
+    () => [
+      {
+        name: "Men",
+        images: IMAGES.categorySlides?.men || [IMAGES.categories.men],
+        path: "/shop/men",
+      },
+      {
+        name: "Women",
+        images: IMAGES.categorySlides?.women || [IMAGES.categories.women],
+        path: "/shop/women",
+      },
+      {
+        name: "Perfumes",
+        images: IMAGES.categorySlides?.perfumes || [IMAGES.categories.perfumes],
+        path: "/shop/perfumes",
+      },
+    ],
+    [],
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -85,7 +81,7 @@ const Home = () => {
     }, 3500);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [categories]);
   const features = [
     { icon: FiTruck, title: "Free Shipping", desc: "On orders over GH₵1,000" },
     { icon: FiShield, title: "Secure Payment", desc: "100% secure checkout" },
@@ -519,12 +515,12 @@ const Home = () => {
               Follow Us on Instagram
             </h2>
             <a
-              href="https://www.instagram.com/diamondvoguegallery/?hl=it"
+              href="https://www.instagram.com/diamondauragallery/?hl=it"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center text-white/75 hover:text-amber-200 transition-colors text-sm sm:text-base"
             >
-              @diamondvoguegallery
+              @diamondauragallery
             </a>
           </div>
 
@@ -533,7 +529,7 @@ const Home = () => {
               {IMAGES.instagram.map((img, index) => (
                 <a
                   key={`instagram-${index}`}
-                  href="https://www.instagram.com/diamondvoguegallery/?hl=it"
+                  href="https://www.instagram.com/diamondauragallery/?hl=it"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`aspect-square rounded-xl overflow-hidden group relative ${index >= 4 ? "hidden md:block" : ""}`}
@@ -550,7 +546,7 @@ const Home = () => {
             </div>
             <div className="mt-6 text-center">
               <a
-                href="https://www.instagram.com/diamondvoguegallery/?hl=it"
+                href="https://www.instagram.com/diamondauragallery/?hl=it"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-white text-gray-900 px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-amber-100 transition-colors"

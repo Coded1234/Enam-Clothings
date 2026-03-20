@@ -6,8 +6,6 @@ import { useSelector } from "react-redux";
 import {
   FiMail,
   FiPhone,
-  FiMapPin,
-  FiClock,
   FiSend,
   FiMessageSquare,
   FiInstagram,
@@ -22,6 +20,7 @@ const Contact = () => {
     email: "",
     phone: "",
     subject: "",
+    returnReason: "",
     message: "",
   });
   const [attachments, setAttachments] = useState([]);
@@ -73,6 +72,8 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const isReturnRequest = formData.subject === "Returns & Refunds";
+
     if (
       !formData.name ||
       !formData.email ||
@@ -83,14 +84,46 @@ const Contact = () => {
       return;
     }
 
+    if (isReturnRequest && !formData.returnReason.trim()) {
+      toast.error("Please provide a reason for your return");
+      return;
+    }
+
     setLoading(true);
     try {
+      const orderId = searchParams.get("orderId") || "";
+      const orderNumber = searchParams.get("orderNumber") || "";
+      const shouldIncludeOrder = Boolean(orderId || orderNumber);
+
+      let composedMessage = formData.message;
+      if (isReturnRequest && formData.returnReason.trim()) {
+        const reasonLine = `Return Reason: ${formData.returnReason.trim()}`;
+        if (!composedMessage.includes(reasonLine)) {
+          composedMessage = `${reasonLine}\n\n${composedMessage}`;
+        }
+      }
+      if (shouldIncludeOrder) {
+        const headerLines = [
+          orderNumber ? `Order Number: ${orderNumber}` : null,
+          orderId ? `Order ID: ${orderId}` : null,
+        ].filter(Boolean);
+
+        const header = headerLines.join("\n");
+        if (header && !composedMessage.includes(headerLines[0])) {
+          composedMessage = `${header}\n\n${composedMessage}`;
+        }
+      }
+
       const payload = new FormData();
       payload.append("name", formData.name);
       payload.append("email", formData.email);
       payload.append("phone", formData.phone);
       payload.append("subject", formData.subject);
-      payload.append("message", formData.message);
+      payload.append("message", composedMessage);
+
+      if (orderId) payload.append("orderId", orderId);
+      if (orderNumber) payload.append("orderNumber", orderNumber);
+
       attachments.forEach((file) => payload.append("attachments", file));
 
       await api.post("/contact", payload, {
@@ -122,6 +155,34 @@ const Contact = () => {
       const incoming = searchParams.get("subject");
       const mapped = subjectMap[incoming] || incoming;
       setFormData((prev) => ({ ...prev, subject: mapped }));
+    }
+
+    // If this page was opened as a return request, prefill a structured template.
+    const orderId = searchParams.get("orderId");
+    const orderNumber = searchParams.get("orderNumber");
+    const isReturnFlow = Boolean(orderId || orderNumber);
+    if (isReturnFlow) {
+      setFormData((prev) => {
+        const next = { ...prev };
+
+        if (!next.subject || next.subject.trim() === "") {
+          next.subject = "Returns & Refunds";
+        }
+
+        const headerLines = [
+          orderNumber ? `Order Number: ${orderNumber}` : null,
+          orderId ? `Order ID: ${orderId}` : null,
+        ].filter(Boolean);
+        const header = headerLines.join("\n");
+
+        if (!next.message || next.message.trim() === "") {
+          next.message = `${header}${header ? "\n\n" : ""}Items to return:\n- \n\nPreferred resolution (Refund/Exchange):\n\nAdditional details:`;
+        } else if (header && !next.message.includes(headerLines[0])) {
+          next.message = `${header}\n\n${next.message}`;
+        }
+
+        return next;
+      });
     }
 
     // Prefill name/email/phone from logged-in user if available and fields are empty
@@ -189,6 +250,7 @@ const Contact = () => {
                     email: "",
                     phone: "",
                     subject: "",
+                    returnReason: "",
                     message: "",
                   });
                   setAttachments([]);
@@ -338,6 +400,23 @@ const Contact = () => {
                   </div>
                 </div>
 
+                {formData.subject === "Returns & Refunds" && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gold mb-2">
+                      Reason for Return <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="returnReason"
+                      value={formData.returnReason}
+                      onChange={handleChange}
+                      placeholder="Tell us why you want to return the item"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-black bg-white"
+                      required
+                    />
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gold mb-2">
                     Message <span className="text-red-500">*</span>
@@ -474,7 +553,7 @@ const Contact = () => {
                     <SiTiktok size={18} />
                   </a>
                   <a
-                    href="https://www.instagram.com/diamondvoguegallery/?hl=it"
+                    href="https://www.instagram.com/diamondauragallery/?hl=it"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity"

@@ -10,7 +10,7 @@ import {
 } from "../../redux/slices/authSlice";
 import IMAGES from "../../config/images";
 import toast from "react-hot-toast";
-import axios from "axios";
+import api from "../../utils/api";
 import { useGoogleLogin } from "@react-oauth/google";
 import CompleteProfileModal from "../../components/customer/CompleteProfileModal";
 import {
@@ -22,7 +22,6 @@ import {
   FiEyeOff,
   FiArrowRight,
   FiCheck,
-  FiCheckCircle,
 } from "react-icons/fi";
 
 const Register = () => {
@@ -37,8 +36,6 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
-  const [registrationSuccess, setRegistrationSuccess] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
 
@@ -96,7 +93,16 @@ const Register = () => {
   }, [error, dispatch]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "phone") {
+      // Keep only digits so users don't get blocked by hidden pattern mismatches.
+      const digitsOnly = String(value || "")
+        .replace(/\D/g, "")
+        .slice(0, 10);
+      setFormData({ ...formData, phone: digitsOnly });
+      return;
+    }
+    setFormData({ ...formData, [name]: value });
   };
 
   // Password strength checker
@@ -120,17 +126,39 @@ const Register = () => {
     "bg-green-500",
   ];
 
+  const STRONG_PASSWORD_REGEX =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+  const STRONG_PASSWORD_MESSAGE =
+    "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.";
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const ALLOWED_EMAIL_DOMAINS = new Set([
+    "gmail.com",
+    "yahoo.com",
+    "hotmail.com",
+  ]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const firstName = String(formData.firstName || "").trim();
+    const lastName = String(formData.lastName || "").trim();
+    const email = String(formData.email || "").trim();
+
     // Validation
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.password
-    ) {
+    if (!firstName || !lastName || !email || !formData.password) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (!EMAIL_REGEX.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    const emailDomain = email.toLowerCase().split("@")[1] || "";
+    if (!ALLOWED_EMAIL_DOMAINS.has(emailDomain)) {
+      toast.error("Enter a valid email address");
       return;
     }
 
@@ -139,15 +167,45 @@ const Register = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    if (!STRONG_PASSWORD_REGEX.test(formData.password)) {
+      toast.error(STRONG_PASSWORD_MESSAGE);
       return;
     }
 
-    if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
+    const phoneDigits = String(formData.phone).replace(/\D/g, "");
+    const phonePrefixes = [
+      "024",
+      "054",
+      "055",
+      "059",
+      "053",
+      "027",
+      "057",
+      "026",
+      "056",
+      "020",
+      "050",
+      "028",
+    ];
+    const blockedNumbers = ["0000000000", "1234567890", "0123456789"];
+
+    if (phoneDigits && !/^\d{10}$/.test(phoneDigits)) {
       toast.error(
         "Phone number must be exactly 10 digits (without country code)",
       );
+      return;
+    }
+
+    if (phoneDigits && blockedNumbers.includes(phoneDigits)) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
+
+    if (
+      phoneDigits &&
+      !phonePrefixes.some((prefix) => phoneDigits.startsWith(prefix))
+    ) {
+      toast.error(" Enter a valid phone number");
       return;
     }
 
@@ -158,20 +216,45 @@ const Register = () => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post("/api/auth/register", {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
+      await api.post("/auth/register", {
+        firstName,
+        lastName,
+        email,
+        phone: phoneDigits,
         password: formData.password,
       });
 
       toast.success(
         "Registration successful! Check your email for your 6-digit OTP code.",
       );
-      router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Registration failed");
+      const status = err.response?.status;
+      const message = String(err.response?.data?.message || "").trim();
+
+      if (status === 400 && /user already exists/i.test(message)) {
+        toast.error(
+          "This email is already registered. Please sign in or use another email.",
+        );
+        return;
+      }
+
+      if (status === 400 && /invalid email/i.test(message)) {
+        toast.error("Please enter a valid email address");
+        return;
+      }
+
+      if (status === 400 && /invalid email domain/i.test(message)) {
+        toast.error("Please use @gmail.com, @yahoo.com, or @hotmail.com");
+        return;
+      }
+
+      if (status === 400 && /invalid phone/i.test(message)) {
+        toast.error("Please enter a valid phone number");
+        return;
+      }
+
+      toast.error(message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -186,7 +269,7 @@ const Register = () => {
           <Link href="/" className="block text-center mb-8">
             <img
               src="/images/loginlogo.png"
-              alt="Diamond Vogue Gallery"
+              alt="Diamond Aura Gallery"
               className="h-10 w-auto object-contain mx-auto"
             />
           </Link>
@@ -209,7 +292,7 @@ const Register = () => {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
               {/* Name Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -293,15 +376,12 @@ const Register = () => {
                     onChange={handleChange}
                     placeholder="Enter mobile number"
                     autoComplete="off"
+                    inputMode="numeric"
                     maxLength="10"
-                    pattern="\d{10}"
                     className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-black"
                     style={{ backgroundColor: "white", color: "black" }}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Enter 10 digits only. Do not include country code (+233)
-                </p>
               </div>
 
               {/* Password */}
@@ -431,13 +511,19 @@ const Register = () => {
                 />
                 <label htmlFor="terms" className="text-sm text-gray-600">
                   I agree to the{" "}
-                  <a href="#" className="text-primary-500 hover:underline">
+                  <Link
+                    href="/terms"
+                    className="text-primary-500 hover:underline"
+                  >
                     Terms of Service
-                  </a>{" "}
+                  </Link>{" "}
                   and{" "}
-                  <a href="#" className="text-primary-500 hover:underline">
+                  <Link
+                    href="/privacy"
+                    className="text-primary-500 hover:underline"
+                  >
                     Privacy Policy
-                  </a>
+                  </Link>
                 </label>
               </div>
 
@@ -521,7 +607,7 @@ const Register = () => {
         <div className="absolute inset-0 bg-gradient-to-l from-primary-500/80 to-secondary-500/80 flex items-center justify-center">
           <div className="text-white text-center p-8 max-w-md">
             <h2 className="text-2xl font-bold mb-3">
-              Join Diamond Vogue Gallery
+              Join Diamond Aura Gallery
             </h2>
             <p className="text-base text-white/90 mb-8">
               Create an account and unlock exclusive benefits

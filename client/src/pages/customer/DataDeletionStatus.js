@@ -24,7 +24,7 @@ const DataDeletionStatus = () => {
         <p className="text-gray-600 dark:text-gray-300 mb-6">
           Your request to delete personal data associated with your Facebook
           account has been successfully processed. Your account information has
-          been removed from Diamond Vogue Gallery.
+          been removed from Diamond Aura Gallery.
         </p>
 
         {code && (

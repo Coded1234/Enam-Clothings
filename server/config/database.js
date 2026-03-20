@@ -60,8 +60,16 @@ const connectDB = async () => {
       console.log("✅ Database synchronized (alter)");
     } else {
       // In production, only create tables that don't exist yet (safe, never drops/alters)
-      await sequelize.sync({ force: false });
-      console.log("✅ Database synchronized (create-if-not-exists)");
+      // If you need to add new columns based on model changes, run once with DB_SYNC_ALTER=true.
+      const allowAlter =
+        String(process.env.DB_SYNC_ALTER || "").toLowerCase() === "true";
+      if (allowAlter) {
+        await sequelize.sync({ alter: true });
+        console.log("✅ Database synchronized (alter) [DB_SYNC_ALTER=true]");
+      } else {
+        await sequelize.sync({ force: false });
+        console.log("✅ Database synchronized (create-if-not-exists)");
+      }
     }
   } catch (error) {
     console.error("❌ PostgreSQL connection error:", error.message);

@@ -25,7 +25,7 @@ const Settings = () => {
 
   const [settings, setSettings] = useState({
     // General Settings
-    siteName: "Diamond Vogue Gallery",
+    siteName: "Diamond Aura Gallery",
     siteDescription: "Your one-stop shop for fashion",
     contactEmail: "diamondauragallery@gmail.com",
     contactPhone: "+233 XX XXX XXXX",

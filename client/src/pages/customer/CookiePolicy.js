@@ -21,7 +21,7 @@ Effective date: January 25, 2026
 
 1. Introduction
 
-This Cookie Policy explains how Diamond Vogue Gallery ("we", "us", "our") uses cookies and similar tracking technologies on our website.
+This Cookie Policy explains how Diamond Aura Gallery ("we", "us", "our") uses cookies and similar tracking technologies on our website.
 
 2. What are Cookies
 

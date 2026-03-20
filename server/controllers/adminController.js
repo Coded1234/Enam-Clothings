@@ -674,6 +674,74 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+// @desc    Update return approval status
+// @route   PUT /api/admin/orders/:id/return-approval
+const updateReturnApproval = async (req, res) => {
+  try {
+    const { returnApprovalStatus } = req.body;
+    const normalized = String(returnApprovalStatus || "")
+      .toLowerCase()
+      .trim();
+
+    const allowed = new Set(["pending", "approved", "not_approved"]);
+    if (!allowed.has(normalized)) {
+      return res.status(400).json({
+        message: "Invalid returnApprovalStatus. Use pending, approved, or not_approved.",
+      });
+    }
+
+    const order = await Order.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "firstName", "lastName", "email"],
+        },
+      ],
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // If admin sets a decision, ensure a request timestamp exists.
+    if (!order.returnRequestedAt) {
+      order.returnRequestedAt = new Date();
+    }
+
+    const previousReturnApprovalStatus = String(order.returnApprovalStatus || "")
+      .toLowerCase()
+      .trim();
+
+    order.returnApprovalStatus = normalized;
+    await order.save();
+
+    // Notify customer by email only when admin makes a decision.
+    // (Do not email for 'pending', and do not email if status didn't change.)
+    const decisionStatuses = new Set(["approved", "not_approved"]);
+    const didChange = previousReturnApprovalStatus !== normalized;
+    if (didChange && decisionStatuses.has(normalized)) {
+      try {
+        const { subject, html } = emailTemplates.returnApprovalUpdate(
+          order,
+          order.user,
+        );
+        await sendEmail(order.user.email, subject, html);
+      } catch (emailError) {
+        console.error("Return approval email failed:", emailError);
+      }
+    }
+
+    res.json(order);
+  } catch (error) {
+    console.error("Error updating return approval:", error);
+    res.status(500).json({
+      message: "Error updating return approval",
+      error: error.message,
+    });
+  }
+};
+
 // ============ USERS ============
 
 // @desc    Get all users (customers and admins)
@@ -1097,6 +1165,7 @@ module.exports = {
   deleteProductImage,
   getAllOrders,
   updateOrderStatus,
+  updateReturnApproval,
   getAllUsers,
   getAllCustomers,
   toggleCustomerStatus,

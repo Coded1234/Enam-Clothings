@@ -98,6 +98,16 @@ const Order = sequelize.define(
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+
+    // Returns
+    returnRequestedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    returnApprovalStatus: {
+      type: DataTypes.ENUM("pending", "approved", "not_approved"),
+      allowNull: true,
+    },
   },
   {
     tableName: "orders",

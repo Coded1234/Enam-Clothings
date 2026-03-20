@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { validateGhanaPhone } = require("../utils/inputValidation");
 
 // Yango Delivery API Configuration
 const YANGO_API_URL =
@@ -31,6 +32,11 @@ exports.calculateShippingRate = async (req, res) => {
       });
     }
 
+    const phoneCheck = validateGhanaPhone(phone, { required: false });
+    if (!phoneCheck.ok) {
+      return res.status(400).json({ success: false, message: phoneCheck.message });
+    }
+
     // Geocode the destination address
     const destinationCoords = await geocodeAddress({
       address,
@@ -50,7 +56,7 @@ exports.calculateShippingRate = async (req, res) => {
     const shippingRate = await getYangoShippingRate(
       STORE_LOCATION,
       destinationCoords,
-      { address, city, postalCode, phone },
+      { address, city, postalCode, phone: phoneCheck.phone || phone },
     );
 
     res.json({

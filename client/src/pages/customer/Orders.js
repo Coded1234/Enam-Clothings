@@ -1,30 +1,38 @@
 "use client";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
-import api from "../../utils/api";
-import { getImageUrl } from "../../utils/imageUrl";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
-  FiPackage,
-  FiTruck,
   FiCheckCircle,
-  FiClock,
-  FiXCircle,
   FiChevronRight,
-  FiSearch,
-  FiFilter,
-  FiShoppingBag,
+  FiClock,
   FiEye,
+  FiFilter,
   FiRefreshCw,
+  FiSearch,
+  FiShoppingBag,
+  FiTruck,
+  FiXCircle,
 } from "react-icons/fi";
+import api from "../../utils/api";
+import { getImageUrl } from "../../utils/imageUrl";
 
 const Orders = () => {
+  const router = useRouter();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 5;
+
+  const handleCardClick = (orderId) => {
+    if (typeof window === "undefined") return;
+    if (window.innerWidth < 640) {
+      router.push(`/orders/${orderId}`);
+    }
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -56,6 +64,28 @@ const Orders = () => {
     }
   };
 
+  const getDeliveredDate = (order) => {
+    if (!order) return null;
+    if (order.deliveredAt) return new Date(order.deliveredAt);
+    const history = Array.isArray(order.statusHistory) ? order.statusHistory : [];
+    const deliveredEntry = history
+      .slice()
+      .reverse()
+      .find((h) => (h?.status || "").toLowerCase() === "delivered");
+    if (deliveredEntry?.date) return new Date(deliveredEntry.date);
+    return null;
+  };
+
+  const isReturnEligible = (order) => {
+    const deliveredDate = getDeliveredDate(order);
+    if (!deliveredDate || Number.isNaN(deliveredDate.getTime())) return false;
+
+    const returnWindowDays = 14;
+    const diffMs = new Date().getTime() - deliveredDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 && diffDays <= returnWindowDays;
+  };
+
   const getTotalQuantity = (items) => {
     if (!items || items.length === 0) return 0;
     return items.reduce((sum, item) => sum + (item.quantity || 1), 0);
@@ -84,7 +114,7 @@ const Orders = () => {
       delivered: FiCheckCircle,
       cancelled: FiXCircle,
     };
-    return icons[status] || FiPackage;
+    return icons[status] || FiClock;
   };
 
   const getStatusColor = (status) => {
@@ -107,18 +137,19 @@ const Orders = () => {
     { value: "cancelled", label: "Cancelled" },
   ];
 
-  // Filter and search orders
   const filteredOrders = orders.filter((order) => {
     const matchesFilter = filter === "all" || order.status === filter;
+    const q = searchQuery.toLowerCase();
     const matchesSearch =
-      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      q === "" ||
+      (order.orderNumber || "").toLowerCase().includes(q) ||
+      (order.id || "").toLowerCase().includes(q) ||
       order.items?.some((item) =>
-        item.productName?.toLowerCase().includes(searchQuery.toLowerCase()),
+        (item.productName || "").toLowerCase().includes(q),
       );
     return matchesFilter && matchesSearch;
   });
 
-  // Pagination
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
   const startIndex = (currentPage - 1) * ordersPerPage;
   const paginatedOrders = filteredOrders.slice(
@@ -126,16 +157,18 @@ const Orders = () => {
     startIndex + ordersPerPage,
   );
 
-  // Loading State
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg)] py-8">
         <div className="container mx-auto px-4">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-48 mb-8"></div>
+            <div className="h-8 bg-gray-200 dark:bg-white/10 rounded w-48 mb-8"></div>
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl p-6 h-40"></div>
+                <div
+                  key={i}
+                  className="bg-white dark:bg-surface rounded-2xl p-6 h-40 border border-gray-100 dark:border-white/10"
+                ></div>
               ))}
             </div>
           </div>
@@ -145,20 +178,19 @@ const Orders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg)] py-8">
       <div className="container mx-auto px-4">
-        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-gold-light mb-2">
             My Orders
           </h1>
-          <p className="text-gray-600">Track and manage your orders</p>
+          <p className="text-gray-600 dark:text-primary-300">
+            Track and manage your orders
+          </p>
         </div>
 
-        {/* Filters & Search */}
-        <div className="bg-white rounded-2xl shadow-sm p-4 mb-6">
+        <div className="bg-white dark:bg-surface rounded-2xl shadow-sm p-4 mb-6 border border-gray-100 dark:border-white/10">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
             <div className="flex-1 relative">
               <FiSearch
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -166,14 +198,13 @@ const Orders = () => {
               />
               <input
                 type="text"
-                placeholder="Search by order ID or product name..."
+                placeholder="Search by order ID, order number, or product name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-black bg-white"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-black dark:text-white placeholder-black dark:placeholder:text-white/70 bg-white dark:bg-white/[0.03]"
               />
             </div>
 
-            {/* Filter Dropdown */}
             <div className="relative">
               <FiFilter
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -185,7 +216,7 @@ const Orders = () => {
                   setFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-11 pr-8 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 appearance-none bg-white w-full md:min-w-[160px]"
+                className="pl-11 pr-8 py-3 border border-gray-300 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 appearance-none bg-white dark:bg-white/[0.03] w-full md:min-w-[170px] text-gray-900 dark:text-white"
               >
                 {filterOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -197,16 +228,15 @@ const Orders = () => {
           </div>
         </div>
 
-        {/* Orders List */}
         {filteredOrders.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+          <div className="bg-white dark:bg-surface rounded-2xl shadow-sm p-12 text-center border border-gray-100 dark:border-white/10">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-white/10 rounded-full flex items-center justify-center">
               <FiShoppingBag className="text-gray-400" size={40} />
             </div>
-            <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-2">
+            <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 dark:text-gold-light mb-2">
               No orders found
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-primary-300 mb-6">
               {filter !== "all"
                 ? `You don't have any ${filter} orders`
                 : "You haven't placed any orders yet"}
@@ -220,115 +250,187 @@ const Orders = () => {
             </Link>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {paginatedOrders.map((order) => {
               const StatusIcon = getStatusIcon(order.status);
+              const orderDisplayNumber =
+                order.orderNumber || `#${order.id.slice(-8).toUpperCase()}`;
+              const firstItemName =
+                order.items?.[0]?.product?.name || order.items?.[0]?.productName;
+              const extraCount = Math.max(0, (order.items?.length || 0) - 1);
+
               return (
                 <div
                   key={order.id}
-                  className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                  className="bg-white dark:bg-surface rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-white/10 cursor-pointer sm:cursor-default"
+                  onClick={() => handleCardClick(order.id)}
                 >
-                  {/* Order Header */}
-                  <div className="px-4 md:px-6 pt-4 pb-3 border-b border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+                  <div className="px-4 md:px-6 py-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                      <div className="flex items-start gap-3 min-w-0">
                         <div
-                          className={`p-2 rounded-xl ${getStatusColor(order.status)}`}
+                          className={`mt-0.5 p-2 rounded-xl ${getStatusColor(order.status)}`}
                         >
                           <StatusIcon size={16} />
                         </div>
-                        <div>
-                          <p className="font-bold text-gray-800 text-xs">
-                            {order.orderNumber ||
-                              `#${order.id.slice(-8).toUpperCase()}`}
-                            <span className="font-normal text-gray-400 mx-1.5">
-                              ·
-                            </span>
-                            <span className="font-normal text-gray-500">
-                              {formatDate(order.createdAt)}
-                            </span>
+                        <div className="min-w-0">
+                          <p className="font-bold text-gray-800 dark:text-gold-light text-sm truncate">
+                            {orderDisplayNumber}
                           </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="font-bold text-gray-800 text-sm">
-                              {formatPrice(order.totalAmount)}
-                            </span>
+                          <div className="mt-1 flex items-center gap-2 flex-wrap">
+                            <p className="text-xs text-gray-500 dark:text-primary-300">
+                              Placed {formatDate(order.createdAt)}
+                            </p>
                             <span
-                              className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(order.status)}`}
+                              className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(order.status)}`}
                             >
                               {order.status}
                             </span>
                           </div>
                         </div>
                       </div>
+
+                      <div className="flex items-center justify-between sm:justify-end gap-3">
+                        <div className="text-left sm:text-right">
+                          <p className="text-sm font-bold text-gray-800 dark:text-gold-light">
+                            {formatPrice(order.totalAmount)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Order Items Preview */}
-                  <Link
-                    href={`/orders/${order.id}`}
-                    className="block p-4 md:p-6 bg-gray-50 hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        {/* Product Images */}
+                  <div className="px-4 md:px-6 py-4 bg-gray-50 dark:bg-white/[0.03] border-t border-gray-100 dark:border-white/10">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 min-w-0">
                         <div className="flex -space-x-3 flex-shrink-0">
-                          {order.items?.slice(0, 4).map((item, index) => (
+                          {order.items?.slice(0, 3).map((item, index) => (
                             <img
                               key={index}
                               src={getImageUrl(item.productImage)}
                               alt={item.productName}
-                              className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg border-2 border-white object-cover"
+                              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl border-2 border-white dark:border-surface object-cover"
                             />
                           ))}
-                          {order.items?.length > 4 && (
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg border-2 border-white bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-600">
-                              +{order.items.length - 4}
+                          {order.items?.length > 3 && (
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl border-2 border-white dark:border-surface bg-gray-200 dark:bg-white/10 flex items-center justify-center text-xs font-semibold text-gray-700 dark:text-white/80">
+                              +{order.items.length - 3}
                             </div>
                           )}
                         </div>
+
                         <div className="min-w-0">
-                          <p className="text-sm text-gray-600">
-                            {getTotalQuantity(order.items)} item(s)
+                          <p className="text-sm font-semibold text-gray-800 dark:text-gold-light truncate">
+                            {firstItemName || "Order items"}
+                            {extraCount > 0 ? ` +${extraCount} more` : ""}
                           </p>
-                          <p className="text-sm text-gray-500 truncate max-w-[120px] sm:max-w-[200px]">
-                            {order.items?.[0]?.product?.name ||
-                              order.items?.[0]?.productName}
-                            {order.items?.length > 1 && " and more..."}
+                          <p className="text-xs text-gray-600 dark:text-primary-300 mt-1">
+                            {getTotalQuantity(order.items)} item(s)
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         {order.status === "pending" && (
                           <button
                             onClick={(e) => {
                               e.preventDefault();
+                              e.stopPropagation();
                               cancelOrder(order.id);
                             }}
-                            className="flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors font-medium text-sm"
+                            className="inline-flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-white/5 rounded-lg transition-colors font-medium text-sm"
                           >
                             <FiXCircle size={18} />
                             <span className="hidden sm:inline">Cancel</span>
                           </button>
                         )}
-                        <FiChevronRight className="text-gray-400" size={20} />
+
+                        {order.status === "delivered" && isReturnEligible(order) && (
+                          <div className="flex flex-col items-end">
+                            <button
+                              disabled={Boolean(order.returnRequestedAt)}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (order.returnRequestedAt) return;
+                                const returnHref = `/contact?subject=${encodeURIComponent(
+                                  "Returns & Exchanges",
+                                )}&orderId=${encodeURIComponent(
+                                  order.id,
+                                )}&orderNumber=${encodeURIComponent(
+                                  order.orderNumber ||
+                                    `Order #${order.id.slice(-8).toUpperCase()}`,
+                                )}`;
+                                router.push(returnHref);
+                              }}
+                              className="inline-flex items-center gap-2 px-3 py-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-white/5 rounded-lg transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent"
+                              title={
+                                order.returnRequestedAt
+                                  ? "Return request already submitted"
+                                  : undefined
+                              }
+                            >
+                              <FiRefreshCw size={18} />
+                              <span className="hidden sm:inline">Request Return</span>
+                            </button>
+                            {order.returnRequestedAt && (
+                              <p
+                                className={`text-[11px] mt-1 ${
+                                  String(order.returnApprovalStatus || "")
+                                    .toLowerCase()
+                                    .trim() === "approved"
+                                    ? "text-green-600"
+                                    : String(order.returnApprovalStatus || "")
+                                          .toLowerCase()
+                                          .trim() === "not_approved"
+                                      ? "text-red-600"
+                                      : "text-yellow-700"
+                                }`}
+                              >
+                                {(() => {
+                                  const s = String(
+                                    order.returnApprovalStatus || "pending",
+                                  )
+                                    .toLowerCase()
+                                    .trim();
+                                  const label =
+                                    s === "approved"
+                                      ? "Approved"
+                                      : s === "not_approved"
+                                        ? "Not approved"
+                                        : "Pending";
+                                  return `Return: ${label}`;
+                                })()}
+                              </p>
+                            )}
+                          </div>
+                        )}
+
+                        <Link
+                          href={`/orders/${order.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm text-gray-700 dark:text-white/90 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                        >
+                          <FiEye size={18} />
+                          <span className="hidden sm:inline">View</span>
+                          <FiChevronRight className="text-gray-400" size={18} />
+                        </Link>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 </div>
               );
             })}
           </div>
         )}
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <div className="mt-8 flex justify-center">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-lg border border-gray-300 dark:border-white/10 text-gray-600 dark:text-white/80 hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
@@ -340,7 +442,7 @@ const Orders = () => {
                   className={`w-10 h-10 text-sm rounded-lg font-medium transition-colors ${
                     currentPage === i + 1
                       ? "bg-primary-500 text-white"
-                      : "border border-gray-300 text-gray-600 hover:bg-gray-50"
+                      : "border border-gray-300 dark:border-white/10 text-gray-600 dark:text-white/80 hover:bg-gray-50 dark:hover:bg-white/5"
                   }`}
                 >
                   {i + 1}
@@ -352,7 +454,7 @@ const Orders = () => {
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
-                className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-lg border border-gray-300 dark:border-white/10 text-gray-600 dark:text-white/80 hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>

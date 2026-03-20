@@ -1,4 +1,4 @@
-# Diamond Vogue Gallery - E-commerce Store
+# Diamond Aura Gallery - E-commerce Store
 
 A full-stack e-commerce clothing store built with Next.js, Node.js, Express, and PostgreSQL.
 

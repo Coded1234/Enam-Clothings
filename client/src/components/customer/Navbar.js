@@ -245,7 +245,7 @@ const Navbar = () => {
           <Link href="/" className="flex items-center">
             <img
               src="/images/loginlogo.png"
-              alt="Diamond Vogue Gallery"
+              alt="Diamond Aura Gallery"
               className="h-10 md:h-12 w-auto max-w-[220px] object-contain"
             />
           </Link>
@@ -529,7 +529,7 @@ const Navbar = () => {
             >
               <img
                 src="/images/loginlogo.png"
-                alt="Diamond Vogue Gallery"
+                alt="Diamond Aura Gallery"
                 className="h-8 md:h-12 w-auto max-w-[220px] object-contain"
               />
             </Link>

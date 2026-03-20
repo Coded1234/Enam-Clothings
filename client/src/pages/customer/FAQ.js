@@ -199,14 +199,14 @@ const FAQ = () => {
       category: "security",
       question: "Can I delete my account?",
       answer:
-        "Yes. You can delete your account yourself from your Profile: go to your account or Security settings and choose \"Delete Account\". Once deleted, your account cannot be recovered. We may retain some anonymized information for legal purposes.",
+        'Yes. You can delete your account yourself from your Profile: go to your account or Security settings and choose "Delete Account". Once deleted, your account cannot be recovered. We may retain some anonymized information for legal purposes.',
     },
     {
       id: 24,
       category: "security",
       question: "How can I unsubscribe from promotional emails?",
       answer:
-        "You can unsubscribe from newsletter and promotional emails in your account: go to your Profile and turn off the newsletter subscription, or use the \"Unsubscribe\" link at the bottom of our promotional emails. You will still receive important transactional emails like order confirmations and shipping updates.",
+        'You can unsubscribe from newsletter and promotional emails in your account: go to your Profile and turn off the newsletter subscription, or use the "Unsubscribe" link at the bottom of our promotional emails. You will still receive important transactional emails like order confirmations and shipping updates.',
     },
   ];
 
@@ -337,12 +337,10 @@ const FAQ = () => {
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link
-                href="/contact"
-                state={{
-                  subject:
-                    categories.find((c) => c.id === activeCategory)?.name ||
+                href={`/contact?subject=${encodeURIComponent(
+                  categories.find((c) => c.id === activeCategory)?.name ||
                     "Support",
-                }}
+                )}`}
                 className="inline-flex items-center justify-center gap-2 bg-white text-primary-600 px-6 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-colors"
               >
                 Email Support
