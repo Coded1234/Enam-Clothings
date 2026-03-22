@@ -597,14 +597,18 @@ const emailTemplates = {
   },
 
   contactConfirmation: (contact) => {
+    const formattedMessage = (contact.message || "").replace(/\n/g, "<br/>");
+
     const content = `
       <h2 style="color: #333; margin-top: 0; text-align: center;">Message Received</h2>
       <p style="text-align: center; color: #666; font-size: 16px;">Hi ${contact.name}, thanks for reaching out.</p>
       
       <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin: 30px 0;">
         <h3 style="color: #333; font-size: 16px; margin-top: 0;">We've received your message:</h3>
-        <p style="color: #666; font-weight: 600; margin-bottom: 5px;">${contact.subject}</p>
-        <p style="color: #666; font-style: italic;">"${contact.message}"</p>
+        <p style="color: #666; font-weight: 600; margin-bottom: 12px; font-size: 15px;">${contact.subject}</p>
+        <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; border: 1px solid #eeeeee; color: #555; line-height: 1.6; font-size: 14px;">
+          ${formattedMessage}
+        </div>
       </div>
       
       <p style="text-align: center; color: #666;">We will get back to you within 24-48 hours.</p>

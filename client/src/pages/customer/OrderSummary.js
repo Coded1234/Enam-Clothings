@@ -161,7 +161,12 @@ const OrderSummary = () => {
 
         if (paymentResponse.data.status && paymentResponse.data.data) {
           // Redirect to Paystack payment page
-          window.location.href = paymentResponse.data.data.authorization_url;
+          const authUrl = paymentResponse.data.data.authorization_url;
+          if (authUrl && authUrl.startsWith("https://")) {
+            window.location.href = authUrl;
+          } else {
+            throw new Error("Invalid payment URL received");
+          }
         } else {
           throw new Error("Payment initialization failed");
         }

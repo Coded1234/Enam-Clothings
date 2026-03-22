@@ -1,4 +1,5 @@
 import { Toaster } from "react-hot-toast";
+import Script from "next/script";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -50,14 +51,12 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){const t=localStorage.getItem('theme');const theme=t||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.classList.add(theme);})();`,
-          }}
-        />
+        <Script id="theme-matcher" strategy="beforeInteractive">
+          {`(function(){const t=localStorage.getItem('theme');const theme=t||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.classList.add(theme);})();`}
+        </Script>
       </head>
       <body suppressHydrationWarning>
         <Providers>

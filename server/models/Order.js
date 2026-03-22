@@ -121,10 +121,14 @@ const Order = sequelize.define(
     ],
     hooks: {
       beforeCreate: (order) => {
-        // Generate order number
-        const timestamp = Date.now().toString(36).toUpperCase();
-        const random = crypto.randomBytes(2).toString("hex").toUpperCase();
-        order.orderNumber = `ORD-${timestamp}-${random}`;
+        // Generate order number (exactly 7 random alphanumeric characters)
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const randomBytes = crypto.randomBytes(7);
+        let randomStr = "";
+        for (let i = 0; i < 7; i++) {
+          randomStr += chars[randomBytes[i] % chars.length];
+        }
+        order.orderNumber = `DAG-${randomStr}`;
 
         // Initialize status history
         order.statusHistory = [

@@ -163,7 +163,37 @@ const createProduct = async (req, res) => {
     console.log("Create product request body:", req.body);
     console.log("Create product files:", req.files);
 
-    const productData = { ...req.body };
+    const {
+      name,
+      description,
+      price,
+      originalPrice,
+      brand,
+      categoryId,
+      totalStock,
+      featured,
+      isActive,
+      sizes,
+      colors,
+      status,
+    } = req.body;
+    const productData = {
+      name,
+      description,
+      price,
+      originalPrice,
+      brand,
+      categoryId,
+      totalStock,
+      featured,
+      isActive,
+      sizes,
+      colors,
+      status,
+    };
+    Object.keys(productData).forEach(
+      (key) => productData[key] === undefined && delete productData[key],
+    );
 
     // Handle images from multer (file uploads)
     if (req.files && req.files.length > 0) {
@@ -283,7 +313,35 @@ const updateProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    const updateData = { ...req.body };
+    const {
+      name,
+      description,
+      price,
+      originalPrice,
+      brand,
+      categoryId,
+      totalStock,
+      featured,
+      isActive,
+      sizes,
+      colors,
+    } = req.body;
+    const updateData = {
+      name,
+      description,
+      price,
+      originalPrice,
+      brand,
+      categoryId,
+      totalStock,
+      featured,
+      isActive,
+      sizes,
+      colors,
+    };
+    Object.keys(updateData).forEach(
+      (key) => updateData[key] === undefined && delete updateData[key],
+    );
     let images = [];
 
     // Handle existing images (kept from form)
@@ -686,7 +744,8 @@ const updateReturnApproval = async (req, res) => {
     const allowed = new Set(["pending", "approved", "not_approved"]);
     if (!allowed.has(normalized)) {
       return res.status(400).json({
-        message: "Invalid returnApprovalStatus. Use pending, approved, or not_approved.",
+        message:
+          "Invalid returnApprovalStatus. Use pending, approved, or not_approved.",
       });
     }
 
@@ -709,9 +768,20 @@ const updateReturnApproval = async (req, res) => {
       order.returnRequestedAt = new Date();
     }
 
-    const previousReturnApprovalStatus = String(order.returnApprovalStatus || "")
+    const previousReturnApprovalStatus = String(
+      order.returnApprovalStatus || "",
+    )
       .toLowerCase()
       .trim();
+
+    if (
+      previousReturnApprovalStatus === "approved" ||
+      previousReturnApprovalStatus === "not_approved"
+    ) {
+      return res.status(400).json({
+        message: "Return status is already locked and cannot be changed.",
+      });
+    }
 
     order.returnApprovalStatus = normalized;
     await order.save();

@@ -242,11 +242,11 @@ const Navbar = () => {
           </button>
 
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center flex-shrink-0 mr-4">
             <img
               src="/images/loginlogo.png"
               alt="Diamond Aura Gallery"
-              className="h-10 md:h-12 w-auto max-w-[220px] object-contain"
+              className="h-10 md:h-16 w-auto max-w-[250px] object-contain"
             />
           </Link>
 
@@ -524,13 +524,13 @@ const Navbar = () => {
           <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary-500 to-secondary-500">
             <Link
               href="/"
-              className="flex items-center"
+              className="flex items-center flex-shrink-0"
               onClick={() => setMobileMenuOpen(false)}
             >
               <img
                 src="/images/loginlogo.png"
                 alt="Diamond Aura Gallery"
-                className="h-8 md:h-12 w-auto max-w-[220px] object-contain"
+                className="h-10 md:h-12 w-auto max-w-[250px] object-contain"
               />
             </Link>
             <button

@@ -309,35 +309,35 @@ const OrderDetail = () => {
     <div className="space-y-4 md:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/admin/orders")}
-            className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 md:p-2.5 hover:bg-gray-100 rounded-xl border border-transparent hover:border-gray-200 transition-all bg-white shadow-sm"
           >
-            <FiArrowLeft size={20} className="md:w-6 md:h-6" />
+            <FiArrowLeft size={20} className="text-gray-600" />
           </button>
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
               Order #{order.orderNumber}
             </h1>
-            <p className="text-xs md:text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mt-0.5">
               Placed on {new Date(order.createdAt).toLocaleString()}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 md:gap-4 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={handlePrint}
-            className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-200 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm transition-all"
           >
-            <FiPrinter size={16} className="md:w-[18px] md:h-[18px]" />
+            <FiPrinter size={16} />
             <span className="hidden sm:inline">Print</span>
           </button>
-          <div className="flex items-center gap-2">
-            <span className="text-xs md:text-sm text-gray-500">Status:</span>
+          <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded-xl border border-gray-200 shadow-sm">
+            <span className="text-sm text-gray-500 font-medium pl-2">Status:</span>
             {order.status === "delivered" || order.status === "cancelled" ? (
               <span
-                className={`px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm font-medium rounded-lg border ${getStatusColor(
+                className={`px-3 py-1 text-sm font-medium rounded-lg border ${getStatusColor(
                   order.status,
                 )}`}
               >
@@ -348,7 +348,7 @@ const OrderDetail = () => {
                 value={order.status}
                 onChange={(e) => handleStatusChange(e.target.value)}
                 disabled={updatingStatus}
-                className={`px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm font-medium rounded-lg border cursor-pointer ${getStatusColor(
+                className={`px-3 py-1 text-sm font-medium rounded-lg border cursor-pointer appearance-none ${getStatusColor(
                   order.status,
                 )}`}
               >
@@ -361,23 +361,22 @@ const OrderDetail = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs md:text-sm text-gray-500">Return:</span>
-            <select
-              value={order.returnApprovalStatus || ""}
-              onChange={(e) => handleReturnApprovalChange(e.target.value)}
-              disabled={updatingReturn}
-              className="px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm font-medium rounded-lg border cursor-pointer bg-white text-gray-800 border-gray-200"
-            >
-              <option value="" disabled>
-                {order.returnRequestedAt ? "Select" : "No request"}
-              </option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="not_approved">Not approved</option>
-            </select>
-            {updatingReturn && <LoadingSpinner size="small" />}
-          </div>
+          {order.returnRequestedAt && (
+            <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded-xl border border-gray-200 shadow-sm">
+              <span className="text-sm text-gray-500 font-medium pl-2">Return:</span>
+              <select
+                value={order.returnApprovalStatus || "pending"}
+                onChange={(e) => handleReturnApprovalChange(e.target.value)}
+                disabled={updatingReturn || order.returnApprovalStatus === "approved" || order.returnApprovalStatus === "not_approved"}
+                className={`px-3 py-1 text-sm font-medium rounded-lg border appearance-none ${order.returnApprovalStatus === 'approved' || order.returnApprovalStatus === 'not_approved' ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200' : 'cursor-pointer bg-white text-gray-800 border-gray-200'}`}
+              >
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="not_approved">Not approved</option>
+              </select>
+              {updatingReturn && <LoadingSpinner size="small" />}
+            </div>
+          )}
         </div>
       </div>
 
@@ -397,8 +396,8 @@ const OrderDetail = () => {
           />
           <span>
             {order.status === "delivered"
-              ? "This order has been delivered. Status is now locked."
-              : "This order has been cancelled. Status is now locked."}
+              ? "This order has been delivered."
+              : "This order has been cancelled."}
           </span>
         </div>
       )}
@@ -426,20 +425,20 @@ const OrderDetail = () => {
                     className="relative flex flex-col items-center"
                   >
                     <div
-                      className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center z-10 ${
+                      className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center z-10 transition-colors ${
                         isCompleted
                           ? "bg-primary-600 text-white"
                           : "bg-gray-200 text-gray-500"
                       } ${isCurrent ? "ring-4 ring-primary-100" : ""}`}
                     >
                       {isCompleted ? (
-                        <FiCheck size={14} className="md:w-4 md:h-4" />
+                        <FiCheck size={16} />
                       ) : (
-                        index + 1
+                        <span className="text-sm font-medium">{index + 1}</span>
                       )}
                     </div>
                     <span
-                      className={`mt-2 text-xs font-medium capitalize ${
+                      className={`mt-2 text-sm font-medium capitalize ${
                         isCompleted ? "text-primary-600" : "text-gray-500"
                       }`}
                     >
@@ -527,23 +526,23 @@ const OrderDetail = () => {
             ))}
           </div>
           <div className="p-4 md:p-6 bg-gray-50 space-y-2 md:space-y-3">
-            <div className="flex justify-between text-xs md:text-sm text-gray-600">
+            <div className="flex justify-between text-sm md:text-base text-gray-600">
               <span>Subtotal</span>
               <span>{formatCurrency(order.subtotal || order.totalAmount)}</span>
             </div>
-            <div className="flex justify-between text-xs md:text-sm text-gray-600">
+            <div className="flex justify-between text-sm md:text-base text-gray-600">
               <span>Shipping</span>
               <span>
                 {formatCurrency(order.shippingFee || order.shippingCost || 0)}
               </span>
             </div>
             {order.discount > 0 && (
-              <div className="flex justify-between text-xs md:text-sm text-green-600">
+              <div className="flex justify-between text-sm md:text-base text-green-600">
                 <span>Discount</span>
                 <span>-{formatCurrency(order.discount)}</span>
               </div>
             )}
-            <div className="flex justify-between text-base md:text-lg font-bold text-gray-800 pt-2 md:pt-3 border-t">
+            <div className="flex justify-between text-lg md:text-xl font-bold text-gray-900 pt-3 md:pt-4 border-t mt-3">
               <span>Total</span>
               <span>{formatCurrency(order.totalAmount)}</span>
             </div>
@@ -559,28 +558,26 @@ const OrderDetail = () => {
               Customer
             </h2>
             <div className="space-y-2 md:space-y-3">
-              <p className="font-medium text-gray-800 text-sm md:text-base">
+              <p className="font-medium text-gray-900 text-sm md:text-base">
                 {order.user?.firstName} {order.user?.lastName}
               </p>
-              <p className="text-gray-600 text-xs md:text-sm">
-                {order.user?.email}
-              </p>
-              <p className="text-gray-600 text-xs md:text-sm">
-                {order.user?.phone}
-              </p>
+              <div className="flex flex-col gap-1 text-gray-500 text-sm">
+                <p>{order.user?.email}</p>
+                <p>{order.user?.phone}</p>
+              </div>
             </div>
           </div>
 
           {/* Shipping Address */}
           <div className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 shadow-sm">
             <h2 className="text-base md:text-lg font-bold text-gray-800 flex items-center gap-2 mb-3 md:mb-4">
-              <FiMapPin size={18} className="md:w-5 md:h-5" />
+              <FiMapPin size={18} className="md:w-5 md:h-5 text-gray-400" />
               Shipping Address
             </h2>
-            <div className="space-y-2 text-gray-600 text-xs md:text-sm">
-              <p>{order.shippingAddress?.address}</p>
+            <div className="space-y-2 text-gray-500 text-sm">
+              <p className="text-gray-900 font-medium">{order.shippingAddress?.address}</p>
               {order.shippingAddress?.addressDetails && (
-                <p className="text-gray-700">
+                <p>
                   {order.shippingAddress.addressDetails}
                 </p>
               )}
@@ -596,22 +593,22 @@ const OrderDetail = () => {
           {/* Payment Info */}
           <div className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 shadow-sm">
             <h2 className="text-base md:text-lg font-bold text-gray-800 flex items-center gap-2 mb-3 md:mb-4">
-              <FiCreditCard size={18} className="md:w-5 md:h-5" />
+              <FiCreditCard size={18} className="md:w-5 md:h-5 text-gray-400" />
               Payment
             </h2>
-            <div className="space-y-2 md:space-y-3">
-              <div className="flex justify-between text-xs md:text-sm">
-                <span className="text-gray-600">Method</span>
-                <span className="font-medium">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center text-sm border-b border-gray-50 pb-2">
+                <span className="text-gray-500">Method</span>
+                <span className="font-medium text-gray-900">
                   {order.paymentMethod === "cod"
                     ? "Pay on Delivery"
                     : "Paystack"}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Status</span>
+              <div className="flex justify-between items-center text-sm border-b border-gray-50 pb-2">
+                <span className="text-gray-500">Status</span>
                 <span
-                  className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  className={`px-3 py-1 text-sm font-medium rounded-full ${
                     order.paymentStatus === "paid"
                       ? "bg-green-100 text-green-800"
                       : "bg-yellow-100 text-yellow-800"
@@ -621,9 +618,9 @@ const OrderDetail = () => {
                 </span>
               </div>
               {order.paymentReference && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Reference</span>
-                  <span className="font-mono text-sm">
+                <div className="flex justify-between items-center text-sm pt-1">
+                  <span className="text-gray-500">Reference</span>
+                  <span className="font-mono text-gray-900">
                     {order.paymentReference}
                   </span>
                 </div>

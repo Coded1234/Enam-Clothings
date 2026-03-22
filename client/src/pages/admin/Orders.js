@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import {
   FiSearch,
@@ -13,6 +14,7 @@ import { adminAPI } from "../../utils/api";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const Orders = () => {
+  const router = useRouter();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -159,7 +161,11 @@ const Orders = () => {
             <div className="md:hidden divide-y divide-gray-100">
               {filteredOrders.length > 0 ? (
                 filteredOrders.map((order) => (
-                  <div key={order.id} className="px-4 py-3 space-y-1.5">
+                  <div 
+                    key={order.id} 
+                    className="px-4 py-3 space-y-1.5 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => router.push(`/admin/orders/${order.id}`)}
+                  >
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-semibold text-gray-900 inline-flex items-center gap-2">
                         <span>#{order.orderNumber}</span>
@@ -178,6 +184,7 @@ const Orders = () => {
                       </span>
                       <Link
                         href={`/admin/orders/${order.id}`}
+                        onClick={(e) => e.stopPropagation()}
                         className="p-1.5 text-primary-600 hover:bg-primary-50 rounded-lg"
                       >
                         <FiEye size={16} />
@@ -203,9 +210,11 @@ const Orders = () => {
                       ) : (
                         <select
                           value={order.status}
-                          onChange={(e) =>
-                            handleStatusChange(order.id, e.target.value)
-                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleStatusChange(order.id, e.target.value);
+                          }}
                           disabled={updatingStatus === order.id}
                           className={`text-xs font-medium rounded-full px-2 py-0.5 border-0 cursor-pointer ${getStatusColor(order.status)}`}
                         >
@@ -268,7 +277,11 @@ const Orders = () => {
                 <tbody className="divide-y divide-gray-200">
                   {filteredOrders.length > 0 ? (
                     filteredOrders.map((order) => (
-                      <tr key={order.id} className="hover:bg-gray-50">
+                      <tr 
+                        key={order.id} 
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => router.push(`/admin/orders/${order.id}`)}
+                      >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           <span className="inline-flex items-center gap-2">
                             <span>#{order.orderNumber}</span>
@@ -320,9 +333,11 @@ const Orders = () => {
                             ) : (
                               <select
                                 value={order.status}
-                                onChange={(e) =>
-                                  handleStatusChange(order.id, e.target.value)
-                                }
+                                onClick={(e) => e.stopPropagation()}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  handleStatusChange(order.id, e.target.value);
+                                }}
                                 disabled={updatingStatus === order.id}
                                 className={`text-xs font-medium rounded-full px-2 py-1 border-0 cursor-pointer ${getStatusColor(order.status)}`}
                               >
@@ -352,6 +367,7 @@ const Orders = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <Link
                             href={`/admin/orders/${order.id}`}
+                            onClick={(e) => e.stopPropagation()}
                             className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-900 text-sm font-medium"
                           >
                             <FiEye size={16} />

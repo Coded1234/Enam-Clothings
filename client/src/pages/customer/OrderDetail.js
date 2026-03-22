@@ -145,7 +145,7 @@ const OrderDetail = () => {
       return { eligible: false, daysRemaining: null, deliveredDate: null };
     }
 
-    const returnWindowDays = 14;
+    const returnWindowDays = 2; // Reduced to 2 days
     const now = new Date();
     const diffMs = now.getTime() - deliveredDate.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));

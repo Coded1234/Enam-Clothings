@@ -2,8 +2,39 @@
 const path = require("path");
 
 const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
+          {
+            key: "Permissions-Policy",
+            value:
+              "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+          },
+        ],
+      },
+    ];
+  },
   // Explicitly include pg in Vercel lambda — sequelize loads it dynamically
   // and the file tracer can't detect dynamic require(dialectModule) calls.
+  outputFileTracingRoot: path.join(__dirname, "./"),
   outputFileTracingIncludes: {
     "/api/**": [
       "./node_modules/pg/**/*",

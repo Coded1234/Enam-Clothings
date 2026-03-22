@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const User = sequelize.define(
   "User",
@@ -122,7 +123,7 @@ User.prototype.getFullName = function () {
 // Instance method to generate 6-digit email verification OTP
 // Stored as "<otp>|<expiryMs>" in emailVerificationToken — no new column needed
 User.prototype.generateEmailOTP = function () {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 100000–999999
+  const otp = crypto.randomInt(100000, 1000000).toString(); // 100000–999999
   const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes from now
   this.emailVerificationToken = `${otp}|${expiry}`;
   return otp;

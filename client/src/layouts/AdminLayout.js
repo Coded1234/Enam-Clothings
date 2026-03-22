@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "../redux/slices/authSlice";
 import { useTheme } from "../context/ThemeContext";
 import ScrollToTop from "../components/common/ScrollToTop";
+import { ordersAPI } from "../utils/api";
 import {
   FiHome, FiShoppingBag, FiShoppingCart, FiUsers, FiStar,
   FiMenu, FiX, FiLogOut, FiChevronDown, FiBarChart2, FiTag,
@@ -28,6 +29,7 @@ const AdminLayout = ({ children }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { theme, toggleTheme } = useTheme();
+  const [dynamicHeader, setDynamicHeader] = useState("");
 
   const menuItems = [
     { path: "/admin", icon: FiHome, label: "Dashboard" },
@@ -71,17 +73,50 @@ const AdminLayout = ({ children }) => {
     };
   }, [sidebarOpen]);
 
+  useEffect(() => {
+    const fetchDynamicHeader = async () => {
+      setDynamicHeader("");
+      if (pathname.startsWith("/admin/orders/") && pathname.split("/").length === 4) {
+        const orderId = pathname.split("/").pop();
+        if (orderId && orderId !== "orders") {
+          try {
+            const { data } = await ordersAPI.getById(orderId);
+            if (data?.orderNumber) {
+              setDynamicHeader(`Order #${data.orderNumber}`);
+            }
+          } catch (err) {
+            console.error("Failed to fetch order title info:", err);
+          }
+        }
+      }
+    };
+    fetchDynamicHeader();
+  }, [pathname]);
+
+  const getPageTitle = () => {
+    const matchedItem = menuItems.find((item) => item.path === pathname);
+    if (matchedItem) return matchedItem.label;
+
+    if (dynamicHeader) return dynamicHeader;
+
+    if (pathname.startsWith("/admin/orders/")) {
+      return "Order Details";
+    }
+
+    return "Admin";
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 text-gray-700 transition-transform duration-300 flex flex-col`}>
-        <div className="pt-4 pb-20 px-4 flex items-center justify-between border-b border-gray-200">
-          <Link href="/admin" className="flex items-center">
-            <img src="/images/loginlogo.png" alt="Diamond Aura Gallery" className="h-10 w-auto object-contain" />
+        <div className="h-[72px] px-4 flex items-center justify-between border-b border-gray-200">
+          <Link href="/admin" className="flex items-center w-full justify-center">
+            <img src="/images/loginlogo.png" alt="Diamond Aura Gallery" className="h-12 w-auto object-contain max-w-full" />
           </Link>
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg hover:bg-gray-50 lg:hidden">
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg hover:bg-gray-50 lg:hidden absolute right-4 top-4">
             <FiX size={20} />
           </button>
         </div>
@@ -108,13 +143,13 @@ const AdminLayout = ({ children }) => {
         </div>
       </aside>
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
-        <header className="bg-white shadow-sm px-4 md:px-6 py-4 flex items-center justify-between">
+        <header className="h-[72px] bg-white shadow-xs border-b border-gray-200 px-4 md:px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-gray-100 -ml-2">
               <FiMenu size={20} />
             </button>
             <h1 className="text-lg md:text-xl font-semibold text-gray-800">
-              {menuItems.find((item) => item.path === pathname)?.label || "Admin"}
+              {getPageTitle()}
             </h1>
           </div>
           <div className="relative" ref={dropdownRef}>

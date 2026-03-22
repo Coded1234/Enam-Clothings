@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import {
   FiPlus,
@@ -18,6 +18,7 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const Products = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -91,57 +92,64 @@ const Products = () => {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      {/* Header: search + add button */}
-      <div className="flex items-center gap-2">
-        <form onSubmit={handleSearch} className="flex-1">
-          <div className="relative">
-            <FiSearch
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              size={16}
-            />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2 md:py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
-            />
-          </div>
-        </form>
+      {/* Controls: Search, Filter, Add Button */}
+      <div className="flex flex-col md:flex-row gap-3 md:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 flex-1 md:max-w-2xl">
+          {/* Search */}
+          <form onSubmit={handleSearch} className="flex-1">
+            <div className="relative">
+              <FiSearch
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={18}
+              />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 shadow-sm"
+              />
+            </div>
+          </form>
 
+          {/* Filter */}
+          <div className="relative w-full sm:w-48 flex-shrink-0 border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden flex items-center">
+            <div className="pl-3 text-gray-400">
+              <FiFilter size={16} />
+            </div>
+            <select
+              value={categoryFilter}
+              onChange={(e) => {
+                setCategoryFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full bg-transparent py-2.5 pl-2 pr-8 text-sm focus:outline-none focus:ring-0 text-gray-700 cursor-pointer appearance-none"
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Add Button */}
         <Link
           href="/admin/products/new"
-          className="inline-flex items-center justify-center bg-primary-600 text-white w-10 h-10 rounded-full hover:bg-primary-700 transition-colors flex-shrink-0"
-          title="Add Product"
+          className="flex items-center justify-center gap-2 bg-primary-600 text-white px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-colors shadow-sm font-medium w-full md:w-auto"
         >
-          <FiPlus size={20} />
+          <FiPlus size={18} />
+          <span>Add Product</span>
         </Link>
       </div>
 
-      {/* Filters (category only) */}
-      <div className="bg-white rounded-lg md:rounded-xl p-3 md:p-4 shadow-sm">
-        <div className="flex items-center gap-2">
-          <FiFilter className="text-gray-400" size={16} />
-          <select
-            value={categoryFilter}
-            onChange={(e) => {
-              setCategoryFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
       {/* Products Table */}
-      <div className="bg-white rounded-lg md:rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg md:rounded-xl shadow-sm overflow-hidden border border-gray-100">
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <LoadingSpinner size="large" />
@@ -154,7 +162,8 @@ const Products = () => {
                 products.map((product) => (
                   <div
                     key={product.id}
-                    className="flex items-center gap-3 px-4 py-3"
+                    className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => router.push(`/admin/products/${product.id}/edit`)}
                   >
                     {/* Image */}
                     <div className="h-12 w-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
@@ -219,12 +228,16 @@ const Products = () => {
                     <div className="flex flex-col gap-1 flex-shrink-0">
                       <Link
                         href={`/admin/products/${product.id}/edit`}
+                        onClick={(e) => e.stopPropagation()}
                         className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         <FiEdit2 size={15} />
                       </Link>
                       <button
-                        onClick={() => handleDeleteClick(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(product);
+                        }}
                         className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         <FiTrash2 size={15} />
@@ -267,7 +280,11 @@ const Products = () => {
                 <tbody className="divide-y divide-gray-200">
                   {products.length > 0 ? (
                     products.map((product) => (
-                      <tr key={product.id} className="hover:bg-gray-50">
+                      <tr 
+                        key={product.id} 
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => router.push(`/admin/products/${product.id}/edit`)}
+                      >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="h-12 w-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
@@ -300,7 +317,7 @@ const Products = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 capitalize">
+                          <span className="text-sm font-medium text-gray-800 capitalize">
                             {product.category}
                           </span>
                         </td>
@@ -355,12 +372,16 @@ const Products = () => {
                           <div className="flex items-center justify-end gap-2">
                             <Link
                               href={`/admin/products/${product.id}/edit`}
+                              onClick={(e) => e.stopPropagation()}
                               className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             >
                               <FiEdit2 size={16} />
                             </Link>
                             <button
-                              onClick={() => handleDeleteClick(product)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteClick(product);
+                              }}
                               className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             >
                               <FiTrash2 size={16} />

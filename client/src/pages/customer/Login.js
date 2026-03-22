@@ -159,7 +159,7 @@ const Login = () => {
             <img
               src="/images/loginlogo.png"
               alt="Diamond Aura Gallery"
-              className="h-12 w-auto object-contain mx-auto"
+              className="h-20 w-auto object-contain mx-auto max-w-full"
             />
           </Link>
 

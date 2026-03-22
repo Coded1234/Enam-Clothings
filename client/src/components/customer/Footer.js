@@ -90,7 +90,7 @@ const Footer = () => {
             <img
               src="/images/loginlogo.png"
               alt="Diamond Aura Gallery"
-              className="h-10 w-auto object-contain mb-5 mx-auto sm:mx-0"
+              className="h-16 w-auto object-contain mb-5 mx-auto sm:mx-0"
             />
             <p className="text-gray-300 mb-4">
               Your one-stop destination for premium fashion and clothing.

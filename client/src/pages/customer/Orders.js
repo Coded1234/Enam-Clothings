@@ -29,9 +29,7 @@ const Orders = () => {
 
   const handleCardClick = (orderId) => {
     if (typeof window === "undefined") return;
-    if (window.innerWidth < 640) {
-      router.push(`/orders/${orderId}`);
-    }
+    router.push(`/orders/${orderId}`);
   };
 
   useEffect(() => {
@@ -80,7 +78,7 @@ const Orders = () => {
     const deliveredDate = getDeliveredDate(order);
     if (!deliveredDate || Number.isNaN(deliveredDate.getTime())) return false;
 
-    const returnWindowDays = 14;
+    const returnWindowDays = 2; // Reduced to 2 days
     const diffMs = new Date().getTime() - deliveredDate.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     return diffDays >= 0 && diffDays <= returnWindowDays;
@@ -262,7 +260,7 @@ const Orders = () => {
               return (
                 <div
                   key={order.id}
-                  className="bg-white dark:bg-surface rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-white/10 cursor-pointer sm:cursor-default"
+                  className="bg-white dark:bg-surface rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-white/10 cursor-pointer hover:shadow-md transition-shadow"
                   onClick={() => handleCardClick(order.id)}
                 >
                   <div className="px-4 md:px-6 py-4">

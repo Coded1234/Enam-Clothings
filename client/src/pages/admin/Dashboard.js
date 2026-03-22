@@ -136,11 +136,8 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-          Dashboard
-        </h1>
-        <p className="text-xs text-gray-400">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-1 mb-2">
+        <p className="text-xs text-gray-400 font-medium">
           {new Date().toLocaleDateString("en-GH", {
             weekday: "long",
             year: "numeric",

@@ -46,10 +46,15 @@ app.use(
 // Rate limiting
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === "production" ? 500 : 2000,
+  max: (req) => {
+    // Apply a higher limit for GET requests instead of completely skipping them
+    if (req.method === "GET") {
+      return process.env.NODE_ENV === "production" ? 2000 : 5000;
+    }
+    return process.env.NODE_ENV === "production" ? 500 : 2000;
+  },
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => req.method === "GET", // GET requests are read-only, skip limiting
   message: { message: "Too many requests, please try again later." },
 });
 
@@ -69,10 +74,11 @@ app.use(
     origin: (origin, callback) => {
       // Allow no-origin requests (server-to-server, curl, Postman)
       if (!origin) return callback(null, true);
-      // Allow all Vercel deployment URLs and localhost
+      // Allow exact predefined deployment domains
       if (
         origin === process.env.CLIENT_URL ||
-        /^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(origin) ||
+        origin === "https://diamondauragallery.vercel.app" ||
+        origin === "https://diamondauragallery-admin.vercel.app" ||
         /^http:\/\/localhost(:\d+)?$/.test(origin)
       ) {
         return callback(null, true);

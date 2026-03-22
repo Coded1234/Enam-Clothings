@@ -168,7 +168,8 @@ const Reviews = () => {
                 filteredReviews.map((review) => (
                   <div
                     key={review.id}
-                    className="flex items-start gap-3 px-4 py-3"
+                    className="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setSelectedReview(review)}
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
@@ -197,15 +198,19 @@ const Reviews = () => {
                     </div>
                     <div className="flex flex-col gap-1 flex-shrink-0 mt-0.5">
                       <button
-                        onClick={() => setSelectedReview(review)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedReview(review);
+                        }}
                         className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"
                       >
                         <FiEye size={15} />
                       </button>
                       <button
-                        onClick={() =>
-                          handleToggleApproval(review.id, review.isApproved)
-                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleApproval(review.id, review.isApproved);
+                        }}
                         disabled={togglingId === review.id}
                         className={`p-1.5 rounded-lg ${review.isApproved ? "text-red-600 hover:bg-red-50" : "text-green-600 hover:bg-green-50"}`}
                       >
@@ -258,7 +263,11 @@ const Reviews = () => {
                 <tbody className="divide-y divide-gray-200">
                   {filteredReviews.length > 0 ? (
                     filteredReviews.map((review) => (
-                      <tr key={review.id} className="hover:bg-gray-50">
+                      <tr 
+                        key={review.id} 
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => setSelectedReview(review)}
+                      >
                         <td className="px-2 md:px-6 py-2 md:py-4 hidden lg:table-cell">
                           <div className="flex items-center">
                             <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -281,6 +290,7 @@ const Reviews = () => {
                             <div className="ml-3">
                               <Link
                                 href={`/admin/products/${review.productId}/edit`}
+                                onClick={(e) => e.stopPropagation()}
                                 className="text-sm font-medium text-gray-900 hover:text-primary-600"
                               >
                                 {review.product?.name || "Product"}
@@ -321,19 +331,23 @@ const Reviews = () => {
                         <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-1 md:gap-2">
                             <button
-                              onClick={() => setSelectedReview(review)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedReview(review);
+                              }}
                               className="md:hidden p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                               title="View Details"
                             >
                               <FiEye size={16} />
                             </button>
                             <button
-                              onClick={() =>
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 handleToggleApproval(
                                   review.id,
                                   review.isApproved,
-                                )
-                              }
+                                );
+                              }}
                               disabled={togglingId === review.id}
                               className={`p-1.5 md:p-2 rounded-lg transition-colors ${
                                 review.isApproved

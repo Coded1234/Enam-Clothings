@@ -120,7 +120,8 @@ const Customers = () => {
                 filteredCustomers.map((customer) => (
                   <div
                     key={customer.id}
-                    className="flex items-center gap-3 px-4 py-3"
+                    className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setSelectedCustomer(customer)}
                   >
                     <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-primary-700 font-semibold text-sm">
@@ -153,18 +154,22 @@ const Customers = () => {
                     </div>
                     <div className="flex flex-col gap-1 flex-shrink-0">
                       <button
-                        onClick={() => setSelectedCustomer(customer)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCustomer(customer);
+                        }}
                         className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"
                       >
                         <FiUser size={15} />
                       </button>
                       <button
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation();
                           handleToggleStatus(
                             customer.id,
                             customer.isActive !== false,
-                          )
-                        }
+                          );
+                        }}
                         disabled={togglingId === customer.id}
                         className={`p-1.5 rounded-lg ${customer.isActive !== false ? "text-green-600 hover:bg-green-50" : "text-red-600 hover:bg-red-50"}`}
                       >
@@ -217,7 +222,11 @@ const Customers = () => {
                 <tbody className="divide-y divide-gray-200">
                   {filteredCustomers.length > 0 ? (
                     filteredCustomers.map((customer) => (
-                      <tr key={customer.id} className="hover:bg-gray-50">
+                      <tr 
+                        key={customer.id} 
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => setSelectedCustomer(customer)}
+                      >
                         <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="w-8 h-8 md:w-10 md:h-10 bg-primary-100 rounded-full flex items-center justify-center">
@@ -288,19 +297,23 @@ const Customers = () => {
                         <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-1 md:gap-2">
                             <button
-                              onClick={() => setSelectedCustomer(customer)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedCustomer(customer);
+                              }}
                               className="p-1.5 md:p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                               title="View Details"
                             >
                               <FiUser size={14} className="md:w-4 md:h-4" />
                             </button>
                             <button
-                              onClick={() =>
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 handleToggleStatus(
                                   customer.id,
                                   customer.isActive !== false,
-                                )
-                              }
+                                );
+                              }}
                               disabled={togglingId === customer.id}
                               className={`p-1.5 md:p-2 rounded-lg transition-colors ${
                                 customer.isActive !== false

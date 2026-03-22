@@ -349,11 +349,23 @@ const cancelOrder = async (req, res) => {
 const trackOrder = async (req, res) => {
   try {
     const order = await Order.findByPk(req.params.id, {
-      attributes: ["status", "statusHistory", "trackingNumber", "createdAt"],
+      attributes: [
+        "status",
+        "statusHistory",
+        "trackingNumber",
+        "createdAt",
+        "userId",
+      ],
     });
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (order.userId !== req.user.id && req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to view tracking info" });
     }
 
     res.json({

@@ -222,32 +222,56 @@ const Shop = () => {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Page Header */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4 sm:py-8">
-          <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-800 capitalize">
-            {category || "All Products"}
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">
-            {pagination.total} products found
-          </p>
+      <div className="bg-white border-b border-gray-200">
+        <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-[1400px] mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight capitalize">
+                {category || "All Products"}
+              </h1>
+              <p className="text-sm font-medium text-gray-500 mt-1.5">
+                {pagination.total} product{pagination.total !== 1 ? 's' : ''} found
+              </p>
+            </div>
+            
+            {/* Active Filters Summary Pills */}
+            <div className="flex flex-wrap items-center gap-2">
+              {filters.size && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">
+                  Size: {filters.size}
+                  <button onClick={() => handleFilterChange("size", "")} className="hover:text-red-500 transition-colors">
+                    <FiX size={14} />
+                  </button>
+                </span>
+              )}
+              {filters.color && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">
+                  Color: {filters.color}
+                  <button onClick={() => handleFilterChange("color", "")} className="hover:text-red-500 transition-colors">
+                    <FiX size={14} />
+                  </button>
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex gap-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-[1400px] mx-auto">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Sidebar Filters - Desktop */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+          <aside className="hidden lg:block w-72 flex-shrink-0">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
+                <h2 className="text-lg font-bold text-gray-900 tracking-wide">
                   Filters
                 </h2>
                 {activeFiltersCount > 0 && (
                   <button
                     onClick={handleClearFilters}
-                    className="text-xs sm:text-sm text-primary-500 hover:text-primary-600"
+                    className="text-sm font-medium text-yellow-600 hover:text-yellow-700 underline underline-offset-4"
                   >
                     Clear All
                   </button>
@@ -259,11 +283,11 @@ const Shop = () => {
                 isOpen={expandedFilters.category}
                 onToggle={() => toggleFilterSection("category")}
               >
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {categories.map((cat) => (
                     <label
                       key={cat.value}
-                      className="flex items-center gap-3 cursor-pointer"
+                      className="flex items-center gap-3 cursor-pointer group"
                     >
                       <input
                         type="radio"
@@ -272,9 +296,9 @@ const Shop = () => {
                         onChange={() =>
                           handleFilterChange("category", cat.value)
                         }
-                        className="w-4 h-4 text-primary-500 focus:ring-primary-500"
+                        className="w-4 h-4 text-yellow-600 focus:ring-yellow-500 border-gray-300"
                       />
-                      <span className="text-xs sm:text-sm text-gray-600">
+                      <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">
                         {cat.label}
                       </span>
                     </label>
@@ -287,27 +311,31 @@ const Shop = () => {
                 isOpen={expandedFilters.price}
                 onToggle={() => toggleFilterSection("price")}
               >
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      placeholder="min"
-                      value={tempMinPrice}
-                      onChange={handleMinPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-black"
-                      style={{ backgroundColor: "white", color: "black" }}
-                    />
-                    <span className="flex items-center text-gray-400">—</span>
-                    <input
-                      type="number"
-                      placeholder="max"
-                      value={tempMaxPrice}
-                      onChange={handleMaxPriceChange}
-                      className="w-full px-3 py-2 border rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-black"
-                      style={{ backgroundColor: "white", color: "black" }}
-                    />
+                <div className="space-y-4">
+                  <div className="flex gap-3 items-center">
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">₵</span>
+                      <input
+                        type="number"
+                        placeholder="Min"
+                        value={tempMinPrice}
+                        onChange={handleMinPriceChange}
+                        className="w-full pl-7 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-colors bg-gray-50 hover:bg-white text-gray-900 placeholder-gray-400"
+                      />
+                    </div>
+                    <span className="text-gray-400 font-medium">-</span>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">₵</span>
+                      <input
+                        type="number"
+                        placeholder="Max"
+                        value={tempMaxPrice}
+                        onChange={handleMaxPriceChange}
+                        className="w-full pl-7 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-colors bg-gray-50 hover:bg-white text-gray-900 placeholder-gray-400"
+                      />
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between pt-2">
+                  <div className="flex justify-between items-center text-xs pt-1">
                     <button
                       onClick={() => {
                         setTempMinPrice("");
@@ -315,15 +343,15 @@ const Shop = () => {
                         handleFilterChange("minPrice", "");
                         handleFilterChange("maxPrice", "");
                       }}
-                      className="text-xs text-gray-500 hover:text-gray-700 uppercase"
+                      className="text-gray-500 hover:text-gray-900 font-medium transition-colors"
                     >
                       Clear
                     </button>
                     <button
                       onClick={applyPriceFilter}
-                      className="text-xs text-green-600 hover:text-green-700 font-medium uppercase"
+                      className="px-4 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-yellow-600 transition-colors shadow-sm"
                     >
-                      Save
+                      Apply Filter
                     </button>
                   </div>
                 </div>
@@ -388,30 +416,33 @@ const Shop = () => {
           {/* Main Content */}
           <div className="flex-1">
             {/* Toolbar */}
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-2 sm:p-4 mb-6 lg:mb-8 flex items-center justify-between">
               {/* Mobile Filter Button */}
               <button
                 onClick={() => setMobileFilterOpen(true)}
-                className="lg:hidden flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 text-xs sm:text-sm"
+                className="lg:hidden flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg transition-colors border border-gray-200"
               >
-                <FiFilter />
+                <FiFilter className="text-gray-500" />
                 Filters
                 {activeFiltersCount > 0 && (
-                  <span className="w-5 h-5 bg-primary-500 text-white text-xs rounded-full flex items-center justify-center">
+                  <span className="w-5 h-5 bg-gray-900 text-white text-[10px] rounded-full flex items-center justify-center font-bold ml-1">
                     {activeFiltersCount}
                   </span>
                 )}
               </button>
 
+              <div className="hidden lg:block flex-1"></div>
+
               {/* Sort */}
-              <div className="flex items-center gap-3">
-                <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">
+              <div className="flex items-center gap-3 w-auto">
+                <span className="text-sm font-medium text-gray-500 hidden sm:inline">
                   Sort by:
                 </span>
                 <select
                   value={filters.sort}
                   onChange={(e) => handleFilterChange("sort", e.target.value)}
-                  className="px-4 py-2 border rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                  className="pl-3 pr-8 py-2 text-sm font-medium text-gray-700 focus:outline-none bg-white rounded-lg border border-gray-200 cursor-pointer appearance-none"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: `right 0.5rem center`, backgroundRepeat: `no-repeat`, backgroundSize: `1.5em 1.5em` }}
                 >
                   {sortOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -422,59 +453,61 @@ const Shop = () => {
               </div>
 
               {/* View Mode */}
-              <div className="hidden sm:flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-200">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-lg ${
+                  className={`p-2 rounded-lg transition-all ${
                     viewMode === "grid"
-                      ? "bg-primary-500 text-white"
-                      : "hover:bg-gray-100"
+                      ? "bg-white text-yellow-600 shadow-sm"
+                      : "text-gray-400 hover:text-gray-600"
                   }`}
                 >
-                  <FiGrid size={20} />
+                  <FiGrid size={18} />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-lg ${
+                  className={`p-2 rounded-lg transition-all ${
                     viewMode === "list"
-                      ? "bg-primary-500 text-white"
-                      : "hover:bg-gray-100"
+                      ? "bg-white text-yellow-600 shadow-sm"
+                      : "text-gray-400 hover:text-gray-600"
                   }`}
                 >
-                  <FiList size={20} />
+                  <FiList size={18} />
                 </button>
               </div>
             </div>
 
             {/* Active Filters Tags */}
+
+            {/* Active Filters Tags */}
             {activeFiltersCount > 0 && (
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div className="flex flex-wrap gap-2 mb-8">
                 {filters.category && (
-                  <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs sm:text-sm">
+                  <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded-full text-xs font-semibold shadow-sm">
                     Category: {filters.category}
-                    <button onClick={() => handleFilterChange("category", "")}>
+                    <button onClick={() => handleFilterChange("category", "")} className="hover:text-red-500 transition-colors">
                       <FiX size={14} />
                     </button>
                   </span>
                 )}
                 {filters.size && (
-                  <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded-full text-xs font-semibold shadow-sm">
                     Size: {filters.size}
-                    <button onClick={() => handleFilterChange("size", "")}>
+                    <button onClick={() => handleFilterChange("size", "")} className="hover:text-red-500 transition-colors">
                       <FiX size={14} />
                     </button>
                   </span>
                 )}
                 {filters.color && (
-                  <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded-full text-xs font-semibold shadow-sm">
                     Color: {filters.color}
-                    <button onClick={() => handleFilterChange("color", "")}>
+                    <button onClick={() => handleFilterChange("color", "")} className="hover:text-red-500 transition-colors">
                       <FiX size={14} />
                     </button>
                   </span>
                 )}
                 {(filters.minPrice || filters.maxPrice) && (
-                  <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded-full text-xs font-semibold shadow-sm">
                     Price: GH₵{filters.minPrice || "0"} - GH₵
                     {filters.maxPrice || "∞"}
                     <button
@@ -482,6 +515,7 @@ const Shop = () => {
                         handleFilterChange("minPrice", "");
                         handleFilterChange("maxPrice", "");
                       }}
+                      className="hover:text-red-500 transition-colors"
                     >
                       <FiX size={14} />
                     </button>
@@ -493,43 +527,43 @@ const Shop = () => {
             {/* Products Grid */}
             {loading ? (
               <div
-                className={`grid gap-3 ${
+                className={`grid gap-3 sm:gap-6 ${
                   viewMode === "grid"
-                    ? "grid-cols-2 md:grid-cols-3"
+                    ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4"
                     : "grid-cols-1"
                 }`}
               >
-                {[...Array(6)].map((_, i) => (
+                {[...Array(8)].map((_, i) => (
                   <div key={i} className="animate-pulse">
-                    <div className="bg-gray-200 aspect-[3/4] rounded-xl mb-4"></div>
+                    <div className="bg-gray-200 aspect-[4/5] rounded-xl mb-4"></div>
                     <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                     <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                   </div>
                 ))}
               </div>
             ) : products.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <FiSearch className="text-gray-400" size={40} />
+              <div className="text-center bg-white rounded-2xl border border-gray-100 py-24 px-6">
+                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400">
+                  <FiSearch size={32} />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
                   No products found
                 </h3>
-                <p className="text-gray-600 mb-6">
-                  Try adjusting your filters or search term
+                <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                  We couldn't find anything matching your current filters. Try adjusting your search or clearing some filters.
                 </p>
                 <button
                   onClick={handleClearFilters}
-                  className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                  className="px-8 py-3 bg-yellow-600 text-white font-semibold rounded-lg shadow-sm hover:bg-yellow-700 transition-colors"
                 >
                   Clear All Filters
                 </button>
               </div>
             ) : (
               <div
-                className={`grid gap-4 ${
+                className={`grid gap-3 sm:gap-6 ${
                   viewMode === "grid"
-                    ? "grid-cols-2 md:grid-cols-4"
+                    ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4"
                     : "grid-cols-1"
                 }`}
               >
@@ -544,11 +578,11 @@ const Shop = () => {
 
             {/* Pagination */}
             {pagination.pages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-12">
+              <div className="flex justify-center items-center gap-2 mt-16 mb-8">
                 <button
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={pagination.page === 1}
-                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 text-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Previous
                 </button>
@@ -565,10 +599,10 @@ const Shop = () => {
                       <button
                         key={page}
                         onClick={() => handlePageChange(page)}
-                        className={`w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm rounded-lg ${
+                        className={`w-10 h-10 text-sm font-semibold rounded-xl transition-all ${
                           pagination.page === page
-                            ? "bg-primary-500 text-white"
-                            : "border hover:bg-gray-50"
+                            ? "bg-yellow-600 text-white shadow-md shadow-yellow-600/20"
+                            : "border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
                         }`}
                       >
                         {page}
@@ -579,7 +613,7 @@ const Shop = () => {
                     page === pagination.page + 2
                   ) {
                     return (
-                      <span key={page} className="px-2">
+                      <span key={page} className="px-2 text-gray-400">
                         ...
                       </span>
                     );
@@ -590,7 +624,7 @@ const Shop = () => {
                 <button
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={pagination.page === pagination.pages}
-                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 text-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Next
                 </button>

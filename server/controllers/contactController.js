@@ -40,7 +40,9 @@ const submitContact = async (req, res) => {
         });
 
         if (returnOrder) {
-          const orderEmail = String(returnOrder.user?.email || "").toLowerCase();
+          const orderEmail = String(
+            returnOrder.user?.email || "",
+          ).toLowerCase();
           const requesterEmail = String(emailCheck.email || "").toLowerCase();
           const isOwner =
             Boolean(orderEmail) &&
@@ -48,9 +50,7 @@ const submitContact = async (req, res) => {
             orderEmail === requesterEmail;
 
           if (isOwner) {
-            const currentStatus = String(
-              returnOrder.returnApprovalStatus || "",
-            )
+            const currentStatus = String(returnOrder.returnApprovalStatus || "")
               .toLowerCase()
               .trim();
 
@@ -65,6 +65,40 @@ const submitContact = async (req, res) => {
               return res.status(409).json({
                 message:
                   "A return request has already been submitted for this order.",
+              });
+            }
+
+            // Enforce the 2-day return window from delivery date
+            if (returnOrder.status !== "delivered") {
+              return res.status(400).json({
+                message:
+                  "Return requests can only be made for delivered orders.",
+              });
+            }
+
+            const history = Array.isArray(returnOrder.statusHistory)
+              ? returnOrder.statusHistory
+              : [];
+            const deliveredEntry = history
+              .slice()
+              .reverse()
+              .find((h) => (h?.status || "").toLowerCase() === "delivered");
+            if (!deliveredEntry || !deliveredEntry.date) {
+              return res.status(400).json({
+                message: "Could not determine delivery date for this order.",
+              });
+            }
+
+            const deliveredDate = new Date(deliveredEntry.date);
+            const diffDays = Math.floor(
+              (new Date().getTime() - deliveredDate.getTime()) /
+                (1000 * 60 * 60 * 24),
+            );
+
+            if (diffDays > 2) {
+              return res.status(400).json({
+                message:
+                  "Return requests must be submitted within 2 days of delivery.",
               });
             }
           }
@@ -143,6 +177,8 @@ const submitContact = async (req, res) => {
           }))
         : [];
 
+      const formattedMessage = (message || "").replace(/\n/g, "<br/>");
+
       await sendEmail(
         process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
         `New Contact Form Submission: ${subject}`,
@@ -153,7 +189,9 @@ const submitContact = async (req, res) => {
           <p><strong>Phone:</strong> ${phone || "Not provided"}</p>
           <p><strong>Subject:</strong> ${subject}</p>
           <p><strong>Message:</strong></p>
-          <p>${message}</p>
+          <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #c9ad65;">
+            ${formattedMessage}
+          </div>
         `,
         attachments.length > 0 ? { attachments } : undefined,
       );

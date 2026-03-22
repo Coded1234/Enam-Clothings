@@ -26,7 +26,7 @@ const isStrongPassword = (password) =>
 // @route   POST /api/auth/register
 const register = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, phone, role } = req.body;
+    const { firstName, lastName, email, password, phone } = req.body;
 
     const emailCheck = validateEmail(email);
     if (!emailCheck.ok) {
@@ -63,18 +63,14 @@ const register = async (req, res) => {
         .json({ message: "User already exists with this email" });
     }
 
-    // Validate role (only allow 'customer' or 'admin')
-    const validRoles = ["customer", "admin"];
-    const userRole = validRoles.includes(role) ? role : "customer";
-
-    // Create user
+    // Create user with explicit customer role to prevent privilege escalation
     const user = await User.create({
       firstName,
       lastName,
       email: emailCheck.email,
       password,
       phone: phoneCheck.phone || null,
-      role: userRole,
+      role: "customer",
     });
 
     // Generate OTP for email verification
