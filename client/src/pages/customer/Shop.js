@@ -232,16 +232,20 @@ const Shop = () => {
                 {category || "All Products"}
               </h1>
               <p className="text-sm font-medium text-gray-500 mt-1.5">
-                {pagination.total} product{pagination.total !== 1 ? 's' : ''} found
+                {pagination.total} product{pagination.total !== 1 ? "s" : ""}{" "}
+                found
               </p>
             </div>
-            
+
             {/* Active Filters Summary Pills */}
             <div className="flex flex-wrap items-center gap-2">
               {filters.size && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">
                   Size: {filters.size}
-                  <button onClick={() => handleFilterChange("size", "")} className="hover:text-red-500 transition-colors">
+                  <button
+                    onClick={() => handleFilterChange("size", "")}
+                    className="hover:text-red-500 transition-colors"
+                  >
                     <FiX size={14} />
                   </button>
                 </span>
@@ -249,7 +253,10 @@ const Shop = () => {
               {filters.color && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">
                   Color: {filters.color}
-                  <button onClick={() => handleFilterChange("color", "")} className="hover:text-red-500 transition-colors">
+                  <button
+                    onClick={() => handleFilterChange("color", "")}
+                    className="hover:text-red-500 transition-colors"
+                  >
                     <FiX size={14} />
                   </button>
                 </span>
@@ -314,7 +321,9 @@ const Shop = () => {
                 <div className="space-y-4">
                   <div className="flex gap-3 items-center">
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">₵</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">
+                        ₵
+                      </span>
                       <input
                         type="number"
                         placeholder="Min"
@@ -325,7 +334,9 @@ const Shop = () => {
                     </div>
                     <span className="text-gray-400 font-medium">-</span>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">₵</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">
+                        ₵
+                      </span>
                       <input
                         type="number"
                         placeholder="Max"
@@ -442,7 +453,12 @@ const Shop = () => {
                   value={filters.sort}
                   onChange={(e) => handleFilterChange("sort", e.target.value)}
                   className="pl-3 pr-8 py-2 text-sm font-medium text-gray-700 focus:outline-none bg-white rounded-lg border border-gray-200 cursor-pointer appearance-none"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: `right 0.5rem center`, backgroundRepeat: `no-repeat`, backgroundSize: `1.5em 1.5em` }}
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                    backgroundPosition: `right 0.5rem center`,
+                    backgroundRepeat: `no-repeat`,
+                    backgroundSize: `1.5em 1.5em`,
+                  }}
                 >
                   {sortOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -485,7 +501,10 @@ const Shop = () => {
                 {filters.category && (
                   <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded-full text-xs font-semibold shadow-sm">
                     Category: {filters.category}
-                    <button onClick={() => handleFilterChange("category", "")} className="hover:text-red-500 transition-colors">
+                    <button
+                      onClick={() => handleFilterChange("category", "")}
+                      className="hover:text-red-500 transition-colors"
+                    >
                       <FiX size={14} />
                     </button>
                   </span>
@@ -493,7 +512,10 @@ const Shop = () => {
                 {filters.size && (
                   <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded-full text-xs font-semibold shadow-sm">
                     Size: {filters.size}
-                    <button onClick={() => handleFilterChange("size", "")} className="hover:text-red-500 transition-colors">
+                    <button
+                      onClick={() => handleFilterChange("size", "")}
+                      className="hover:text-red-500 transition-colors"
+                    >
                       <FiX size={14} />
                     </button>
                   </span>
@@ -501,7 +523,10 @@ const Shop = () => {
                 {filters.color && (
                   <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded-full text-xs font-semibold shadow-sm">
                     Color: {filters.color}
-                    <button onClick={() => handleFilterChange("color", "")} className="hover:text-red-500 transition-colors">
+                    <button
+                      onClick={() => handleFilterChange("color", "")}
+                      className="hover:text-red-500 transition-colors"
+                    >
                       <FiX size={14} />
                     </button>
                   </span>
@@ -550,7 +575,8 @@ const Shop = () => {
                   No products found
                 </h3>
                 <p className="text-gray-500 mb-8 max-w-md mx-auto">
-                  We couldn't find anything matching your current filters. Try adjusting your search or clearing some filters.
+                  We couldn't find anything matching your current filters. Try
+                  adjusting your search or clearing some filters.
                 </p>
                 <button
                   onClick={handleClearFilters}

@@ -172,7 +172,10 @@ const ProductCard = ({
               isWishlisted ? "Remove from wishlist" : "Add to wishlist"
             }
           >
-            <FiHeart size={16} className={`sm:w-[18px] sm:h-[18px] ${isWishlisted ? "fill-current" : ""}`} />
+            <FiHeart
+              size={16}
+              className={`sm:w-[18px] sm:h-[18px] ${isWishlisted ? "fill-current" : ""}`}
+            />
           </button>
         </div>
 
@@ -199,7 +202,7 @@ const ProductCard = ({
               {product.name}
             </h3>
           </Link>
-          
+
           <div className="flex items-baseline gap-2 mb-1.5">
             <span className="text-lg font-bold text-gray-900">
               GH₵{Math.round(product.price)}
@@ -215,7 +218,9 @@ const ProductCard = ({
             {isOutOfStock ? (
               <p className="text-sm font-medium text-red-600">Out of stock</p>
             ) : displayStock <= 10 && displayStock > 0 ? (
-              <p className="text-sm font-medium text-orange-500">{displayStock} left</p>
+              <p className="text-sm font-medium text-orange-500">
+                {displayStock} left
+              </p>
             ) : (
               <p className="text-sm text-transparent select-none">In stock</p> // Layout spacer
             )}

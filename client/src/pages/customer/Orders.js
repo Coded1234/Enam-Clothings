@@ -65,7 +65,9 @@ const Orders = () => {
   const getDeliveredDate = (order) => {
     if (!order) return null;
     if (order.deliveredAt) return new Date(order.deliveredAt);
-    const history = Array.isArray(order.statusHistory) ? order.statusHistory : [];
+    const history = Array.isArray(order.statusHistory)
+      ? order.statusHistory
+      : [];
     const deliveredEntry = history
       .slice()
       .reverse()
@@ -254,7 +256,8 @@ const Orders = () => {
               const orderDisplayNumber =
                 order.orderNumber || `#${order.id.slice(-8).toUpperCase()}`;
               const firstItemName =
-                order.items?.[0]?.product?.name || order.items?.[0]?.productName;
+                order.items?.[0]?.product?.name ||
+                order.items?.[0]?.productName;
               const extraCount = Math.max(0, (order.items?.length || 0) - 1);
 
               return (
@@ -343,66 +346,69 @@ const Orders = () => {
                           </button>
                         )}
 
-                        {order.status === "delivered" && isReturnEligible(order) && (
-                          <div className="flex flex-col items-end">
-                            <button
-                              disabled={Boolean(order.returnRequestedAt)}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                if (order.returnRequestedAt) return;
-                                const returnHref = `/contact?subject=${encodeURIComponent(
-                                  "Returns & Exchanges",
-                                )}&orderId=${encodeURIComponent(
-                                  order.id,
-                                )}&orderNumber=${encodeURIComponent(
-                                  order.orderNumber ||
-                                    `Order #${order.id.slice(-8).toUpperCase()}`,
-                                )}`;
-                                router.push(returnHref);
-                              }}
-                              className="inline-flex items-center gap-2 px-3 py-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-white/5 rounded-lg transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent"
-                              title={
-                                order.returnRequestedAt
-                                  ? "Return request already submitted"
-                                  : undefined
-                              }
-                            >
-                              <FiRefreshCw size={18} />
-                              <span className="hidden sm:inline">Request Return</span>
-                            </button>
-                            {order.returnRequestedAt && (
-                              <p
-                                className={`text-[11px] mt-1 ${
-                                  String(order.returnApprovalStatus || "")
-                                    .toLowerCase()
-                                    .trim() === "approved"
-                                    ? "text-green-600"
-                                    : String(order.returnApprovalStatus || "")
-                                          .toLowerCase()
-                                          .trim() === "not_approved"
-                                      ? "text-red-600"
-                                      : "text-yellow-700"
-                                }`}
+                        {order.status === "delivered" &&
+                          isReturnEligible(order) && (
+                            <div className="flex flex-col items-end">
+                              <button
+                                disabled={Boolean(order.returnRequestedAt)}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (order.returnRequestedAt) return;
+                                  const returnHref = `/contact?subject=${encodeURIComponent(
+                                    "Returns & Exchanges",
+                                  )}&orderId=${encodeURIComponent(
+                                    order.id,
+                                  )}&orderNumber=${encodeURIComponent(
+                                    order.orderNumber ||
+                                      `Order #${order.id.slice(-8).toUpperCase()}`,
+                                  )}`;
+                                  router.push(returnHref);
+                                }}
+                                className="inline-flex items-center gap-2 px-3 py-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-white/5 rounded-lg transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent"
+                                title={
+                                  order.returnRequestedAt
+                                    ? "Return request already submitted"
+                                    : undefined
+                                }
                               >
-                                {(() => {
-                                  const s = String(
-                                    order.returnApprovalStatus || "pending",
-                                  )
-                                    .toLowerCase()
-                                    .trim();
-                                  const label =
-                                    s === "approved"
-                                      ? "Approved"
-                                      : s === "not_approved"
-                                        ? "Not approved"
-                                        : "Pending";
-                                  return `Return: ${label}`;
-                                })()}
-                              </p>
-                            )}
-                          </div>
-                        )}
+                                <FiRefreshCw size={18} />
+                                <span className="hidden sm:inline">
+                                  Request Return
+                                </span>
+                              </button>
+                              {order.returnRequestedAt && (
+                                <p
+                                  className={`text-[11px] mt-1 ${
+                                    String(order.returnApprovalStatus || "")
+                                      .toLowerCase()
+                                      .trim() === "approved"
+                                      ? "text-green-600"
+                                      : String(order.returnApprovalStatus || "")
+                                            .toLowerCase()
+                                            .trim() === "not_approved"
+                                        ? "text-red-600"
+                                        : "text-yellow-700"
+                                  }`}
+                                >
+                                  {(() => {
+                                    const s = String(
+                                      order.returnApprovalStatus || "pending",
+                                    )
+                                      .toLowerCase()
+                                      .trim();
+                                    const label =
+                                      s === "approved"
+                                        ? "Approved"
+                                        : s === "not_approved"
+                                          ? "Not approved"
+                                          : "Pending";
+                                    return `Return: ${label}`;
+                                  })()}
+                                </p>
+                              )}
+                            </div>
+                          )}
 
                         <Link
                           href={`/orders/${order.id}`}

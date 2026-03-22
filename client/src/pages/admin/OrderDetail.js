@@ -334,7 +334,9 @@ const OrderDetail = () => {
             <span className="hidden sm:inline">Print</span>
           </button>
           <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded-xl border border-gray-200 shadow-sm">
-            <span className="text-sm text-gray-500 font-medium pl-2">Status:</span>
+            <span className="text-sm text-gray-500 font-medium pl-2">
+              Status:
+            </span>
             {order.status === "delivered" || order.status === "cancelled" ? (
               <span
                 className={`px-3 py-1 text-sm font-medium rounded-lg border ${getStatusColor(
@@ -363,12 +365,18 @@ const OrderDetail = () => {
 
           {order.returnRequestedAt && (
             <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded-xl border border-gray-200 shadow-sm">
-              <span className="text-sm text-gray-500 font-medium pl-2">Return:</span>
+              <span className="text-sm text-gray-500 font-medium pl-2">
+                Return:
+              </span>
               <select
                 value={order.returnApprovalStatus || "pending"}
                 onChange={(e) => handleReturnApprovalChange(e.target.value)}
-                disabled={updatingReturn || order.returnApprovalStatus === "approved" || order.returnApprovalStatus === "not_approved"}
-                className={`px-3 py-1 text-sm font-medium rounded-lg border appearance-none ${order.returnApprovalStatus === 'approved' || order.returnApprovalStatus === 'not_approved' ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200' : 'cursor-pointer bg-white text-gray-800 border-gray-200'}`}
+                disabled={
+                  updatingReturn ||
+                  order.returnApprovalStatus === "approved" ||
+                  order.returnApprovalStatus === "not_approved"
+                }
+                className={`px-3 py-1 text-sm font-medium rounded-lg border appearance-none ${order.returnApprovalStatus === "approved" || order.returnApprovalStatus === "not_approved" ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200" : "cursor-pointer bg-white text-gray-800 border-gray-200"}`}
               >
                 <option value="pending">Pending</option>
                 <option value="approved">Approved</option>
@@ -575,11 +583,11 @@ const OrderDetail = () => {
               Shipping Address
             </h2>
             <div className="space-y-2 text-gray-500 text-sm">
-              <p className="text-gray-900 font-medium">{order.shippingAddress?.address}</p>
+              <p className="text-gray-900 font-medium">
+                {order.shippingAddress?.address}
+              </p>
               {order.shippingAddress?.addressDetails && (
-                <p>
-                  {order.shippingAddress.addressDetails}
-                </p>
+                <p>{order.shippingAddress.addressDetails}</p>
               )}
               {order.shippingAddress?.phone && (
                 <p>Phone: {order.shippingAddress?.phone}</p>

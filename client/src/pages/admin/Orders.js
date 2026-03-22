@@ -161,8 +161,8 @@ const Orders = () => {
             <div className="md:hidden divide-y divide-gray-100">
               {filteredOrders.length > 0 ? (
                 filteredOrders.map((order) => (
-                  <div 
-                    key={order.id} 
+                  <div
+                    key={order.id}
                     className="px-4 py-3 space-y-1.5 cursor-pointer hover:bg-gray-50 transition-colors"
                     onClick={() => router.push(`/admin/orders/${order.id}`)}
                   >
@@ -277,8 +277,8 @@ const Orders = () => {
                 <tbody className="divide-y divide-gray-200">
                   {filteredOrders.length > 0 ? (
                     filteredOrders.map((order) => (
-                      <tr 
-                        key={order.id} 
+                      <tr
+                        key={order.id}
                         className="hover:bg-gray-50 cursor-pointer"
                         onClick={() => router.push(`/admin/orders/${order.id}`)}
                       >

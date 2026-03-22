@@ -21,8 +21,11 @@ import {
 
 const OrderSummary = () => {
   const router = useRouter();
-    const dispatch = useDispatch();
-  const _oState = typeof window !== "undefined" ? JSON.parse(sessionStorage.getItem("orderSummaryState") || "{}") : {};
+  const dispatch = useDispatch();
+  const _oState =
+    typeof window !== "undefined"
+      ? JSON.parse(sessionStorage.getItem("orderSummaryState") || "{}")
+      : {};
   const {
     orderData,
     items,
@@ -403,7 +406,9 @@ const OrderSummary = () => {
                 ) : (
                   <div className="p-4 border-2 border-gray-200 rounded-xl bg-gray-50 dark:bg-surface">
                     <p className="text-sm text-gray-600 dark:text-primary-300">
-                      Pay on Delivery is only available for addresses in Greater Accra. For your location we accept Paystack (card or mobile money) above.
+                      Pay on Delivery is only available for addresses in Greater
+                      Accra. For your location we accept Paystack (card or
+                      mobile money) above.
                     </p>
                   </div>
                 )}
@@ -464,8 +469,9 @@ const OrderSummary = () => {
                           {item.product?.name}
                         </h3>
                         <div className="mt-1 space-y-1">
-                          {String(item.product?.category || "").toLowerCase() !==
-                            "perfumes" && (
+                          {String(
+                            item.product?.category || "",
+                          ).toLowerCase() !== "perfumes" && (
                             <>
                               <p className="text-sm text-gray-500">
                                 Size: {item.size}
@@ -476,7 +482,9 @@ const OrderSummary = () => {
                                   {getColorCode() && (
                                     <span
                                       className="w-4 h-4 rounded-full border border-gray-300"
-                                      style={{ backgroundColor: getColorCode() }}
+                                      style={{
+                                        backgroundColor: getColorCode(),
+                                      }}
                                     ></span>
                                   )}
                                   {getColorName()}
@@ -557,9 +565,7 @@ const OrderSummary = () => {
                   <>
                     <FiCheckCircle className="w-5 h-5" />
                     <span>
-                      {paymentMethod === "paystack"
-                        ? "Pay Now"
-                        : "Place Order"}
+                      {paymentMethod === "paystack" ? "Pay Now" : "Place Order"}
                     </span>
                   </>
                 )}

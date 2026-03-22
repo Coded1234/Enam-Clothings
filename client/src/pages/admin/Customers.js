@@ -222,8 +222,8 @@ const Customers = () => {
                 <tbody className="divide-y divide-gray-200">
                   {filteredCustomers.length > 0 ? (
                     filteredCustomers.map((customer) => (
-                      <tr 
-                        key={customer.id} 
+                      <tr
+                        key={customer.id}
                         className="hover:bg-gray-50 cursor-pointer"
                         onClick={() => setSelectedCustomer(customer)}
                       >

@@ -263,8 +263,8 @@ const Reviews = () => {
                 <tbody className="divide-y divide-gray-200">
                   {filteredReviews.length > 0 ? (
                     filteredReviews.map((review) => (
-                      <tr 
-                        key={review.id} 
+                      <tr
+                        key={review.id}
                         className="hover:bg-gray-50 cursor-pointer"
                         onClick={() => setSelectedReview(review)}
                       >

@@ -133,7 +133,19 @@ const Products = () => {
               ))}
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                ></path>
+              </svg>
             </div>
           </div>
         </div>
@@ -163,7 +175,9 @@ const Products = () => {
                   <div
                     key={product.id}
                     className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
-                    onClick={() => router.push(`/admin/products/${product.id}/edit`)}
+                    onClick={() =>
+                      router.push(`/admin/products/${product.id}/edit`)
+                    }
                   >
                     {/* Image */}
                     <div className="h-12 w-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
@@ -280,10 +294,12 @@ const Products = () => {
                 <tbody className="divide-y divide-gray-200">
                   {products.length > 0 ? (
                     products.map((product) => (
-                      <tr 
-                        key={product.id} 
+                      <tr
+                        key={product.id}
                         className="hover:bg-gray-50 cursor-pointer"
-                        onClick={() => router.push(`/admin/products/${product.id}/edit`)}
+                        onClick={() =>
+                          router.push(`/admin/products/${product.id}/edit`)
+                        }
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">

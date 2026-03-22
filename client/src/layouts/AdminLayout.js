@@ -9,9 +9,20 @@ import { useTheme } from "../context/ThemeContext";
 import ScrollToTop from "../components/common/ScrollToTop";
 import { ordersAPI } from "../utils/api";
 import {
-  FiHome, FiShoppingBag, FiShoppingCart, FiUsers, FiStar,
-  FiMenu, FiX, FiLogOut, FiChevronDown, FiBarChart2, FiTag,
-  FiSun, FiMoon, FiBell,
+  FiHome,
+  FiShoppingBag,
+  FiShoppingCart,
+  FiUsers,
+  FiStar,
+  FiMenu,
+  FiX,
+  FiLogOut,
+  FiChevronDown,
+  FiBarChart2,
+  FiTag,
+  FiSun,
+  FiMoon,
+  FiBell,
 } from "react-icons/fi";
 
 const pageVariants = {
@@ -56,7 +67,9 @@ const AdminLayout = ({ children }) => {
     if (dropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-    return () => { document.removeEventListener("mousedown", handleClickOutside); };
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, [dropdownOpen]);
 
   useEffect(() => {
@@ -76,7 +89,10 @@ const AdminLayout = ({ children }) => {
   useEffect(() => {
     const fetchDynamicHeader = async () => {
       setDynamicHeader("");
-      if (pathname.startsWith("/admin/orders/") && pathname.split("/").length === 4) {
+      if (
+        pathname.startsWith("/admin/orders/") &&
+        pathname.split("/").length === 4
+      ) {
         const orderId = pathname.split("/").pop();
         if (orderId && orderId !== "orders") {
           try {
@@ -109,14 +125,29 @@ const AdminLayout = ({ children }) => {
   return (
     <div className="flex h-screen bg-gray-100">
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
-      <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 text-gray-700 transition-transform duration-300 flex flex-col`}>
+      <aside
+        className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 text-gray-700 transition-transform duration-300 flex flex-col`}
+      >
         <div className="h-[72px] px-4 flex items-center justify-between border-b border-gray-200">
-          <Link href="/admin" className="flex items-center w-full justify-center">
-            <img src="/images/loginlogo.png" alt="Diamond Aura Gallery" className="h-12 w-auto object-contain max-w-full" />
+          <Link
+            href="/admin"
+            className="flex items-center w-full justify-center"
+          >
+            <img
+              src="/images/loginlogo.png"
+              alt="Diamond Aura Gallery"
+              className="h-12 w-auto object-contain max-w-full"
+            />
           </Link>
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg hover:bg-gray-50 lg:hidden absolute right-4 top-4">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 rounded-lg hover:bg-gray-50 lg:hidden absolute right-4 top-4"
+          >
             <FiX size={20} />
           </button>
         </div>
@@ -124,7 +155,11 @@ const AdminLayout = ({ children }) => {
           <ul className="space-y-2">
             {menuItems.map((item) => (
               <li key={item.path}>
-                <Link href={item.path} onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${pathname === item.path ? "bg-primary-500 text-white" : "text-gray-400 hover:bg-gray-50 hover:text-primary-500"}`}>
+                <Link
+                  href={item.path}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${pathname === item.path ? "bg-primary-500 text-white" : "text-gray-400 hover:bg-gray-50 hover:text-primary-500"}`}
+                >
                   <item.icon size={20} />
                   <span>{item.label}</span>
                 </Link>
@@ -133,11 +168,19 @@ const AdminLayout = ({ children }) => {
           </ul>
         </nav>
         <div className="p-4 border-t border-gray-200 flex items-center gap-2">
-          <Link href="/" onClick={() => setSidebarOpen(false)} className="flex-1 flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-50 hover:text-primary-500 rounded-lg">
+          <Link
+            href="/"
+            onClick={() => setSidebarOpen(false)}
+            className="flex-1 flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-50 hover:text-primary-500 rounded-lg"
+          >
             <FiShoppingBag size={20} />
             <span>Back to Store</span>
           </Link>
-          <button onClick={toggleTheme} className="p-3 text-gray-400 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors" aria-label="Toggle theme">
+          <button
+            onClick={toggleTheme}
+            className="p-3 text-gray-400 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors"
+            aria-label="Toggle theme"
+          >
             {theme === "dark" ? <FiSun size={20} /> : <FiMoon size={20} />}
           </button>
         </div>
@@ -145,7 +188,10 @@ const AdminLayout = ({ children }) => {
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
         <header className="h-[72px] bg-white shadow-xs border-b border-gray-200 px-4 md:px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-gray-100 -ml-2">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 -ml-2"
+            >
               <FiMenu size={20} />
             </button>
             <h1 className="text-lg md:text-xl font-semibold text-gray-800">
@@ -153,7 +199,10 @@ const AdminLayout = ({ children }) => {
             </h1>
           </div>
           <div className="relative" ref={dropdownRef}>
-            <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg">
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg"
+            >
               <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white font-medium">
                 {user?.firstName?.[0]}
               </div>
@@ -162,8 +211,17 @@ const AdminLayout = ({ children }) => {
             </button>
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                <Link href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={() => setDropdownOpen(false)}>Profile</Link>
-                <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 flex items-center gap-2">
+                <Link
+                  href="/profile"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 flex items-center gap-2"
+                >
                   <FiLogOut /> Logout
                 </button>
               </div>
@@ -173,7 +231,13 @@ const AdminLayout = ({ children }) => {
         <main className="flex-1 overflow-auto p-6">
           <ScrollToTop />
           <AnimatePresence mode="wait">
-            <motion.div key={pathname} initial="initial" animate="animate" exit="exit" variants={pageVariants}>
+            <motion.div
+              key={pathname}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              variants={pageVariants}
+            >
               {children}
             </motion.div>
           </AnimatePresence>
