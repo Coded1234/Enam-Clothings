@@ -34,14 +34,14 @@ const getProducts = async (req, res) => {
     // Filter by size (sizes is a JSONB array)
     if (size) {
       where.sizes = {
-        [Op.contains]: [{ size: size }]
+        [Op.contains]: [{ size: size }],
       };
     }
 
     // Filter by color (colors is a JSONB array)
     if (color) {
       where.colors = {
-        [Op.contains]: [{ name: color }]
+        [Op.contains]: [{ name: color }],
       };
     }
 
@@ -112,12 +112,10 @@ const getFeaturedProducts = async (req, res) => {
     });
     res.json(products);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error fetching featured products",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error fetching featured products",
+      error: error.message,
+    });
   }
 };
 
@@ -163,12 +161,10 @@ const getRelatedProducts = async (req, res) => {
 
     res.json(relatedProducts);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error fetching related products",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error fetching related products",
+      error: error.message,
+    });
   }
 };
 
@@ -216,7 +212,7 @@ const getCategories = async (req, res) => {
     });
 
     res.json(
-      categories.map((c) => ({ _id: c.category, count: parseInt(c.count) }))
+      categories.map((c) => ({ _id: c.category, count: parseInt(c.count) })),
     );
   } catch (error) {
     res
