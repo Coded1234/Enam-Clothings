@@ -127,9 +127,6 @@ const Announcements = () => {
         <div className="flex items-center gap-3">
           <FiBell size={24} className="text-primary-500 flex-shrink-0" />
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-              Announcements
-            </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Send notices that pop up for all users on their next visit
             </p>

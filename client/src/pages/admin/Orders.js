@@ -105,8 +105,7 @@ const Orders = () => {
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-800">Orders</h1>
+      <div className="flex justify-end gap-2">
         <span className="text-xs md:text-sm text-gray-500">
           {orders.length} total orders
         </span>

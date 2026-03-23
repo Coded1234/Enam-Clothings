@@ -54,9 +54,9 @@ const SearchResults = () => {
       const response = await api.get(`/products?${params}`);
       setProducts(response.data.products || []);
       setPagination({
-        page: response.data.pagination?.page || 1,
-        pages: response.data.pagination?.pages || 1,
-        total: response.data.pagination?.total || 0,
+        page: response.data.page || 1,
+        pages: response.data.pages || 1,
+        total: response.data.total || 0,
       });
     } catch (error) {
       console.error("Error searching products:", error);

@@ -165,10 +165,7 @@ const Settings = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 md:gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">
-            Settings
-          </h1>
-          <p className="text-xs md:text-sm text-gray-600 mt-1">
+          <p className="text-xs md:text-sm text-gray-600">
             Manage your store configuration
           </p>
         </div>
