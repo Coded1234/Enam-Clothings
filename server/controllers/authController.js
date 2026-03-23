@@ -73,13 +73,13 @@ const register = async (req, res) => {
       role: "customer",
     });
 
-    // Generate OTP for email verification
-    const otp = user.generateEmailOTP();
-    await user.save();
+// Generate token for email verification
+      const token = user.generateEmailVerificationToken();
+      await user.save();
 
-    // Send verification email with OTP
-    try {
-      const { subject, html } = emailTemplates.emailVerification(user, otp);
+      // Send verification email with token
+      try {
+        const { subject, html } = emailTemplates.emailVerification(user, token);
       await sendEmail(user.email, subject, html);
     } catch (emailError) {
       console.error("Verification email failed:", emailError);
@@ -140,7 +140,7 @@ const login = async (req, res) => {
     if (!user.emailVerified) {
       return res.status(401).json({
         message:
-          "Please verify your email address before logging in. Check your inbox for your 6-digit OTP code.",
+          "Please verify your email address before logging in. Check your inbox for your verification link.",
         emailVerified: false,
       });
     }
@@ -542,14 +542,14 @@ const deleteAvatar = async (req, res) => {
 
 // @desc    Verify email address
 // @route   GET /api/auth/verify-email/:token
-// @desc    Verify email with OTP
+// @desc    Verify email with link
 // @route   POST /api/auth/verify-email
 const verifyEmail = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email, token } = req.body;
 
-    if (!email || !otp) {
-      return res.status(400).json({ message: "Email and OTP are required" });
+    if (!email || !token) {
+      return res.status(400).json({ message: "Email and token are required" });
     }
 
     const emailCheck = validateEmail(email);
@@ -559,7 +559,7 @@ const verifyEmail = async (req, res) => {
 
     const user = await User.findOne({ where: { email: emailCheck.email } });
     if (!user) {
-      return res.status(400).json({ message: "Invalid email or OTP" });
+      return res.status(400).json({ message: "Invalid email or token" });
     }
 
     if (user.emailVerified) {
@@ -568,15 +568,15 @@ const verifyEmail = async (req, res) => {
 
     // Parse stored token: "<otp>|<expiryMs>"
     const stored = user.emailVerificationToken || "";
-    const [storedOtp, expiryStr] = stored.split("|");
+    const [storedToken, expiryStr] = stored.split("|");
 
-    if (!storedOtp || otp.trim() !== storedOtp) {
-      return res.status(400).json({ message: "Incorrect OTP code" });
+    if (!storedToken || token.trim() !== storedToken) {
+      return res.status(400).json({ message: "Invalid verification token" });
     }
 
     if (expiryStr && Date.now() > parseInt(expiryStr, 10)) {
       return res.status(400).json({
-        message: "OTP has expired. Please request a new one.",
+        message: "Token has expired. Please request a new one.",
       });
     }
 
@@ -644,13 +644,13 @@ const resendVerificationEmail = async (req, res) => {
       });
     }
 
-    // Generate new OTP
-    const otp = user.generateEmailOTP();
+    // Generate new token
+    const token = user.generateEmailVerificationToken();
     await user.save();
 
-    // Send OTP email
+    // Send verification email
     try {
-      const { subject, html } = emailTemplates.emailVerification(user, otp);
+      const { subject, html } = emailTemplates.emailVerification(user, token);
       await sendEmail(user.email, subject, html);
     } catch (emailError) {
       console.error("Verification email failed:", emailError);
@@ -659,7 +659,7 @@ const resendVerificationEmail = async (req, res) => {
         .json({ message: "Failed to send verification email" });
     }
 
-    res.json({ message: "A new 6-digit OTP has been sent to your email." });
+    res.json({ message: "A new verification link has been sent to your email." });
   } catch (error) {
     console.error("Resend verification error:", error);
     res.status(500).json({

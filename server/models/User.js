@@ -120,13 +120,13 @@ User.prototype.getFullName = function () {
   return `${this.firstName} ${this.lastName}`;
 };
 
-// Instance method to generate 6-digit email verification OTP
-// Stored as "<otp>|<expiryMs>" in emailVerificationToken — no new column needed
-User.prototype.generateEmailOTP = function () {
-  const otp = crypto.randomInt(100000, 1000000).toString(); // 100000–999999
+// Instance method to generate email verification token
+// Stored directly in emailVerificationToken
+User.prototype.generateEmailVerificationToken = function () {
+  const token = crypto.randomBytes(32).toString('hex');
   const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes from now
-  this.emailVerificationToken = `${otp}|${expiry}`;
-  return otp;
+  this.emailVerificationToken = `${token}|${expiry}`;
+  return token;
 };
 
 module.exports = User;

@@ -619,33 +619,29 @@ const emailTemplates = {
     };
   },
 
-  emailVerification: (user, otp) => {
-    const digits = otp
-      .toString()
-      .split("")
-      .map(
-        (d) =>
-          `<span style="display:inline-block;width:44px;height:56px;line-height:56px;text-align:center;font-size:28px;font-weight:700;border:2px solid #c9ad65;border-radius:10px;margin:0 4px;color:#1a1a1a;background:#fffdf5;">${d}</span>`,
-      )
-      .join("");
+emailVerification: (user, token) => {
+    const FRONTEND_URL = process.env.CLIENT_URL || "http://localhost:3000";
+    const verificationLink = `${FRONTEND_URL}/verify-email?token=${token}&email=${encodeURIComponent(user.email)}`;
+    
     const content = `
       <h2 style="color: #333; margin-top: 0; text-align: center;">Verify Your Email</h2>
-      <p style="text-align: center; color: #666; font-size: 16px;">Hi ${user.firstName}, enter the code below on the verification page to activate your account.</p>
+      <p style="text-align: center; color: #666; font-size: 16px;">Hi ${user.firstName}, please click the button below to verify your email address and activate your account.</p>
       
       <div style="text-align: center; margin: 40px 0;">
-        ${digits}
+        <a href="${verificationLink}" style="display: inline-block; padding: 16px 36px; background-color: #1a1a1a; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; border-radius: 8px; letter-spacing: 0.5px;">Verify Email</a>
       </div>
-      
-      <p style="text-align: center; color: #c9ad65; font-size: 28px; font-weight: 700; letter-spacing: 10px; margin: 0 0 10px;">
-        ${otp}
+
+      <p style="text-align: center; color: #666; font-size: 14px;">
+        Or copy and paste this link into your browser:<br>
+        <a href="${verificationLink}" style="color: #c9ad65; text-decoration: none; word-break: break-all;">${verificationLink}</a>
       </p>
 
-      <p style="text-align: center; color: #999; font-size: 13px;">
-        This code expires in <strong>10 minutes</strong>. If you didn't create an account, you can safely ignore this email.
+      <p style="text-align: center; color: #999; font-size: 13px; margin-top: 30px;">
+        This link expires in <strong>10 minutes</strong>. If you didn't create an account, you can safely ignore this email.
       </p>
     `;
     return {
-      subject: "Your Verification Code",
+      subject: "Action Required: Verify Your Email",
       html: getEmailLayout(content, "Email Verification"),
     };
   },
