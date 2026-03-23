@@ -319,51 +319,51 @@ const Navbar = () => {
                         unread.map((a) => (
                           <div
                             key={a.id}
-                          onClick={() => {
-                            openAnnouncement(a);
-                            setBellOpen(false);
-                          }}
-                          className="px-4 py-3 border-b dark:border-primary-800 last:border-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-primary-900/30 transition-colors bg-blue-50 dark:bg-blue-900/20"
-                        >
-                          <div className="flex items-start gap-2">
-                            <span className="mt-1.5 w-2 h-2 rounded-full bg-primary-500 flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-gray-800 dark:text-gold-light text-sm">
-                                {a.title}
-                              </p>
-                              <p className="text-gray-500 dark:text-gray-400 text-xs mt-0.5 line-clamp-2">
-                                {a.message}
-                              </p>
-                              {a.createdAt && (
-                                <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">
-                                  {new Date(a.createdAt).toLocaleDateString(
-                                    undefined,
-                                    {
-                                      day: "numeric",
-                                      month: "short",
-                                      year: "numeric",
-                                    },
-                                  )}
+                            onClick={() => {
+                              openAnnouncement(a);
+                              setBellOpen(false);
+                            }}
+                            className="px-4 py-3 border-b dark:border-primary-800 last:border-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-primary-900/30 transition-colors bg-blue-50 dark:bg-blue-900/20"
+                          >
+                            <div className="flex items-start gap-2">
+                              <span className="mt-1.5 w-2 h-2 rounded-full bg-primary-500 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-gray-800 dark:text-gold-light text-sm">
+                                  {a.title}
                                 </p>
-                              )}
+                                <p className="text-gray-500 dark:text-gray-400 text-xs mt-0.5 line-clamp-2">
+                                  {a.message}
+                                </p>
+                                {a.createdAt && (
+                                  <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">
+                                    {new Date(a.createdAt).toLocaleDateString(
+                                      undefined,
+                                      {
+                                        day: "numeric",
+                                        month: "short",
+                                        year: "numeric",
+                                      },
+                                    )}
+                                  </p>
+                                )}
+                              </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  dismissOne(a.id);
+                                }}
+                                className="ml-1 flex-shrink-0 text-gray-300 hover:text-red-500 transition-colors p-0.5 rounded"
+                                aria-label="Dismiss announcement"
+                              >
+                                <FiX size={14} />
+                              </button>
                             </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                dismissOne(a.id);
-                              }}
-                              className="ml-1 flex-shrink-0 text-gray-300 hover:text-red-500 transition-colors p-0.5 rounded"
-                              aria-label="Dismiss announcement"
-                            >
-                              <FiX size={14} />
-                            </button>
                           </div>
-                        </div>
-                      ))
-                    )}
+                        ))
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
               </div>
             )}
 

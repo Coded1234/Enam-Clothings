@@ -28,7 +28,10 @@ const ResetPassword = () => {
     { text: "Contains lowercase letter", met: /[a-z]/.test(password) },
     { text: "Contains uppercase letter", met: /[A-Z]/.test(password) },
     { text: "Contains a number", met: /\d/.test(password) },
-    { text: "Contains a special character", met: /[^A-Za-z0-9]/.test(password) },
+    {
+      text: "Contains a special character",
+      met: /[^A-Za-z0-9]/.test(password),
+    },
   ];
 
   const handleSubmit = async (e) => {

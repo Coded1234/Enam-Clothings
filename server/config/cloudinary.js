@@ -57,10 +57,10 @@ if (isCloudinaryConfigured) {
     }
   };
 
-  upload = multer({ 
+  upload = multer({
     storage: storage,
     fileFilter: fileFilter,
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   });
 
   // Avatar storage for Cloudinary
@@ -68,22 +68,17 @@ if (isCloudinaryConfigured) {
     cloudinary: cloudinary,
     params: {
       folder: "clothing-store/avatars",
-      allowed_formats: [
-        "jpg",
-        "jpeg",
-        "png",
-        "webp",
-      ],
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
       transformation: [
         { width: 200, height: 200, crop: "fill", gravity: "face" },
       ],
     },
   });
 
-  avatarUpload = multer({ 
+  avatarUpload = multer({
     storage: avatarStorage,
     fileFilter: fileFilter,
-    limits: { fileSize: 2 * 1024 * 1024 } // 2MB limit
+    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
   });
 } else {
   // Use local disk storage as fallback

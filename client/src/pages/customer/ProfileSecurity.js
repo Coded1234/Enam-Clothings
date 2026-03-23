@@ -47,11 +47,16 @@ const PasswordField = ({
         {show ? <FiEyeOff size={15} /> : <FiEye size={15} />}
       </button>
     </div>
-    {name === "newPassword" && passwordData[name] && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(passwordData[name]) && (
-      <p className="text-xs text-red-500 mt-2 font-medium">
-        Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.
-      </p>
-    )}
+    {name === "newPassword" &&
+      passwordData[name] &&
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(
+        passwordData[name],
+      ) && (
+        <p className="text-xs text-red-500 mt-2 font-medium">
+          Password must be at least 8 characters and include uppercase,
+          lowercase, a number, and a special character.
+        </p>
+      )}
   </div>
 );
 
@@ -83,12 +88,16 @@ const ProfileSecurity = () => {
       toast.error("Passwords do not match");
       return;
     }
-    
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(passwordData.newPassword)) {
+
+    if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(
+        passwordData.newPassword,
+      )
+    ) {
       document.querySelector('input[name="newPassword"]')?.focus();
       return;
     }
-    
+
     if (passwordData.newPassword.length < 6) {
       toast.error("Password must be at least 6 characters");
       return;
@@ -105,8 +114,13 @@ const ProfileSecurity = () => {
         confirmPassword: "",
       });
     } catch (error) {
-      const message = error.response?.data?.message || "Failed to change password";
-      if (error.response?.status === 400 && message === "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.") {
+      const message =
+        error.response?.data?.message || "Failed to change password";
+      if (
+        error.response?.status === 400 &&
+        message ===
+          "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character."
+      ) {
         document.querySelector('input[name="newPassword"]')?.focus();
       } else {
         toast.error(message);

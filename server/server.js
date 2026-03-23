@@ -57,9 +57,18 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://fonts.googleapis.com",
+          "https://cdn.jsdelivr.net",
+        ],
         imgSrc: ["'self'", "data:", "https:", "res.cloudinary.com"],
-        connectSrc: ["'self'", "https://api.paystack.co", "https://api.cloudinary.com"],
+        connectSrc: [
+          "'self'",
+          "https://api.paystack.co",
+          "https://api.cloudinary.com",
+        ],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         frameSrc: ["'self'"],
       },
@@ -140,12 +149,12 @@ app.use((req, res, next) => {
   if (req.path === "/api/v1/payment/webhook" || req.path === "/api/webhook") {
     return next();
   }
-  
+
   // Allow Swagger API docs to bypass CSRF for testing purposes
   if (req.headers.referer && req.headers.referer.includes("/api-docs")) {
     return next();
   }
-  
+
   csrfProtection(req, res, next);
 });
 
@@ -154,18 +163,26 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Protect API docs with basic authentication
 const swaggerBasicAuth = (req, res, next) => {
-  const auth = Buffer.from((req.headers.authorization || '').replace('Basic ', ''), 'base64').toString();
-  const [user, pass] = auth.split(':');
-  
+  const auth = Buffer.from(
+    (req.headers.authorization || "").replace("Basic ", ""),
+    "base64",
+  ).toString();
+  const [user, pass] = auth.split(":");
+
   // NEVER hardcode credentials directly in the codebase for production!
   // These are now required to be configured in your .env file
   const expectedUser = process.env.SWAGGER_USER;
   const expectedPass = process.env.SWAGGER_PASSWORD;
-  
+
   // If either credential isn't set, block access entirely as a fail-safe
-  if (!expectedUser || !expectedPass || user !== expectedUser || pass !== expectedPass) {
-    res.setHeader('WWW-Authenticate', 'Basic realm="API Docs"');
-    return res.status(401).json({ message: 'Unauthorized' });
+  if (
+    !expectedUser ||
+    !expectedPass ||
+    user !== expectedUser ||
+    pass !== expectedPass
+  ) {
+    res.setHeader("WWW-Authenticate", 'Basic realm="API Docs"');
+    return res.status(401).json({ message: "Unauthorized" });
   }
   next();
 };
@@ -214,8 +231,12 @@ app.get(`${API_PREFIX}/health`, (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  if (err.code === 'EBADCSRFTOKEN') {
-    return res.status(403).json({ message: "Invalid CSRF Token. Please refresh the page and try again." });
+  if (err.code === "EBADCSRFTOKEN") {
+    return res
+      .status(403)
+      .json({
+        message: "Invalid CSRF Token. Please refresh the page and try again.",
+      });
   }
 
   logger.error(err.stack);

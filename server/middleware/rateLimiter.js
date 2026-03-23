@@ -9,9 +9,10 @@ const generalLimiter = rateLimit({
 
 // Strict rate limiter for authentication endpoints (login, register, forgot-password)
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
+  windowMs: 15 * 60 * 1000,
   max: 10, // 10 requests per 15 minutes
-  message: "Too many authentication attempts, please try again after 15 minutes",
+  message:
+    "Too many authentication attempts, please try again after 15 minutes",
 });
 
 // Strict rate limiter for order endpoints to prevent card testing or spam

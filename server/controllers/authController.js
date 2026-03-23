@@ -117,7 +117,12 @@ const login = async (req, res) => {
     // Find user
     const user = await User.findOne({ where: { email: emailCheck.email } });
     if (!user) {
-      return res.status(404).json({ message: "We don't recognize this email. Please register to continue." });
+      return res
+        .status(404)
+        .json({
+          message:
+            "We don't recognize this email. Please register to continue.",
+        });
     }
 
     // Check password

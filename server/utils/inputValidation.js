@@ -1,4 +1,4 @@
-const validator = require('validator');
+const validator = require("validator");
 
 const GMAIL_DOMAIN = "@gmail.com";
 const ALLOWED_SIGNUP_EMAIL_DOMAINS = new Set([

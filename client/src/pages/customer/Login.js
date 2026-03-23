@@ -148,7 +148,9 @@ const Login = () => {
         setFormError(errMsg);
         if (errMsg.includes("We don't recognize this email")) {
           setTimeout(() => {
-            router.push(`/register?email=${encodeURIComponent(formData.email)}`);
+            router.push(
+              `/register?email=${encodeURIComponent(formData.email)}`,
+            );
           }, 3000);
         }
       } else {
@@ -221,7 +223,9 @@ const Login = () => {
                   onChange={handleChange}
                   placeholder="Enter your email"
                   className={`w-full pl-12 pr-4 py-4 border ${
-                    formError && (formError.includes("email") || formError.includes("email or password"))
+                    formError &&
+                    (formError.includes("email") ||
+                      formError.includes("email or password"))
                       ? "border-red-500 focus:ring-red-500"
                       : "border-gray-300 focus:ring-primary-500"
                   } rounded-xl placeholder-black focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
@@ -232,7 +236,9 @@ const Login = () => {
               {formError &&
                 (formError.includes("We don't recognize this email") ||
                   formError.toLowerCase() === "invalid email") && (
-                  <p className="mt-2 text-sm text-red-500 font-medium">{formError}</p>
+                  <p className="mt-2 text-sm text-red-500 font-medium">
+                    {formError}
+                  </p>
                 )}
             </div>
 
@@ -253,7 +259,9 @@ const Login = () => {
                   onChange={handleChange}
                   placeholder="Enter your password"
                   className={`w-full pl-12 pr-12 py-4 border ${
-                    formError && (formError.toLowerCase().includes("password") || formError.toLowerCase().includes("credentials"))
+                    formError &&
+                    (formError.toLowerCase().includes("password") ||
+                      formError.toLowerCase().includes("credentials"))
                       ? "border-red-500 focus:ring-red-500"
                       : "border-gray-300 focus:ring-primary-500"
                   } rounded-xl placeholder-black focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
@@ -272,7 +280,9 @@ const Login = () => {
                 (formError.toLowerCase().includes("password") ||
                   formError.toLowerCase().includes("credentials") ||
                   formError.toLowerCase() === "invalid email or password") && (
-                  <p className="mt-2 text-sm text-red-500 font-medium">{formError}</p>
+                  <p className="mt-2 text-sm text-red-500 font-medium">
+                    {formError}
+                  </p>
                 )}
             </div>
 
