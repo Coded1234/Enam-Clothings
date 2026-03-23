@@ -84,9 +84,7 @@ const Login = () => {
       const isFormError =
         typeof error === "string" &&
         (error.includes("We don't recognize this email") ||
-          error.toLowerCase().includes("invalid email") ||
-          error.toLowerCase().includes("incorrect password") ||
-          error.toLowerCase().includes("invalid credentials"));
+          error.toLowerCase().includes("invalid email or password"));
 
       if (!isFormError) {
         toast.error(error);
@@ -141,9 +139,7 @@ const Login = () => {
       } else if (
         errMsg &&
         (errMsg.includes("We don't recognize this email") ||
-          errMsg.toLowerCase().includes("invalid email") ||
-          errMsg.toLowerCase().includes("incorrect password") ||
-          errMsg.toLowerCase().includes("invalid credentials"))
+          errMsg.toLowerCase().includes("invalid email or password"))
       ) {
         setFormError(errMsg);
         if (errMsg.includes("We don't recognize this email")) {
@@ -224,8 +220,7 @@ const Login = () => {
                   placeholder="Enter your email"
                   className={`w-full pl-12 pr-4 py-4 border ${
                     formError &&
-                    (formError.includes("email") ||
-                      formError.includes("email or password"))
+                    formError.includes("We don't recognize this email")
                       ? "border-red-500 focus:ring-red-500"
                       : "border-gray-300 focus:ring-primary-500"
                   } rounded-xl placeholder-black focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
@@ -234,8 +229,7 @@ const Login = () => {
                 />
               </div>
               {formError &&
-                (formError.includes("We don't recognize this email") ||
-                  formError.toLowerCase() === "invalid email") && (
+                formError.includes("We don't recognize this email") && (
                   <p className="mt-2 text-sm text-red-500 font-medium">
                     {formError}
                   </p>
@@ -260,8 +254,7 @@ const Login = () => {
                   placeholder="Enter your password"
                   className={`w-full pl-12 pr-12 py-4 border ${
                     formError &&
-                    (formError.toLowerCase().includes("password") ||
-                      formError.toLowerCase().includes("credentials"))
+                    formError.toLowerCase().includes("invalid email or password")
                       ? "border-red-500 focus:ring-red-500"
                       : "border-gray-300 focus:ring-primary-500"
                   } rounded-xl placeholder-black focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
@@ -277,9 +270,7 @@ const Login = () => {
                 </button>
               </div>
               {formError &&
-                (formError.toLowerCase().includes("password") ||
-                  formError.toLowerCase().includes("credentials") ||
-                  formError.toLowerCase() === "invalid email or password") && (
+                formError.toLowerCase().includes("invalid email or password") && (
                   <p className="mt-2 text-sm text-red-500 font-medium">
                     {formError}
                   </p>
