@@ -11,6 +11,7 @@ const getBaseURL = () => {
 
 const api = axios.create({
   baseURL: getBaseURL(),
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -19,6 +20,9 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
+    // Note: HttpOnly cookie will be automatically sent with requests
+    // We still keep Authorization header for backwards compatibility if a token exists in localStorage 
+    // from an old session, but new sessions use cookies heavily.
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

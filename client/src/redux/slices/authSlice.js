@@ -19,7 +19,6 @@ export const register = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const { data } = await authAPI.register(userData);
-      localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
       return data;
     } catch (error) {
@@ -35,7 +34,6 @@ export const login = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const { data } = await authAPI.login(credentials);
-      localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
       return data;
     } catch (error) {
@@ -49,7 +47,6 @@ export const googleLogin = createAsyncThunk(
   async (token, { rejectWithValue }) => {
     try {
       const { data } = await authAPI.googleLogin(token);
-      localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
       return data;
     } catch (error) {
@@ -65,7 +62,6 @@ export const facebookLogin = createAsyncThunk(
   async (token, { rejectWithValue }) => {
     try {
       const { data } = await authAPI.facebookLogin(token);
-      localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
       return data;
     } catch (error) {
@@ -80,8 +76,9 @@ export const loadUser = createAsyncThunk(
   "auth/loadUser",
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return null;
+      const hasUser = !!localStorage.getItem("user");
+      // Still attempt if hasUser is true, the cookie should handle auth
+      if (!hasUser) return null;
 
       const { data } = await authAPI.getProfile();
       return data;
@@ -113,6 +110,10 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
+      // Send logout request to backend to clear HttpOnly cookie
+      try {
+        authAPI.logout().catch(err => console.error(err));
+      } catch(e) {}
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       state.user = null;
@@ -206,3 +207,4 @@ const authSlice = createSlice({
 
 export const { logout, clearError, setCredentials } = authSlice.actions;
 export default authSlice.reducer;
+
