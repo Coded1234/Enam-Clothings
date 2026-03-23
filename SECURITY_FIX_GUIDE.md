@@ -13,7 +13,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 # server/.env - CHANGE THESE IMMEDIATELY:
 
 # Old (COMPROMISED):
-# JWT_SECRET=[REDACTED_JWT]
+# JWT_SECRET=[EXPOSED_JWT_REDACTED]
 
 # New (Generate from above):
 JWT_SECRET=<paste-new-generated-secret>
@@ -36,7 +36,7 @@ EMAIL_PASS=<use-app-password-not-login-password>
 
 # Admin - REMOVE ENTIRELY!
 # DELETE THIS LINE:
-# ADMIN_PASSWORD=[REDACTED_ADMIN_PWD]
+# ADMIN_PASSWORD=[ADMIN_PASSWORD_REDACTED]
 # Setup admin via CLI instead (see below)
 ```
 
