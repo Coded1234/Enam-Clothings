@@ -14,13 +14,15 @@ const sequelize = process.env.DATABASE_URL
           require: true,
           rejectUnauthorized: false,
         },
+        keepAlive: true,
       },
       logging: process.env.NODE_ENV === "development" ? console.log : false,
       pool: {
         max: 5,
         min: 0,
         acquire: 30000,
-        idle: 10000,
+        idle: 0,
+        evict: 1000,
       },
       define: {
         timestamps: true,
@@ -35,12 +37,16 @@ const sequelize = process.env.DATABASE_URL
         host: process.env.DB_HOST || "localhost",
         port: process.env.DB_PORT || 5432,
         dialect: "postgres",
+        dialectOptions: {
+          keepAlive: true,
+        },
         logging: process.env.NODE_ENV === "development" ? console.log : false,
         pool: {
           max: 5,
           min: 0,
           acquire: 30000,
-          idle: 10000,
+          idle: 0,
+          evict: 1000,
         },
         define: {
           timestamps: true,

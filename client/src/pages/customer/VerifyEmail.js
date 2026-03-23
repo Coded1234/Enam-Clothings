@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/slices/authSlice";
-import axios from "axios";
+import api from "../../utils/api";
 import toast from "react-hot-toast";
 import { FiMail, FiCheckCircle, FiRefreshCw } from "react-icons/fi";
 
@@ -73,7 +73,7 @@ const VerifyEmail = () => {
     }
     setLoading(true);
     try {
-      const { data } = await axios.post("/api/auth/verify-email", {
+      const { data } = await api.post("/auth/verify-email", {
         email,
         otp,
       });
@@ -102,7 +102,7 @@ const VerifyEmail = () => {
     }
     setResending(true);
     try {
-      const { data } = await axios.post("/api/auth/resend-verification", {
+      const { data } = await api.post("/auth/resend-verification", {
         email,
       });
       toast.success(data.message);
