@@ -83,7 +83,7 @@ const VerifyEmail = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center flex flex-col items-center">
-          <FiLoader className="text-primary-600 animate-spin mb-4" size:{48} />
+          <FiLoader className="text-primary-600 animate-spin mb-4" size={48} />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Verifying Email...</h2>
           <p className="text-gray-500">Please wait while we verify your email address.</p>
         </div>
@@ -95,7 +95,7 @@ const VerifyEmail = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-          <FiCheckCircle className="mx-auto text-green-500 mb-4" size/{64} />
+          <FiCheckCircle className="mx-auto text-green-500 mb-4" size={64} />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Email Verified!</h2>
           <p className="text-gray-500 mb-6">Your account is now active. You are being redirected...</p>
           <Link
