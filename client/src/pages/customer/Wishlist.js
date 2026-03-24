@@ -18,7 +18,11 @@ import {
   FiX,
 } from "react-icons/fi";
 
+import { useDispatch } from "react-redux";
+import { addToCart as addToCartAction } from "../../redux/slices/cartSlice";
+
 const Wishlist = () => {
+  const dispatch = useDispatch();
   const [wishlistItems, setWishlistItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState("grid");
@@ -64,25 +68,60 @@ const Wishlist = () => {
   const addToCart = async (product) => {
     setAddingToCartId(product.id);
     try {
-      await cartAPI.add({
-        productId: product.id,
-        quantity: 1,
-        size: product.sizes?.[0] || "M",
-        color: product.colors?.[0] || null,
-      });
+      await dispatch(
+        addToCartAction({
+          productId: product.id,
+          quantity: 1,
+          size: product.sizes?.[0] || "M",
+          color: product.colors?.[0] || null,
+        }),
+      ).unwrap();
       toast.success("Added to cart!");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to add to cart");
+      toast.error(error?.message || "Failed to add to cart");
     } finally {
       setAddingToCartId(null);
     }
   };
 
   const moveAllToCart = async () => {
-    for (const item of wishlistItems) {
-      await addToCart(item);
+    const availableItems = wishlistItems.filter((item) => item.stock > 0);
+
+    if (availableItems.length === 0) {
+      toast.error("No available items to add to cart");
+      return;
     }
-    toast.success("All items moved to cart!");
+
+    let successCount = 0;
+
+    for (const item of availableItems) {
+      setAddingToCartId(item.id);
+      try {
+        await dispatch(
+          addToCartAction({
+            productId: item.id,
+            quantity: 1,
+            size: item.sizes?.[0] || "M",
+            color: item.colors?.[0] || null,
+          }),
+        ).unwrap();
+        successCount++;
+        // Optional: Remove from wishlist after moving
+        // await authAPI.toggleWishlist(item.id);
+      } catch (error) {
+        console.error(`Failed to add ${item.name}:`, error);
+      }
+    }
+
+    setAddingToCartId(null);
+
+    if (successCount === availableItems.length) {
+      toast.success("All items moved to cart!");
+    } else if (successCount > 0) {
+      toast.success(`Successfully added ${successCount} items to cart!`);
+    } else {
+      toast.error("Failed to move items to cart.");
+    }
   };
 
   const clearWishlist = async () => {

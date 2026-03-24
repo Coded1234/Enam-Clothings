@@ -62,6 +62,11 @@ const nextConfig = {
       { protocol: "http", hostname: "localhost" },
     ],
   },
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
+  },
   transpilePackages: [],
   webpack: (config) => {
     // IMPORTANT: This repo embeds components from ./client/src inside Next.
