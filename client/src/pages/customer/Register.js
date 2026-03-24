@@ -234,9 +234,7 @@ const Register = () => {
         password: formData.password,
       });
 
-      toast.success(
-        "Registration successful! Check your email for your 6-digit OTP code.",
-      );
+      toast.success("Registration successful! Verify your email");
       router.push(`/verify-email?email=${encodeURIComponent(email)}`);
     } catch (err) {
       const status = err.response?.status;

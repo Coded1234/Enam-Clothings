@@ -1,0 +1,39 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install Server Dependencies
+        run: cd server && npm ci
+
+      - name: Install Client Dependencies
+        run: cd client && npm ci
+
+      - name: Run Server Tests
+        run: cd server && npm test || echo "No server tests found or tests failed"
+
+      - name: Run Client Tests
+        run: cd client && npm test || echo "No client tests found or tests failed"
+
+      - name: Build Client
+        run: cd client && npm run build

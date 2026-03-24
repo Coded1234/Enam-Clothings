@@ -191,9 +191,12 @@ const AddressMapPicker = ({ onAddressSelect, currentPosition }) => {
       },
       (error) => {
         console.error("Error getting location:", error);
-        alert("Unable to get your location. Please select on the map.");
+        alert(
+          "Unable to get your location. Please check your browser permissions.",
+        );
         setLoading(false);
       },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
     );
   };
 

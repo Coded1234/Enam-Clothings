@@ -135,6 +135,10 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 app.use(xssMiddleware());
 
+// Prevent HTTP Parameter Pollution
+const hpp = require("hpp");
+app.use(hpp());
+
 const csrf = require("csurf");
 const csrfProtection = csrf({
   cookie: {
@@ -232,11 +236,9 @@ app.get(`${API_PREFIX}/health`, (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   if (err.code === "EBADCSRFTOKEN") {
-    return res
-      .status(403)
-      .json({
-        message: "Invalid CSRF Token. Please refresh the page and try again.",
-      });
+    return res.status(403).json({
+      message: "Invalid CSRF Token. Please refresh the page and try again.",
+    });
   }
 
   logger.error(err.stack);
@@ -248,12 +250,14 @@ app.use((err, req, res, next) => {
 
 // Connect to PostgreSQL and start server
 const PORT = process.env.PORT || 5000;
+const { initCronJobs } = require("./utils/cronJobs");
 
 const startServer = async () => {
   try {
     await connectDB();
     app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
+      initCronJobs(); // Initialize background cron jobs
     });
   } catch (error) {
     logger.error("Failed to start server:", error);

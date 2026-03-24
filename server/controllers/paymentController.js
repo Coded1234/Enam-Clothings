@@ -39,7 +39,9 @@ const initializePayment = async (req, res) => {
 
     const emailCheck = validateEmail(email);
     if (!emailCheck.ok) {
-      return res.status(400).json({ status: false, message: emailCheck.message });
+      return res
+        .status(400)
+        .json({ status: false, message: emailCheck.message });
     }
 
     if (amount <= 0) {
@@ -134,50 +136,82 @@ const verifyPayment = async (req, res) => {
             const orderId = response.data.metadata.order_id;
 
             if (orderId) {
-              const order = await Order.findByPk(orderId, {
-                include: [
-                  {
-                    model: OrderItem,
-                    as: "items",
-                  },
-                  {
-                    model: User,
-                    as: "user",
-                  },
-                ],
-              });
+              const { sequelize } = require("../models");
+              let order;
+              try {
+                order = await sequelize.transaction(async (t) => {
+                  const o = await Order.findByPk(orderId, {
+                    include: [
+                      {
+                        model: OrderItem,
+                        as: "items",
+                      },
+                      {
+                        model: User,
+                        as: "user",
+                      },
+                    ],
+                    lock: t.LOCK.UPDATE,
+                    transaction: t,
+                  });
 
-              if (order && order.paymentStatus !== "paid") {
-                // Update order status
-                order.paymentStatus = "paid";
-                order.paymentReference = reference;
-                order.status = "confirmed";
-                await order.save();
+                  if (o && o.paymentStatus !== "paid") {
+                    // Idempotency check
+                    const existingOrder = await Order.findOne({
+                      where: { paymentReference: reference },
+                      transaction: t,
+                    });
+                    if (existingOrder) {
+                      return o; // Already processed
+                    }
 
-                // Clear user's cart after successful payment
-                const { Cart, CartItem } = require("../models");
-                const cart = await Cart.findOne({
-                  where: { userId: order.userId },
-                });
-                if (cart) {
-                  await CartItem.destroy({ where: { cartId: cart.id } });
-                  cart.totalAmount = 0;
-                  await cart.save();
-                }
+                    // Update order status
+                    o.paymentStatus = "paid";
+                    o.paymentReference = reference;
+                    o.status = "confirmed";
+                    await o.save({ transaction: t });
 
-                // Update stock for each product in the order
-                for (const item of order.items) {
-                  const product = await Product.findByPk(item.productId);
-                  if (product) {
-                    // Increase soldCount and decrease remainingStock
-                    product.soldCount =
-                      (product.soldCount || 0) + item.quantity;
-                    product.remainingStock =
-                      (product.totalStock || 0) - product.soldCount;
-                    await product.save();
+                    // Clear user's cart after successful payment
+                    const { Cart, CartItem } = require("../models");
+                    const cart = await Cart.findOne({
+                      where: { userId: o.userId },
+                      transaction: t,
+                    });
+                    if (cart) {
+                      await CartItem.destroy({
+                        where: { cartId: cart.id },
+                        transaction: t,
+                      });
+                      cart.totalAmount = 0;
+                      await cart.save({ transaction: t });
+                    }
+
+                    // Update stock for each product in the order
+                    for (const item of o.items) {
+                      const product = await Product.findByPk(item.productId, {
+                        lock: t.LOCK.UPDATE,
+                        transaction: t,
+                      });
+                      if (product) {
+                        // Increase soldCount and decrease remainingStock
+                        product.soldCount =
+                          (product.soldCount || 0) + item.quantity;
+                        product.remainingStock =
+                          (product.totalStock || 0) - product.soldCount;
+                        await product.save({ transaction: t });
+                      }
+                    }
+
+                    o.justPaid = true;
                   }
-                }
+                  return o;
+                });
+              } catch (txError) {
+                console.error("Error verifying payment transaction:", txError);
+                order = await Order.findByPk(orderId); // fallback
+              }
 
+              if (order && order.justPaid) {
                 // Send confirmation email
                 try {
                   // To Customer
@@ -265,9 +299,10 @@ const verifyPayment = async (req, res) => {
 const paystackWebhook = async (req, res) => {
   try {
     const crypto = require("crypto");
+    const rawBody = req.rawBody || JSON.stringify(req.body);
     const hash = crypto
       .createHmac("sha512", PAYSTACK_SECRET)
-      .update(JSON.stringify(req.body))
+      .update(rawBody)
       .digest("hex");
 
     if (hash === req.headers["x-paystack-signature"]) {
@@ -282,49 +317,79 @@ const paystackWebhook = async (req, res) => {
         console.log("Payment successful:", reference, "Order ID:", orderId);
 
         if (orderId) {
-          const order = await Order.findByPk(orderId, {
-            include: [
-              {
-                model: OrderItem,
-                as: "items",
-              },
-            ],
-          });
+          const { sequelize } = require("../models");
+          try {
+            await sequelize.transaction(async (t) => {
+              const order = await Order.findByPk(orderId, {
+                include: [
+                  {
+                    model: OrderItem,
+                    as: "items",
+                  },
+                ],
+                lock: t.LOCK.UPDATE,
+                transaction: t,
+              });
 
-          if (order && order.paymentStatus !== "paid") {
-            // Update order status
-            order.paymentStatus = "paid";
-            order.paymentReference = reference;
-            order.status = "confirmed";
-            await order.save();
+              if (order && order.paymentStatus !== "paid") {
+                // Check idempotency by reference just in case
+                const existingOrder = await Order.findOne({
+                  where: { paymentReference: reference },
+                  transaction: t,
+                });
+                if (existingOrder) {
+                  console.log("Idempotency hit: reference already used.");
+                  return;
+                }
 
-            // Clear user's cart after successful payment
-            const { Cart, CartItem } = require("../models");
-            const cart = await Cart.findOne({
-              where: { userId: order.userId },
-            });
-            if (cart) {
-              await CartItem.destroy({ where: { cartId: cart.id } });
-              cart.totalAmount = 0;
-              await cart.save();
-            }
+                // Update order status
+                order.paymentStatus = "paid";
+                order.paymentReference = reference;
+                order.status = "confirmed";
+                await order.save({ transaction: t });
 
-            // Update stock for each product in the order
-            for (const item of order.items) {
-              const product = await Product.findByPk(item.productId);
-              if (product) {
-                // Increase soldCount and decrease remainingStock
-                product.soldCount = (product.soldCount || 0) + item.quantity;
-                product.remainingStock =
-                  (product.totalStock || 0) - product.soldCount;
-                await product.save();
+                // Clear user's cart after successful payment
+                const { Cart, CartItem } = require("../models");
+                const cart = await Cart.findOne({
+                  where: { userId: order.userId },
+                  transaction: t,
+                });
+                if (cart) {
+                  await CartItem.destroy({
+                    where: { cartId: cart.id },
+                    transaction: t,
+                  });
+                  cart.totalAmount = 0;
+                  await cart.save({ transaction: t });
+                }
+
+                // Update stock for each product in the order
+                for (const item of order.items) {
+                  const product = await Product.findByPk(item.productId, {
+                    lock: t.LOCK.UPDATE,
+                    transaction: t,
+                  });
+                  if (product) {
+                    // Increase soldCount and decrease remainingStock
+                    product.soldCount =
+                      (product.soldCount || 0) + item.quantity;
+                    product.remainingStock =
+                      (product.totalStock || 0) - product.soldCount;
+                    await product.save({ transaction: t });
+                  }
+                }
+
+                console.log(
+                  "Order updated:",
+                  order.id,
+                  "- Stock updated for all items",
+                );
               }
-            }
-
-            console.log(
-              "Order updated:",
-              order.id,
-              "- Stock updated for all items",
+            });
+          } catch (txError) {
+            console.error(
+              "Error updating order in webhook transaction:",
+              txError,
             );
           }
         }

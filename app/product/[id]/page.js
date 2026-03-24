@@ -92,8 +92,45 @@ export default async function ProductDetailPage({ params }) {
     getReviews(id),
   ]);
 
+  // Construct SEO JSON-LD schema
+  const jsonLd = product
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: product.name,
+        image: product.images
+          ? product.images.map((img) => extractImageUrl(img)).filter(Boolean)
+          : [],
+        description: product.description,
+        sku: product.id,
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "USD", // Update to store currency if dynamic
+          price: product.price,
+          availability:
+            product.stock > 0
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+        },
+        // Optional: add AggregateRating if we have reviews
+        ...(reviewsData?.total > 0 && {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: product.averageRating || 5, // fallback if needed
+            reviewCount: reviewsData.total,
+          },
+        }),
+      }
+    : null;
+
   return (
     <CustomerLayout>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <ProductDetail
         initialProduct={toPlain(product)}
         initialRelatedProducts={toPlain(relatedProducts)}

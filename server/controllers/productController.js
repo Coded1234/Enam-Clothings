@@ -1,11 +1,22 @@
 const { Product, sequelize } = require("../models");
 const { Op } = require("sequelize");
 const { cloudinary } = require("../config/cloudinary");
+const NodeCache = require("node-cache");
+const productCache = new NodeCache({ stdTTL: 300 }); // Cache for 5 mins
+
+// Helper to flush cache when products change
+const flushProductCache = () => productCache.flushAll();
 
 // @desc    Get all products with filters
 // @route   GET /api/products
 const getProducts = async (req, res) => {
   try {
+    const cacheKey = `products_${JSON.stringify(req.query)}`;
+    const cachedResponse = productCache.get(cacheKey);
+    if (cachedResponse) {
+      return res.json(cachedResponse);
+    }
+
     const {
       page = 1,
       limit = 12,
@@ -69,12 +80,16 @@ const getProducts = async (req, res) => {
       limit: Number(limit),
     });
 
-    res.json({
+    const responseData = {
       products,
       page: Number(page),
       pages: Math.ceil(total / Number(limit)),
       total,
-    });
+    };
+
+    productCache.set(cacheKey, responseData);
+
+    res.json(responseData);
   } catch (error) {
     console.error("Get products error:", error);
     res
@@ -105,11 +120,18 @@ const getProductById = async (req, res) => {
 // @route   GET /api/products/featured
 const getFeaturedProducts = async (req, res) => {
   try {
+    const cacheKey = "featured_products";
+    const cachedResponse = productCache.get(cacheKey);
+    if (cachedResponse) return res.json(cachedResponse);
+
     const products = await Product.findAll({
       where: { featured: true, isActive: true },
       limit: 8,
       order: [["createdAt", "DESC"]],
     });
+
+    productCache.set(cacheKey, products);
+
     res.json(products);
   } catch (error) {
     res.status(500).json({
