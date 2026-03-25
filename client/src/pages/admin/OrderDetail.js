@@ -305,6 +305,11 @@ const OrderDetail = () => {
     );
   }
 
+  const isGuestOrder = Boolean(
+    order.guestName || order.guestEmail || order.sessionId || !order.userId,
+  );
+  const customerPhone = order.shippingAddress?.phone || order.user?.phone;
+
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Header */}
@@ -575,17 +580,12 @@ const OrderDetail = () => {
                       : "Guest")}
               </p>
               <div className="flex flex-col gap-1 text-gray-500 text-sm">
-                {(order.shippingAddress?.email ||
-                  order.guestEmail ||
-                  (order.user?.email && order.user?.role !== "admin")) && (
-                  <p>
-                    {order.shippingAddress?.email ||
-                      order.guestEmail ||
-                      order.user?.email}
-                  </p>
-                )}
-                <p>{order.shippingAddress?.phone || order.user?.phone}</p>
-                {!order.shippingAddress?.email && !order.guestEmail && (
+                {!isGuestOrder &&
+                  (order.shippingAddress?.email || order.user?.email) && (
+                    <p>{order.shippingAddress?.email || order.user?.email}</p>
+                  )}
+                <p>{customerPhone}</p>
+                {isGuestOrder && (
                   <p className="text-xs text-indigo-500 font-medium bg-indigo-50 inline-block px-2 py-1 rounded w-fit mt-1">
                     Guest Checkout
                   </p>
@@ -610,9 +610,12 @@ const OrderDetail = () => {
               {order.shippingAddress?.phone && (
                 <p>Phone: {order.shippingAddress?.phone}</p>
               )}
-              {(order.shippingAddress?.email || order.guestEmail) && (
-                <p>Email: {order.shippingAddress?.email || order.guestEmail}</p>
-              )}
+              {!isGuestOrder &&
+                (order.shippingAddress?.email || order.user?.email) && (
+                  <p>
+                    Email: {order.shippingAddress?.email || order.user?.email}
+                  </p>
+                )}
             </div>
           </div>
 
