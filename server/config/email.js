@@ -144,6 +144,9 @@ const getEmailLayout = (content, title = "Diamond Aura Gallery") => `
 // Email templates
 const emailTemplates = {
   orderConfirmation: (order, user) => {
+    const customerFirstName = user
+      ? user.firstName
+      : order.shippingAddress?.firstName || "Customer";
     const itemsHtml = order.items
       ?.map(
         (item) => `
@@ -167,7 +170,7 @@ const emailTemplates = {
     const content = `
       <h2 style="color: #333; margin-top: 0; text-align: center;">Order Confirmed!</h2>
       <p style="text-align: center; color: #666; font-size: 16px;">Hi ${
-        user.firstName
+        customerFirstName
       }, thank you for your order.</p>
       
       <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin: 30px 0;">
@@ -619,10 +622,10 @@ const emailTemplates = {
     };
   },
 
-emailVerification: (user, token) => {
+  emailVerification: (user, token) => {
     const FRONTEND_URL = process.env.CLIENT_URL || "http://localhost:3000";
     const verificationLink = `${FRONTEND_URL}/verify-email?token=${token}&email=${encodeURIComponent(user.email)}`;
-    
+
     const content = `
       <h2 style="color: #333; margin-top: 0; text-align: center;">Verify Your Email</h2>
       <p style="text-align: center; color: #666; font-size: 16px;">Hi ${user.firstName}, please click the button below to verify your email address and activate your account.</p>
@@ -648,6 +651,16 @@ emailVerification: (user, token) => {
 
   // Admin Notification Templates
   adminNewOrder: (order, user) => {
+    const customerFirstName = user
+      ? user.firstName
+      : order.shippingAddress?.firstName || "Guest";
+    const customerLastName = user
+      ? user.lastName
+      : order.shippingAddress?.lastName || "";
+    const customerEmail = user
+      ? user.email
+      : order.shippingAddress?.email || "No email";
+
     const itemsHtml = order.items
       ?.map(
         (item) => `
@@ -664,11 +677,9 @@ emailVerification: (user, token) => {
 
     const content = `
       <h2 style="color: #333; margin-top: 0;">New Order Alert 🔔</h2>
-      
+
       <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
-        <p style="margin: 5px 0;"><strong>Customer:</strong> ${user.firstName} ${
-          user.lastName
-        } (${user.email})</p>
+        <p style="margin: 5px 0;"><strong>Customer:</strong> ${customerFirstName} ${customerLastName} (${customerEmail})</p>
         <p style="margin: 5px 0;"><strong>Amount:</strong> GH₵${Number(
           order.totalAmount,
         ).toLocaleString()}</p>

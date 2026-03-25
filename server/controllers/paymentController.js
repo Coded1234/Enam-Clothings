@@ -51,11 +51,14 @@ const initializePayment = async (req, res) => {
       });
     }
 
+    const callbackBaseUrl =
+      process.env.CLIENT_URL || req.headers.origin || "http://localhost:3000";
+
     const params = JSON.stringify({
       email: emailCheck.email,
       amount: Math.round(amount * 100), // Convert to kobo and ensure integer
       metadata,
-      callback_url: `${process.env.CLIENT_URL}/payment/verify`,
+      callback_url: `${callbackBaseUrl}/payment/verify`,
     });
 
     const options = {
@@ -76,9 +79,30 @@ const initializePayment = async (req, res) => {
         data += chunk;
       });
 
-      paystackRes.on("end", () => {
-        const response = JSON.parse(data);
-        res.json(response);
+      paystackRes.on("end", async () => {
+        try {
+          const response = JSON.parse(data);
+
+          // Save the reference to the order IMMEDIATELY so we don't rely only on metadata later
+          if (
+            response.status &&
+            response.data &&
+            response.data.reference &&
+            metadata?.order_id
+          ) {
+            const { Order } = require("../models");
+            await Order.update(
+              { paymentReference: response.data.reference },
+              { where: { id: metadata.order_id } },
+            );
+          }
+
+          res.json(response);
+        } catch (err) {
+          console.error("Error updating order reference:", err);
+          // Still return the response to let them pay
+          res.json(JSON.parse(data || "{}"));
+        }
       });
     });
 
@@ -133,7 +157,35 @@ const verifyPayment = async (req, res) => {
           if (response.status && response.data.status === "success") {
             // Payment successful - update order status
             const { Order, OrderItem, Product, User } = require("../models");
-            const orderId = response.data.metadata.order_id;
+
+            // Safely parse metadata
+            let metadata = response.data.metadata;
+            if (typeof metadata === "string") {
+              try {
+                metadata = JSON.parse(metadata);
+              } catch (e) {
+                console.error("Failed to parse metadata string:", e);
+                metadata = {};
+              }
+            }
+
+            // Look up the order either by saved paymentReference OR metadata order_id
+            let orderToUpdate = await Order.findOne({
+              where: { paymentReference: reference },
+            });
+            if (!orderToUpdate && metadata?.order_id) {
+              orderToUpdate = await Order.findByPk(metadata.order_id);
+            }
+
+            const orderId = orderToUpdate?.id;
+            console.log(
+              "VerifyPayment: Paystack response for ref",
+              reference,
+              "status:",
+              response.data.status,
+              "Extracted Order ID:",
+              orderId,
+            );
 
             if (orderId) {
               const { sequelize } = require("../models");
@@ -156,13 +208,16 @@ const verifyPayment = async (req, res) => {
                   });
 
                   if (o && o.paymentStatus !== "paid") {
-                    // Idempotency check
+                    // Idempotency check: ensure this reference isn't already used by ANOTHER paid order
                     const existingOrder = await Order.findOne({
-                      where: { paymentReference: reference },
+                      where: {
+                        paymentReference: reference,
+                        paymentStatus: "paid",
+                      },
                       transaction: t,
                     });
-                    if (existingOrder) {
-                      return o; // Already processed
+                    if (existingOrder && existingOrder.id !== o.id) {
+                      return o; // Already processed by another order
                     }
 
                     // Update order status
@@ -253,11 +308,18 @@ const verifyPayment = async (req, res) => {
                   order: order,
                   data: response.data,
                 });
-              } else if (order) {
+              } else if (order && order.paymentStatus === "paid") {
                 // Order already paid, just return success
                 return res.json({
                   success: true,
                   message: "Payment already verified",
+                  order: order,
+                  data: response.data,
+                });
+              } else {
+                return res.json({
+                  success: false,
+                  message: "Payment verification failed during database update",
                   order: order,
                   data: response.data,
                 });
@@ -317,9 +379,32 @@ const paystackWebhook = async (req, res) => {
         // Handle successful charge
         const { Order, OrderItem, Product } = require("../models");
         const reference = event.data.reference;
-        const orderId = event.data.metadata?.order_id;
 
-        console.log("Payment successful:", reference, "Order ID:", orderId);
+        let metadata = event.data.metadata;
+        if (typeof metadata === "string") {
+          try {
+            metadata = JSON.parse(metadata);
+          } catch (e) {
+            console.error("Failed to parse event metadata string:", e);
+            metadata = {};
+          }
+        }
+
+        let targetOrder = await Order.findOne({
+          where: { paymentReference: reference },
+        });
+        if (!targetOrder && metadata?.order_id) {
+          targetOrder = await Order.findByPk(metadata.order_id);
+        }
+
+        const orderId = targetOrder?.id;
+
+        console.log(
+          "Webhook Payment successful:",
+          reference,
+          "Order ID:",
+          orderId,
+        );
 
         if (orderId) {
           const { sequelize } = require("../models");
@@ -339,11 +424,13 @@ const paystackWebhook = async (req, res) => {
               if (order && order.paymentStatus !== "paid") {
                 // Check idempotency by reference just in case
                 const existingOrder = await Order.findOne({
-                  where: { paymentReference: reference },
+                  where: { paymentReference: reference, paymentStatus: "paid" },
                   transaction: t,
                 });
-                if (existingOrder) {
-                  console.log("Idempotency hit: reference already used.");
+                if (existingOrder && existingOrder.id !== order.id) {
+                  console.log(
+                    "Idempotency hit: reference already used by another paid order.",
+                  );
                   return;
                 }
 
@@ -355,17 +442,23 @@ const paystackWebhook = async (req, res) => {
 
                 // Clear user's cart after successful payment
                 const { Cart, CartItem } = require("../models");
-                const cart = await Cart.findOne({
-                  where: { userId: order.userId },
-                  transaction: t,
-                });
-                if (cart) {
-                  await CartItem.destroy({
-                    where: { cartId: cart.id },
+                if (order.userId || order.sessionId) {
+                  const cartQuery = order.userId
+                    ? { userId: order.userId }
+                    : { sessionId: order.sessionId };
+
+                  const cart = await Cart.findOne({
+                    where: cartQuery,
                     transaction: t,
                   });
-                  cart.totalAmount = 0;
-                  await cart.save({ transaction: t });
+                  if (cart) {
+                    await CartItem.destroy({
+                      where: { cartId: cart.id },
+                      transaction: t,
+                    });
+                    cart.totalAmount = 0;
+                    await cart.save({ transaction: t });
+                  }
                 }
 
                 // Update stock for each product in the order
