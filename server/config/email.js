@@ -213,6 +213,9 @@ const emailTemplates = {
   },
 
   payOnDeliveryOrder: (order, user) => {
+    const customerFirstName = user
+      ? user.firstName
+      : order.shippingAddress?.firstName || "Customer";
     const itemsHtml = order.items
       ?.map(
         (item) => `
@@ -236,7 +239,7 @@ const emailTemplates = {
     const content = `
       <h2 style="color: #333; margin-top: 0; text-align: center;">Order Placed!</h2>
       <p style="text-align: center; color: #666; font-size: 16px;">Hi ${
-        user.firstName
+        customerFirstName
       }, thank you for choosing Pay on Delivery.</p>
       
       <div style="background-color: #fff0f0; border-left: 4px solid #FF5E62; border-radius: 4px; padding: 20px; margin: 30px 0;">
@@ -282,10 +285,13 @@ const emailTemplates = {
   },
 
   orderStatusUpdate: (order, user) => {
+    const customerFirstName = user
+      ? user.firstName
+      : order.shippingAddress?.firstName || "Customer";
     const content = `
       <h2 style="color: #333; margin-top: 0; text-align: center;">Order Status Update</h2>
       <p style="text-align: center; color: #666; font-size: 16px;">Hi ${
-        user.firstName
+        customerFirstName
       }, your order status has changed.</p>
       
       <div style="text-align: center; margin: 40px 0;">
@@ -344,9 +350,12 @@ const emailTemplates = {
     `
         : "";
 
+    const customerFirstName = user
+      ? user.firstName
+      : order.shippingAddress?.firstName || "Customer";
     const content = `
       <h2 style="color: #333; margin-top: 0; text-align: center;">Return Request Update</h2>
-      <p style="text-align: center; color: #666; font-size: 16px;">Hi ${user.firstName}, there is an update on your return request.</p>
+      <p style="text-align: center; color: #666; font-size: 16px;">Hi ${customerFirstName}, there is an update on your return request.</p>
 
       <div style="margin: 40px 0; padding: 20px; background: #f9f9f9; border-radius: 12px; max-width: 500px; margin-left: auto; margin-right: auto;">
         <h3 style="color: #222; margin-bottom: 16px; text-align: left;">Order Details</h3>
@@ -732,16 +741,17 @@ const emailTemplates = {
   },
 
   adminOrderCancellation: (order, user, reason) => {
+    const customerName = user
+      ? `${user.firstName} ${user.lastName}`
+      : `${order.shippingAddress?.firstName || "Guest"} ${order.shippingAddress?.lastName || ""}`;
     const content = `
       <h2 style="color: #e53e3e; margin-top: 0; text-align: center;">Order Cancelled ⚠️</h2>
-      
+
       <div style="background-color: #fff5f5; border-left: 4px solid #e53e3e; border-radius: 4px; padding: 20px; margin: 20px 0;">
         <p style="margin: 5px 0;"><strong>Order:</strong> #${
           order.orderNumber || order.id?.slice(-8).toUpperCase()
         }</p>
-        <p style="margin: 5px 0;"><strong>Customer:</strong> ${
-          user.firstName
-        } ${user.lastName}</p>
+        <p style="margin: 5px 0;"><strong>Customer:</strong> ${customerName}</p>
         <p style="margin: 5px 0;"><strong>Reason:</strong> ${
           reason || "No reason provided"
         }</p>

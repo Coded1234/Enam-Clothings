@@ -175,11 +175,17 @@ const createOrder = async (req, res) => {
     // Send email notification based on payment method
     if (paymentMethod === "cod") {
       try {
+        const recipientEmail = req.user
+          ? req.user.email
+          : guestEmail || shippingAddress?.email;
+
         const template = emailTemplates.payOnDeliveryOrder(
           populatedOrder,
           req.user,
         );
-        await sendEmail(req.user.email, template.subject, template.html);
+        if (recipientEmail) {
+          await sendEmail(recipientEmail, template.subject, template.html);
+        }
 
         // Notify Admin
         const adminTemplate = emailTemplates.adminNewOrder(

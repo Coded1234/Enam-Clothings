@@ -190,24 +190,21 @@ const verifyPayment = async (req, res) => {
             if (orderId) {
               const { sequelize } = require("../models");
               let order;
+              let justPaid = false;
               try {
-                order = await sequelize.transaction(async (t) => {
+                const finalOrder = await sequelize.transaction(async (t) => {
                   const o = await Order.findByPk(orderId, {
-                    include: [
-                      {
-                        model: OrderItem,
-                        as: "items",
-                      },
-                      {
-                        model: User,
-                        as: "user",
-                      },
-                    ],
                     lock: t.LOCK.UPDATE,
                     transaction: t,
                   });
 
                   if (o && o.paymentStatus !== "paid") {
+                    // Fetch items manually to avoid PostgreSQL outer join lock error
+                    const items = await OrderItem.findAll({
+                      where: { orderId: o.id },
+                      transaction: t,
+                    });
+                    o.items = items;
                     // Idempotency check: ensure this reference isn't already used by ANOTHER paid order
                     const existingOrder = await Order.findOne({
                       where: {
@@ -266,10 +263,22 @@ const verifyPayment = async (req, res) => {
                   }
                   return o;
                 });
+
+                if (finalOrder && finalOrder.justPaid) {
+                  justPaid = true;
+                }
               } catch (txError) {
                 console.error("Error verifying payment transaction:", txError);
-                order = await Order.findByPk(orderId); // fallback
               }
+
+              // Fetch the full order including user for emails and response
+              order = await Order.findByPk(orderId, {
+                include: [
+                  { model: OrderItem, as: "items" },
+                  { model: User, as: "user" },
+                ],
+              });
+              if (order && justPaid) order.justPaid = true;
 
               if (order && order.justPaid) {
                 // Send confirmation email
@@ -279,11 +288,17 @@ const verifyPayment = async (req, res) => {
                     order,
                     order.user,
                   );
-                  await sendEmail(
-                    order.user.email,
-                    template.subject,
-                    template.html,
-                  );
+                  // Use guestEmail if user is null
+                  const recipientEmail = order.user
+                    ? order.user.email
+                    : order.guestEmail || order.shippingAddress?.email;
+                  if (recipientEmail) {
+                    await sendEmail(
+                      recipientEmail,
+                      template.subject,
+                      template.html,
+                    );
+                  }
 
                   // To Admin
                   const adminTemplate = emailTemplates.adminNewOrder(
@@ -411,17 +426,16 @@ const paystackWebhook = async (req, res) => {
           try {
             await sequelize.transaction(async (t) => {
               const order = await Order.findByPk(orderId, {
-                include: [
-                  {
-                    model: OrderItem,
-                    as: "items",
-                  },
-                ],
                 lock: t.LOCK.UPDATE,
                 transaction: t,
               });
 
               if (order && order.paymentStatus !== "paid") {
+                // Fetch items manually to avoid PostgreSQL outer join lock error
+                order.items = await OrderItem.findAll({
+                  where: { orderId: order.id },
+                  transaction: t,
+                });
                 // Check idempotency by reference just in case
                 const existingOrder = await Order.findOne({
                   where: { paymentReference: reference, paymentStatus: "paid" },
