@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   FiPlus,
   FiEdit2,
@@ -16,49 +16,66 @@ import { productsAPI, adminAPI } from "../../utils/api";
 import { getImageUrl } from "../../utils/imageUrl";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 
+const ADMIN_SEARCH_DEBOUNCE_MS = 450;
+
 const Products = () => {
   const pathname = usePathname();
   const router = useRouter();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const latestRequestRef = useRef(0);
 
   const categories = ["men", "women", "perfumes"];
 
   useEffect(() => {
-    fetchProducts();
-  }, [currentPage, categoryFilter, pathname]);
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim());
+    }, ADMIN_SEARCH_DEBOUNCE_MS);
 
-  const fetchProducts = async () => {
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchTerm, categoryFilter]);
+
+  const fetchProducts = useCallback(async () => {
+    const requestId = Date.now();
+    latestRequestRef.current = requestId;
+
     try {
       setLoading(true);
       const params = {
         page: currentPage,
         limit: 10,
         ...(categoryFilter && { category: categoryFilter }),
-        ...(searchTerm && { search: searchTerm }),
+        ...(debouncedSearchTerm && { search: debouncedSearchTerm }),
       };
       const { data } = await productsAPI.getAll(params);
+
+      if (latestRequestRef.current !== requestId) return;
       setProducts(data.products || data || []);
       setTotalPages(data.totalPages || data.pages || 1);
     } catch (err) {
+      if (latestRequestRef.current !== requestId) return;
       console.error("Failed to fetch products:", err);
     } finally {
+      if (latestRequestRef.current !== requestId) return;
       setLoading(false);
     }
-  };
+  }, [currentPage, categoryFilter, debouncedSearchTerm]);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setCurrentPage(1);
+  useEffect(() => {
     fetchProducts();
-  };
+  }, [fetchProducts, pathname]);
 
   const handleDeleteClick = (product) => {
     setProductToDelete(product);
@@ -96,7 +113,7 @@ const Products = () => {
       <div className="flex flex-col md:flex-row gap-3 md:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-3 flex-1 md:max-w-2xl">
           {/* Search */}
-          <form onSubmit={handleSearch} className="flex-1">
+          <form onSubmit={(e) => e.preventDefault()} className="flex-1">
             <div className="relative">
               <FiSearch
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"

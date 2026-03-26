@@ -84,15 +84,10 @@ function App() {
         <Route path="newsletter" element={<Newsletter />} />
         <Route path="data-deletion-status" element={<DataDeletionStatus />} />
 
+        {/* Checkout is intentionally public to support guest orders */}
+        <Route path="checkout" element={<Checkout />} />
+
         {/* Protected Customer Routes */}
-        <Route
-          path="checkout"
-          element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          }
-        />
         <Route
           path="order-summary"
           element={

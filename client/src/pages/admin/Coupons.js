@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   FiPlus,
   FiEdit2,
@@ -11,10 +11,13 @@ import {
 } from "react-icons/fi";
 import api from "../../utils/api";
 
+const ADMIN_SEARCH_DEBOUNCE_MS = 450;
+
 const Coupons = () => {
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [showModal, setShowModal] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState(null);
@@ -24,6 +27,7 @@ const Coupons = () => {
     message: "",
   });
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const latestRequestRef = useRef(0);
 
   const [formData, setFormData] = useState({
     code: "",
@@ -43,29 +47,48 @@ const Coupons = () => {
   const categories = ["men", "women", "perfumes"];
 
   useEffect(() => {
-    fetchCoupons();
-  }, [pagination.page, statusFilter]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, ADMIN_SEARCH_DEBOUNCE_MS);
 
-  const fetchCoupons = async () => {
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  }, [debouncedSearch, statusFilter]);
+
+  const fetchCoupons = useCallback(async () => {
+    const requestId = Date.now();
+    latestRequestRef.current = requestId;
+
     try {
       setLoading(true);
       const params = new URLSearchParams({
         page: pagination.page,
         limit: 10,
         ...(statusFilter !== "all" && { status: statusFilter }),
-        ...(search && { search }),
+        ...(debouncedSearch && { search: debouncedSearch }),
       });
 
       const response = await api.get(`/coupons?${params}`);
+      if (latestRequestRef.current !== requestId) return;
+
       setCoupons(response.data.coupons);
       setPagination(response.data.pagination);
     } catch (error) {
+      if (latestRequestRef.current !== requestId) return;
       console.error("Error fetching coupons:", error);
       showNotification("error", "Failed to fetch coupons");
     } finally {
+      if (latestRequestRef.current !== requestId) return;
       setLoading(false);
     }
-  };
+  }, [pagination.page, statusFilter, debouncedSearch]);
+
+  useEffect(() => {
+    fetchCoupons();
+  }, [fetchCoupons]);
 
   const showNotification = (type, message) => {
     setNotification({ show: true, type, message });
@@ -77,8 +100,6 @@ const Coupons = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setPagination((prev) => ({ ...prev, page: 1 }));
-    fetchCoupons();
   };
 
   const openModal = (coupon = null) => {

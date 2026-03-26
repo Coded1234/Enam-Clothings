@@ -20,6 +20,9 @@ import {
 } from "react-icons/fi";
 
 const Checkout = () => {
+  const SAVED_COUPON_KEY = "savedCouponCode";
+  const CHECKOUT_STATE_KEY = "checkoutState";
+
   const router = useRouter();
   const { items, totalAmount } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.auth);
@@ -27,7 +30,7 @@ const Checkout = () => {
   // Get coupon data from Cart page if passed
   const _checkoutState =
     typeof window !== "undefined"
-      ? JSON.parse(sessionStorage.getItem("checkoutState") || "{}")
+      ? JSON.parse(localStorage.getItem(CHECKOUT_STATE_KEY) || "{}")
       : {};
   const passedCoupon = _checkoutState.coupon || null;
   const passedDiscount = _checkoutState.couponDiscount || 0;
@@ -66,6 +69,37 @@ const Checkout = () => {
   const subtotal = parseFloat(totalAmount) || 0;
   const tax = (subtotal - couponDiscount) * 0.0; // Tax included in prices
   const finalTotal = subtotal - couponDiscount + shippingCost + tax;
+
+  // Restore and validate persisted coupon code if checkout state payload is missing
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (appliedCoupon?.code || subtotal <= 0) return;
+
+    const savedCouponCode = localStorage.getItem(SAVED_COUPON_KEY);
+    if (!savedCouponCode) return;
+
+    const restoreCoupon = async () => {
+      try {
+        const response = await api.post("/coupons/validate", {
+          code: savedCouponCode,
+          subtotal,
+        });
+
+        if (response.data.success) {
+          setAppliedCoupon(response.data.coupon);
+          setCouponDiscount(response.data.discount);
+          setCouponCode(response.data.coupon.code);
+          localStorage.setItem(SAVED_COUPON_KEY, response.data.coupon.code);
+        }
+      } catch (error) {
+        setAppliedCoupon(null);
+        setCouponDiscount(0);
+        localStorage.removeItem(SAVED_COUPON_KEY);
+      }
+    };
+
+    restoreCoupon();
+  }, [appliedCoupon?.code, subtotal]);
 
   // Auto-enable free shipping for orders >= GH₵1000
   React.useEffect(() => {
@@ -117,6 +151,16 @@ const Checkout = () => {
       if (response.data.success) {
         setAppliedCoupon(response.data.coupon);
         setCouponDiscount(response.data.discount);
+        if (typeof window !== "undefined") {
+          localStorage.setItem(SAVED_COUPON_KEY, response.data.coupon.code);
+          localStorage.setItem(
+            CHECKOUT_STATE_KEY,
+            JSON.stringify({
+              coupon: response.data.coupon,
+              couponDiscount: response.data.discount,
+            }),
+          );
+        }
         toast.success(response.data.message);
       }
     } catch (error) {
@@ -133,6 +177,10 @@ const Checkout = () => {
     setCouponDiscount(0);
     setCouponCode("");
     setCouponError("");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(SAVED_COUPON_KEY);
+      localStorage.removeItem(CHECKOUT_STATE_KEY);
+    }
     toast.success("Coupon removed");
   };
 

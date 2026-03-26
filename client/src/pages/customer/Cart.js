@@ -25,6 +25,9 @@ import {
 } from "react-icons/fi";
 
 const Cart = () => {
+  const SAVED_COUPON_KEY = "savedCouponCode";
+  const CHECKOUT_STATE_KEY = "checkoutState";
+
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -43,6 +46,41 @@ const Cart = () => {
   useEffect(() => {
     dispatch(fetchCart());
   }, [dispatch]);
+
+  // Calculate summary - ensure all values are numbers
+  const subtotal = parseFloat(totalAmount) || 0;
+
+  // Auto-validate and sync coupon when cart subtotal changes (or on initial load)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const savedCoupon = localStorage.getItem(SAVED_COUPON_KEY);
+    const codeToValidate = appliedCoupon?.code || savedCoupon;
+
+    if (codeToValidate && subtotal > 0) {
+      const validateAutomatically = async () => {
+        try {
+          const response = await api.post("/coupons/validate", {
+            code: codeToValidate,
+            subtotal: subtotal,
+          });
+          if (response.data.success) {
+            setAppliedCoupon(response.data.coupon);
+            setCouponDiscount(response.data.discount);
+            setCouponCode(response.data.coupon.code);
+            localStorage.setItem(SAVED_COUPON_KEY, response.data.coupon.code);
+          }
+        } catch (error) {
+          // If the coupon becomes invalid (e.g. minimum spend not met anymore)
+          setAppliedCoupon(null);
+          setCouponDiscount(0);
+          setCouponCode("");
+          localStorage.removeItem(SAVED_COUPON_KEY);
+        }
+      };
+      validateAutomatically();
+    }
+  }, [subtotal, appliedCoupon?.code]);
 
   // Load recently viewed products
   useEffect(() => {
@@ -114,16 +152,11 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
-    // If not authenticated, we still let them proceed to checkout route,
-    // which will route them to login since /checkout is protected.
-    // However, if we want Guest Checkout, we should remove the trap there too!
-    // But for now, let's keep the Redirect logic, but actually `/checkout`
-    // redirects to `/login` via ProtectedRoute.
-    // To enable Guest Checkout, we must remove ProtectedRoute from `/checkout`!
+    // Preserve coupon state before navigating to checkout.
 
     if (typeof window !== "undefined") {
-      sessionStorage.setItem(
-        "checkoutState",
+      localStorage.setItem(
+        CHECKOUT_STATE_KEY,
         JSON.stringify({
           coupon: appliedCoupon,
           couponDiscount: couponDiscount,
@@ -157,6 +190,7 @@ const Cart = () => {
       if (response.data.success) {
         setAppliedCoupon(response.data.coupon);
         setCouponDiscount(response.data.discount);
+        localStorage.setItem(SAVED_COUPON_KEY, response.data.coupon.code);
         toast.success(response.data.message);
       }
     } catch (error) {
@@ -173,11 +207,14 @@ const Cart = () => {
     setCouponDiscount(0);
     setCouponCode("");
     setCouponError("");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(SAVED_COUPON_KEY);
+      localStorage.removeItem(CHECKOUT_STATE_KEY);
+    }
     toast.success("Coupon removed");
   };
 
-  // Calculate summary - ensure all values are numbers
-  const subtotal = parseFloat(totalAmount) || 0;
+  // Calculate summary
   const shippingFee = 0; // Will be calculated at checkout with Yango
   const total = subtotal - couponDiscount + shippingFee;
 
@@ -210,10 +247,10 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg)] py-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg)] py-8 overflow-x-hidden">
+      <div className="container mx-auto px-4 max-w-full">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
           <div>
             <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gold-light">
               Shopping Cart
@@ -237,7 +274,7 @@ const Cart = () => {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-xl shadow-sm p-4 md:p-6 flex gap-4"
+                className="bg-white rounded-xl shadow-sm p-4 md:p-6 flex gap-4 overflow-hidden"
               >
                 {/* Product Image */}
                 <Link
@@ -291,7 +328,7 @@ const Cart = () => {
                   </div>
 
                   {/* Price & Quantity */}
-                  <div className="mt-4 flex items-center justify-between">
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3 sm:flex-nowrap">
                     <div className="flex items-center gap-3">
                       {/* Quantity Controls */}
                       <div className="flex items-center border rounded-lg">
@@ -345,7 +382,7 @@ const Cart = () => {
                     </div>
 
                     {/* Price */}
-                    <div className="text-right">
+                    <div className="w-full sm:w-auto text-left sm:text-right">
                       <p className="text-lg font-bold text-gray-800">
                         GH₵
                         {Math.round(
@@ -398,7 +435,7 @@ const Cart = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 min-w-0">
                     <input
                       type="text"
                       value={couponCode}
@@ -409,7 +446,7 @@ const Cart = () => {
                         e.key === "Enter" && handleApplyCoupon()
                       }
                       placeholder="Enter coupon code"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     <button
                       onClick={handleApplyCoupon}

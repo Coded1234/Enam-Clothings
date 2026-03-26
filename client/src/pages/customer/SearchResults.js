@@ -1,10 +1,12 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { FiSearch, FiFilter, FiX, FiGrid, FiList } from "react-icons/fi";
 import api from "../../utils/api";
 import ProductCard from "../../components/customer/ProductCard";
+
+const SEARCH_DEBOUNCE_MS = 450;
 
 const SearchResults = () => {
   const searchParams = useSearchParams();
@@ -15,6 +17,7 @@ const SearchResults = () => {
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const latestRequestRef = useRef(0);
 
   const [filters, setFilters] = useState({
     category: searchParams.get("category") || "",
@@ -39,6 +42,9 @@ const SearchResults = () => {
   ];
 
   const fetchSearchResults = useCallback(async () => {
+    const requestId = Date.now();
+    latestRequestRef.current = requestId;
+
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -52,6 +58,8 @@ const SearchResults = () => {
       });
 
       const response = await api.get(`/products?${params}`);
+      if (latestRequestRef.current !== requestId) return;
+
       setProducts(response.data.products || []);
       setPagination({
         page: response.data.page || 1,
@@ -59,16 +67,22 @@ const SearchResults = () => {
         total: response.data.total || 0,
       });
     } catch (error) {
+      if (latestRequestRef.current !== requestId) return;
       console.error("Error searching products:", error);
       setProducts([]);
     } finally {
+      if (latestRequestRef.current !== requestId) return;
       setLoading(false);
     }
   }, [query, filters, pagination.page]);
 
   useEffect(() => {
     if (query) {
-      fetchSearchResults();
+      const debounceTimer = setTimeout(() => {
+        fetchSearchResults();
+      }, SEARCH_DEBOUNCE_MS);
+
+      return () => clearTimeout(debounceTimer);
     } else {
       setProducts([]);
       setLoading(false);

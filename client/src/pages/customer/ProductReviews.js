@@ -111,7 +111,7 @@ const ProductReviews = () => {
           {product && (
             <div className="flex items-center gap-4 pb-4 border-b">
               <img
-                src={product.images?.[0]?.url || "/placeholder.png"}
+                src={product.images?.[0]?.url || "/placeholder.jpg"}
                 alt={product.name}
                 className="w-16 h-16 object-cover rounded-lg"
               />

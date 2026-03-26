@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   FiSearch,
   FiFilter,
@@ -13,11 +13,14 @@ import {
 import { adminAPI } from "../../utils/api";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 
+const ADMIN_SEARCH_DEBOUNCE_MS = 300;
+
 const Orders = () => {
   const router = useRouter();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -35,6 +38,14 @@ const Orders = () => {
   useEffect(() => {
     fetchOrders();
   }, [currentPage, statusFilter]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim());
+    }, ADMIN_SEARCH_DEBOUNCE_MS);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const fetchOrders = async () => {
     try {
@@ -91,30 +102,33 @@ const Orders = () => {
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
-  const filteredOrders = orders.filter((order) => {
-    if (!searchTerm) return true;
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      order.orderNumber?.toLowerCase().includes(searchLower) ||
-      (order.shippingAddress?.firstName
-        ? `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`
-        : order.user
-          ? `${order.user.firstName || ""} ${order.user.lastName || ""}`
-          : order.guestName || ""
-      )
-        .toLowerCase()
-        .includes(searchLower) ||
-      (
-        order.shippingAddress?.email ||
-        order.guestEmail ||
-        order.shippingAddress?.phone ||
-        order.phone ||
-        (order.user?.email && !order.guestName ? order.user.email : "")
-      )
-        .toLowerCase()
-        .includes(searchLower)
-    );
-  });
+  const filteredOrders = useMemo(() => {
+    if (!debouncedSearchTerm) return orders;
+
+    const searchLower = debouncedSearchTerm.toLowerCase();
+    return orders.filter((order) => {
+      return (
+        order.orderNumber?.toLowerCase().includes(searchLower) ||
+        (order.shippingAddress?.firstName
+          ? `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`
+          : order.user
+            ? `${order.user.firstName || ""} ${order.user.lastName || ""}`
+            : order.guestName || ""
+        )
+          .toLowerCase()
+          .includes(searchLower) ||
+        (
+          order.shippingAddress?.email ||
+          order.guestEmail ||
+          order.shippingAddress?.phone ||
+          order.phone ||
+          (order.user?.email && !order.guestName ? order.user.email : "")
+        )
+          .toLowerCase()
+          .includes(searchLower)
+      );
+    });
+  }, [orders, debouncedSearchTerm]);
 
   return (
     <div className="space-y-4 md:space-y-6">
