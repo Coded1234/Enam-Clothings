@@ -3,7 +3,7 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { authAPI, cartAPI } from "../../utils/api";
 import { getProductImage } from "../../utils/imageUrl";
-import { getRecentlyViewed } from "../../utils/recentlyViewed";
+import { getValidRecentlyViewed } from "../../utils/recentlyViewed";
 import toast from "react-hot-toast";
 import {
   FiHeart,
@@ -32,9 +32,21 @@ const Wishlist = () => {
 
   useEffect(() => {
     fetchWishlist();
-    // Load recently viewed
-    const viewed = getRecentlyViewed();
-    setRecentlyViewed(viewed.slice(0, 4));
+
+    let isMounted = true;
+    // Load recently viewed and prune deleted products from cache
+    const loadRecentlyViewed = async () => {
+      const viewed = await getValidRecentlyViewed();
+      if (isMounted) {
+        setRecentlyViewed(viewed.slice(0, 4));
+      }
+    };
+
+    loadRecentlyViewed();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const fetchWishlist = async () => {

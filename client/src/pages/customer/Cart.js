@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchCart,
@@ -10,7 +10,7 @@ import {
   clearCart,
 } from "../../redux/slices/cartSlice";
 import { getProductImage } from "../../utils/imageUrl";
-import { getRecentlyViewed } from "../../utils/recentlyViewed";
+import { getValidRecentlyViewed } from "../../utils/recentlyViewed";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
 import {
@@ -19,7 +19,6 @@ import {
   FiPlus,
   FiShoppingBag,
   FiArrowLeft,
-  FiEye,
   FiTag,
   FiCheck,
 } from "react-icons/fi";
@@ -42,10 +41,40 @@ const Cart = () => {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState("");
   const [editingQuantity, setEditingQuantity] = useState({});
+  const prunedInvalidItemsRef = useRef(new Set());
 
   useEffect(() => {
     dispatch(fetchCart());
   }, [dispatch]);
+
+  // Remove stale cart rows whose products were deleted/unpublished.
+  useEffect(() => {
+    const invalidItems = items.filter((item) => !item.product?.id);
+    if (!invalidItems.length) return;
+
+    const pruneInvalidItems = async () => {
+      let removedCount = 0;
+
+      for (const invalidItem of invalidItems) {
+        if (prunedInvalidItemsRef.current.has(invalidItem.id)) continue;
+
+        prunedInvalidItemsRef.current.add(invalidItem.id);
+        try {
+          await dispatch(removeFromCart(invalidItem.id)).unwrap();
+          removedCount += 1;
+        } catch (error) {
+          // Allow retry if request fails.
+          prunedInvalidItemsRef.current.delete(invalidItem.id);
+        }
+      }
+
+      if (removedCount > 0) {
+        toast.success("Removed unavailable item(s) from cart");
+      }
+    };
+
+    pruneInvalidItems();
+  }, [dispatch, items]);
 
   // Calculate summary - ensure all values are numbers
   const subtotal = parseFloat(totalAmount) || 0;
@@ -84,11 +113,25 @@ const Cart = () => {
 
   // Load recently viewed products
   useEffect(() => {
-    const viewed = getRecentlyViewed();
-    // Filter out items that are already in the cart
-    const cartProductIds = items.map((item) => item.product?.id);
-    const filteredViewed = viewed.filter((p) => !cartProductIds.includes(p.id));
-    setRecentlyViewed(filteredViewed.slice(0, 4));
+    let isMounted = true;
+
+    const loadRecentlyViewed = async () => {
+      const viewed = await getValidRecentlyViewed();
+      // Filter out items that are already in the cart
+      const cartProductIds = items.map((item) => item.product?.id);
+      const filteredViewed = viewed.filter(
+        (p) => !cartProductIds.includes(p.id),
+      );
+      if (isMounted) {
+        setRecentlyViewed(filteredViewed.slice(0, 4));
+      }
+    };
+
+    loadRecentlyViewed();
+
+    return () => {
+      isMounted = false;
+    };
   }, [items]);
 
   const handleQuantityChange = async (itemId, currentQty, change) => {
@@ -268,7 +311,7 @@ const Cart = () => {
           </button>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8 min-w-0">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
@@ -278,12 +321,14 @@ const Cart = () => {
               >
                 {/* Product Image */}
                 <Link
-                  href={`/product/${item.product?.id}`}
+                  href={
+                    item.product?.id ? `/product/${item.product.id}` : "/shop"
+                  }
                   className="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 rounded-lg overflow-hidden bg-gray-100"
                 >
                   <img
                     src={getProductImage(item.product)}
-                    alt={item.product?.name}
+                    alt={item.product?.name || "Unavailable product"}
                     className="w-full h-full object-cover"
                   />
                 </Link>
@@ -293,10 +338,14 @@ const Cart = () => {
                   <div className="flex justify-between gap-4">
                     <div>
                       <Link
-                        href={`/product/${item.product?.id}`}
+                        href={
+                          item.product?.id
+                            ? `/product/${item.product.id}`
+                            : "/shop"
+                        }
                         className="font-medium text-gray-800 hover:text-primary-500 line-clamp-2"
                       >
-                        {item.product?.name}
+                        {item.product?.name || "Unavailable product"}
                       </Link>
                       <div className="mt-1 text-sm text-gray-500 space-y-1">
                         <p>
@@ -411,8 +460,8 @@ const Cart = () => {
           </div>
 
           {/* Order Summary Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24 space-y-6">
+          <div className="lg:col-span-1 min-w-0">
+            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24 space-y-6 overflow-hidden">
               <h2 className="text-lg font-bold text-gray-800">Order Summary</h2>
 
               {/* Coupon Code */}
@@ -422,8 +471,8 @@ const Cart = () => {
                   Promo Code
                 </label>
                 {appliedCoupon ? (
-                  <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                    <span className="text-green-700 font-medium text-sm">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                    <span className="text-green-700 font-medium text-sm min-w-0 break-words">
                       <FiCheck className="inline mr-1" />
                       {appliedCoupon.code} applied
                     </span>
@@ -435,7 +484,7 @@ const Cart = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="flex gap-2 min-w-0">
+                  <div className="flex flex-col sm:flex-row gap-2 min-w-0">
                     <input
                       type="text"
                       value={couponCode}
@@ -446,12 +495,12 @@ const Cart = () => {
                         e.key === "Enter" && handleApplyCoupon()
                       }
                       placeholder="Enter coupon code"
-                      className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full sm:flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     <button
                       onClick={handleApplyCoupon}
                       disabled={couponLoading}
-                      className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 whitespace-nowrap"
+                      className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 whitespace-nowrap"
                     >
                       {couponLoading ? "..." : "Apply"}
                     </button>
@@ -464,25 +513,33 @@ const Cart = () => {
 
               {/* Totals */}
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
-                  <span>GH₵{Math.round(subtotal).toLocaleString()}</span>
+                <div className="flex items-start justify-between gap-3 text-gray-600">
+                  <span className="flex-1">Subtotal</span>
+                  <span className="flex-1 text-right min-w-0 break-words">
+                    GH₵{Math.round(subtotal).toLocaleString()}
+                  </span>
                 </div>
                 {couponDiscount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Discount ({appliedCoupon?.code})</span>
-                    <span>
+                  <div className="flex items-start justify-between gap-3 text-green-600">
+                    <span className="flex-1 min-w-0 break-words">
+                      Discount ({appliedCoupon?.code})
+                    </span>
+                    <span className="flex-1 text-right min-w-0 break-words">
                       -GH₵{Math.round(couponDiscount).toLocaleString()}
                     </span>
                   </div>
                 )}
-                <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span className="text-green-600">Calculated at checkout</span>
+                <div className="flex items-start justify-between gap-3 text-gray-600">
+                  <span className="flex-1">Shipping</span>
+                  <span className="flex-1 text-right min-w-0 break-words text-green-600">
+                    Calculated at checkout
+                  </span>
                 </div>
-                <div className="border-t pt-3 flex justify-between font-bold text-gray-900 text-base">
-                  <span>Total</span>
-                  <span>GH₵{Math.round(total).toLocaleString()}</span>
+                <div className="border-t pt-3 flex items-start justify-between gap-3 font-bold text-gray-900 text-base">
+                  <span className="flex-1">Total</span>
+                  <span className="flex-1 text-right min-w-0 break-words">
+                    GH₵{Math.round(total).toLocaleString()}
+                  </span>
                 </div>
               </div>
 
@@ -499,11 +556,11 @@ const Cart = () => {
         </div>
 
         {/* Recently Viewed Section */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
-            You Also Viewed
-          </h2>
-          {recentlyViewed.length > 0 ? (
+        {recentlyViewed.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              You Also Viewed
+            </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
               {recentlyViewed.map((product) => {
                 const images = Array.isArray(product.images)
@@ -575,22 +632,8 @@ const Cart = () => {
                 );
               })}
             </div>
-          ) : (
-            <div className="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl p-8 text-center">
-              <FiEye className="w-12 h-12 text-primary-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">
-                You haven't viewed any products yet. Start browsing to see your
-                recently viewed items here!
-              </p>
-              <Link
-                href="/shop"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-xl font-semibold text-gray-800 hover:shadow-md transition-shadow"
-              >
-                Browse Products
-              </Link>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
