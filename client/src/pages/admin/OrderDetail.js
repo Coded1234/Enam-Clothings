@@ -1,7 +1,10 @@
 "use client";
+/* eslint-env browser */
+/* eslint-disable no-unused-vars */
+/* global alert, Intl */
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   FiArrowLeft,
   FiPackage,
@@ -93,7 +96,8 @@ const OrderDetail = () => {
       })
       .join("");
 
-    const payLabel = paymentMethod === "cod" ? "Pay on Delivery" : "Paystack";
+    const payLabel =
+      paymentMethod === "paystack" ? "Paystack" : "Online Payment";
     const logoUrl = `${window.location.origin}/images/loginlogo.png`;
 
     const html = `<!DOCTYPE html>
@@ -629,9 +633,9 @@ const OrderDetail = () => {
               <div className="flex justify-between items-center text-sm border-b border-gray-50 pb-2">
                 <span className="text-gray-500">Method</span>
                 <span className="font-medium text-gray-900">
-                  {order.paymentMethod === "cod"
-                    ? "Pay on Delivery"
-                    : "Paystack"}
+                  {order.paymentMethod === "paystack"
+                    ? "Paystack"
+                    : "Online Payment"}
                 </span>
               </div>
               <div className="flex justify-between items-center text-sm border-b border-gray-50 pb-2">

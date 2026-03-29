@@ -687,7 +687,9 @@ const OrderDetail = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Method</span>
                   <span className="font-medium text-gray-800">
-                    {paymentMethod === "cod" ? "Pay on Delivery" : "Paystack"}
+                    {paymentMethod === "paystack"
+                      ? "Paystack"
+                      : "Online Payment"}
                   </span>
                 </div>
                 <div className="flex justify-between">

@@ -4,6 +4,5 @@ node_modules
 *.log
 .DS_Store
 .vscode
-test_admin_users.py
 server/uploads/avatars/*
 server/uploads/products/*

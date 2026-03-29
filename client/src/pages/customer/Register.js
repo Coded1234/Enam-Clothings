@@ -1,7 +1,8 @@
 "use client";
+/* eslint-disable no-unused-vars */
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearError,
@@ -37,8 +38,26 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+
+  const phonePrefixes = [
+    "020",
+    "023",
+    "024",
+    "025",
+    "026",
+    "027",
+    "028",
+    "050",
+    "053",
+    "054",
+    "055",
+    "056",
+    "057",
+    "059",
+  ];
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -79,7 +98,7 @@ const Register = () => {
             toast.success("Registration successful!");
           }
         })
-        .catch((err) => {
+        .catch(() => {
           // Error handled by slice or toast
         });
     },
@@ -154,82 +173,57 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormErrors({});
 
-    const firstName = String(formData.firstName || "").trim();
-    const lastName = String(formData.lastName || "").trim();
-    const email = String(formData.email || "").trim();
+    const { firstName, lastName, email, phone, password, confirmPassword } =
+      formData;
 
-    // Validation
-    if (!firstName || !lastName || !email || !formData.password) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
+    let errors = {};
+
+    if (!firstName) errors.firstName = "First name is required";
+    if (!lastName) errors.lastName = "Last name is required";
+    if (!email) errors.email = "Email is required";
+    if (!password) errors.password = "Password is required";
 
     if (!EMAIL_REGEX.test(email)) {
-      toast.error("Please enter a valid email address");
-      return;
+      errors.email = "Please enter a valid email address";
+    } else {
+      const emailDomain = email.toLowerCase().split("@")[1] || "";
+      if (!ALLOWED_EMAIL_DOMAINS.has(emailDomain)) {
+        errors.email =
+          "Enter a valid email address (@gmail.com, @yahoo.com, or @hotmail.com)";
+      }
     }
 
-    const emailDomain = email.toLowerCase().split("@")[1] || "";
-    if (!ALLOWED_EMAIL_DOMAINS.has(emailDomain)) {
-      toast.error("Enter a valid email address");
-      return;
+    if (password && password !== confirmPassword) {
+      errors.confirmPassword = "Passwords do not match";
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
-    if (!STRONG_PASSWORD_REGEX.test(formData.password)) {
-      // Intentionally not showing a toast here. The error will render under the input.
-      document.querySelector('input[name="password"]')?.focus();
-      return;
-    }
-
-    const phoneDigits = String(formData.phone).replace(/\D/g, "");
-    const phonePrefixes = [
-      "024",
-      "054",
-      "055",
-      "059",
-      "053",
-      "027",
-      "057",
-      "026",
-      "056",
-      "020",
-      "050",
-      "028",
-    ];
     const blockedNumbers = ["0000000000", "1234567890", "0123456789"];
+    const phoneDigits = String(phone || "").replace(/\D/g, "");
 
     if (phoneDigits && !/^\d{10}$/.test(phoneDigits)) {
-      toast.error(
-        "Phone number must be exactly 10 digits (without country code)",
-      );
-      return;
-    }
-
-    if (phoneDigits && blockedNumbers.includes(phoneDigits)) {
-      toast.error("Please enter a valid phone number");
-      return;
-    }
-
-    if (
+      errors.phone = "Phone number must be exactly 10 digits";
+    } else if (phoneDigits && blockedNumbers.includes(phoneDigits)) {
+      errors.phone = "Please enter a valid phone number";
+    } else if (
       phoneDigits &&
       !phonePrefixes.some((prefix) => phoneDigits.startsWith(prefix))
     ) {
-      toast.error(" Enter a valid phone number");
-      return;
+      errors.phone = "Enter a valid phone number";
     }
 
     if (!agreeTerms) {
-      toast.error("Please agree to the terms and conditions");
+      errors.agreeTerms = "Please agree to the terms and conditions";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
 
     setLoading(true);
+
     try {
       await api.post("/auth/register", {
         firstName,
@@ -253,17 +247,19 @@ const Register = () => {
       }
 
       if (status === 400 && /invalid email/i.test(message)) {
-        toast.error("Please enter a valid email address");
+        setFormErrors({ email: "Please enter a valid email address" });
         return;
       }
 
       if (status === 400 && /invalid email domain/i.test(message)) {
-        toast.error("Please use @gmail.com, @yahoo.com, or @hotmail.com");
+        setFormErrors({
+          email: "Please use @gmail.com, @yahoo.com, or @hotmail.com",
+        });
         return;
       }
 
       if (status === 400 && /invalid phone/i.test(message)) {
-        toast.error("Please enter a valid phone number");
+        setFormErrors({ phone: "Please enter a valid phone number" });
         return;
       }
 
@@ -346,7 +342,11 @@ const Register = () => {
                     onChange={handleChange}
                     placeholder="Last name"
                     autoComplete="off"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-black"
+                    className={`w-full px-4 py-3 rounded-xl border placeholder-black transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                      formErrors.lastName
+                        ? "border-red-500 ring-2 ring-red-500/20 bg-red-50"
+                        : "border-gray-300"
+                    }`}
                     style={{ backgroundColor: "white", color: "black" }}
                     required
                   />
@@ -370,7 +370,11 @@ const Register = () => {
                     onChange={handleChange}
                     placeholder="Enter your email"
                     autoComplete="off"
-                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-black"
+                    className={`w-full pl-11 pr-4 py-3 rounded-xl border placeholder-black transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                      formErrors.email
+                        ? "border-red-500 ring-2 ring-red-500/20 bg-red-50"
+                        : "border-gray-300"
+                    }`}
                     style={{ backgroundColor: "white", color: "black" }}
                     required
                   />
@@ -396,7 +400,11 @@ const Register = () => {
                     autoComplete="off"
                     inputMode="numeric"
                     maxLength="10"
-                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-black"
+                    className={`w-full pl-11 pr-4 py-3 rounded-xl border placeholder-black transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                      formErrors.phone
+                        ? "border-red-500 ring-2 ring-red-500/20 bg-red-50"
+                        : "border-gray-300"
+                    }`}
                     style={{ backgroundColor: "white", color: "black" }}
                   />
                 </div>
@@ -419,7 +427,11 @@ const Register = () => {
                     onChange={handleChange}
                     placeholder="Create a password"
                     autoComplete="new-password"
-                    className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-black"
+                    className={`w-full pl-11 pr-12 py-3 rounded-xl border placeholder-black transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                      formErrors.password
+                        ? "border-red-500 ring-2 ring-red-500/20 bg-red-50"
+                        : "border-gray-300"
+                    }`}
                     style={{ backgroundColor: "white", color: "black" }}
                     required
                   />
@@ -659,7 +671,7 @@ const Register = () => {
       <CompleteProfileModal
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
-        onComplete={(updatedUser) => {
+        onComplete={() => {
           dispatch(loadUser());
         }}
         user={user}

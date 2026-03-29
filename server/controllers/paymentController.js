@@ -2,15 +2,84 @@ const https = require("https");
 const { sendEmail, emailTemplates } = require("../config/email");
 const { Order, OrderItem, Product, User } = require("../models");
 const { validateEmail } = require("../utils/inputValidation");
+const logger = require("../config/logger");
+const crypto = require("crypto");
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
 
+const toMinorCurrencyUnits = (amount) => {
+  const parsed = Number.parseFloat(amount);
+  if (!Number.isFinite(parsed) || parsed < 0) return null;
+  return Math.round(parsed * 100);
+};
+
+const getOrderPaymentEmail = (order) => {
+  return (
+    order?.user?.email ||
+    order?.guestEmail ||
+    order?.shippingAddress?.email ||
+    null
+  );
+};
+
+const isPaidAmountValidForOrder = (order, paidAmountMinorUnits) => {
+  const expectedAmountMinorUnits = toMinorCurrencyUnits(order?.totalAmount);
+  return (
+    Number.isInteger(expectedAmountMinorUnits) &&
+    Number.isInteger(paidAmountMinorUnits) &&
+    paidAmountMinorUnits === expectedAmountMinorUnits
+  );
+};
+
+const getSessionIdFromRequest = (req) => {
+  const rawSessionId = req.headers["x-session-id"];
+  return typeof rawSessionId === "string" ? rawSessionId.trim() : "";
+};
+
+const canVerifyOrderFromRequest = (req, order) => {
+  if (!order) return false;
+
+  const requestSessionId = getSessionIdFromRequest(req);
+
+  if (req.user) {
+    if (req.user.role === "admin") return true;
+    if (order.userId && order.userId === req.user.id) return true;
+    if (requestSessionId && order.sessionId === requestSessionId) return true;
+    return false;
+  }
+
+  return Boolean(requestSessionId && order.sessionId === requestSessionId);
+};
+
+const sanitizeOrderForClient = (order) => {
+  if (!order) return null;
+
+  const fallbackEmail =
+    order.user?.email ||
+    order.guestEmail ||
+    order.shippingAddress?.email ||
+    null;
+
+  return {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    totalAmount: order.totalAmount,
+    totalItems:
+      order.totalItems || (Array.isArray(order.items) ? order.items.length : 0),
+    status: order.status,
+    paymentStatus: order.paymentStatus,
+    shippingAddress: {
+      email: fallbackEmail,
+    },
+  };
+};
+
 // Check if Paystack is configured
 if (!PAYSTACK_SECRET || PAYSTACK_SECRET.includes("your_")) {
-  console.warn(
+  logger.warn(
     "⚠️  WARNING: Paystack not configured! Please add PAYSTACK_SECRET_KEY to .env file",
   );
-  console.warn(
+  logger.warn(
     "⚠️  Get your keys from: https://dashboard.paystack.com/settings/developer",
   );
 }
@@ -29,35 +98,84 @@ const initializePayment = async (req, res) => {
       });
     }
 
-    // Validate input
-    if (!email || !amount) {
+    const orderId = metadata?.order_id;
+    if (!orderId) {
       return res.status(400).json({
         status: false,
-        message: "Email and amount are required",
+        message: "metadata.order_id is required",
       });
     }
 
-    const emailCheck = validateEmail(email);
+    const order = await Order.findByPk(orderId, {
+      include: [{ model: User, as: "user", attributes: ["id", "email"] }],
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        status: false,
+        message: "Order not found",
+      });
+    }
+
+    if (!canVerifyOrderFromRequest(req, order)) {
+      return res.status(403).json({
+        status: false,
+        message: "Not authorized to initialize payment for this order",
+      });
+    }
+
+    if (order.paymentStatus === "paid") {
+      return res.status(400).json({
+        status: false,
+        message: "Order is already paid",
+      });
+    }
+
+    const trustedAmountMinorUnits = toMinorCurrencyUnits(order.totalAmount);
+    if (
+      !Number.isInteger(trustedAmountMinorUnits) ||
+      trustedAmountMinorUnits <= 0
+    ) {
+      return res.status(400).json({
+        status: false,
+        message: "Invalid order amount",
+      });
+    }
+
+    if (amount !== undefined && amount !== null && amount !== "") {
+      const clientAmountMinorUnits = toMinorCurrencyUnits(amount);
+      if (
+        !Number.isInteger(clientAmountMinorUnits) ||
+        clientAmountMinorUnits !== trustedAmountMinorUnits
+      ) {
+        return res.status(400).json({
+          status: false,
+          message: "Amount mismatch for this order",
+        });
+      }
+    }
+
+    const fallbackEmail = getOrderPaymentEmail(order);
+    const effectiveEmail = fallbackEmail || email;
+    const emailCheck = validateEmail(effectiveEmail);
     if (!emailCheck.ok) {
-      return res
-        .status(400)
-        .json({ status: false, message: emailCheck.message });
-    }
-
-    if (amount <= 0) {
       return res.status(400).json({
         status: false,
-        message: "Invalid amount",
+        message: "Order does not have a valid payment email",
       });
     }
 
-    const callbackBaseUrl =
-      process.env.CLIENT_URL || req.headers.origin || "http://localhost:3000";
+    const callbackBaseUrl = process.env.CLIENT_URL || "http://localhost:3000";
+
+    const sanitizedMetadata = {
+      ...(metadata || {}),
+      order_id: order.id,
+    };
 
     const params = JSON.stringify({
       email: emailCheck.email,
-      amount: Math.round(amount * 100), // Convert to kobo and ensure integer
-      metadata,
+      amount: trustedAmountMinorUnits,
+      metadata: sanitizedMetadata,
       callback_url: `${callbackBaseUrl}/payment/verify`,
     });
 
@@ -88,18 +206,20 @@ const initializePayment = async (req, res) => {
             response.status &&
             response.data &&
             response.data.reference &&
-            metadata?.order_id
+            order?.id
           ) {
             const { Order } = require("../models");
             await Order.update(
               { paymentReference: response.data.reference },
-              { where: { id: metadata.order_id } },
+              { where: { id: order.id } },
             );
           }
 
           res.json(response);
         } catch (err) {
-          console.error("Error updating order reference:", err);
+          logger.error("Error updating order reference", {
+            error: err.message,
+          });
           // Still return the response to let them pay
           res.json(JSON.parse(data || "{}"));
         }
@@ -107,22 +227,22 @@ const initializePayment = async (req, res) => {
     });
 
     paystackReq.on("error", (error) => {
-      console.error("Paystack error:", error);
+      logger.error("Paystack initialize transport error", {
+        error: error.message,
+      });
       res.status(500).json({
         status: false,
         message: "Payment initialization failed",
-        error: error.message,
       });
     });
 
     paystackReq.write(params);
     paystackReq.end();
   } catch (error) {
-    console.error("Payment initialization error:", error);
+    logger.error("Payment initialization error", { error: error.message });
     res.status(500).json({
       status: false,
       message: "Payment initialization failed",
-      error: error.message,
     });
   }
 };
@@ -132,6 +252,14 @@ const initializePayment = async (req, res) => {
 const verifyPayment = async (req, res) => {
   try {
     const { reference } = req.params;
+    const requestSessionId = getSessionIdFromRequest(req);
+
+    if (!req.user && !requestSessionId) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication or session is required to verify payment",
+      });
+    }
 
     const options = {
       hostname: "api.paystack.co",
@@ -164,7 +292,9 @@ const verifyPayment = async (req, res) => {
               try {
                 metadata = JSON.parse(metadata);
               } catch (e) {
-                console.error("Failed to parse metadata string:", e);
+                logger.warn("Failed to parse payment metadata string", {
+                  error: e.message,
+                });
                 metadata = {};
               }
             }
@@ -177,15 +307,47 @@ const verifyPayment = async (req, res) => {
               orderToUpdate = await Order.findByPk(metadata.order_id);
             }
 
-            const orderId = orderToUpdate?.id;
-            console.log(
-              "VerifyPayment: Paystack response for ref",
-              reference,
-              "status:",
-              response.data.status,
-              "Extracted Order ID:",
-              orderId,
+            if (!orderToUpdate) {
+              return res.status(404).json({
+                success: false,
+                message: "Order not found for this payment reference",
+              });
+            }
+
+            if (!canVerifyOrderFromRequest(req, orderToUpdate)) {
+              return res.status(403).json({
+                success: false,
+                message: "Not authorized to verify this payment reference",
+              });
+            }
+
+            const paidAmountMinorUnits = Number(response.data.amount);
+            const expectedAmountMinorUnits = toMinorCurrencyUnits(
+              orderToUpdate.totalAmount,
             );
+
+            if (
+              !isPaidAmountValidForOrder(orderToUpdate, paidAmountMinorUnits)
+            ) {
+              logger.warn("Payment verification amount mismatch", {
+                reference,
+                orderId: orderToUpdate.id,
+                paidAmountMinorUnits,
+                expectedAmountMinorUnits,
+              });
+
+              return res.status(400).json({
+                success: false,
+                message: "Paid amount does not match order total",
+              });
+            }
+
+            const orderId = orderToUpdate.id;
+            logger.info("Verify payment response received", {
+              reference,
+              status: response.data.status,
+              orderId,
+            });
 
             if (orderId) {
               const { sequelize } = require("../models");
@@ -223,24 +385,30 @@ const verifyPayment = async (req, res) => {
                     o.status = "confirmed";
                     await o.save({ transaction: t });
 
-                    // Clear user's cart after successful payment
+                    // Clear carts after successful payment.
+                    // We clear both when available to handle authenticated orders
+                    // created from a session-cart fallback.
                     const { Cart, CartItem } = require("../models");
-                    const cartQuery = o.userId
-                      ? { userId: o.userId }
-                      : { sessionId: o.sessionId };
-                    if (o.userId || o.sessionId) {
+                    const clearCartByQuery = async (whereClause) => {
                       const cart = await Cart.findOne({
-                        where: cartQuery,
+                        where: whereClause,
                         transaction: t,
                       });
-                      if (cart) {
-                        await CartItem.destroy({
-                          where: { cartId: cart.id },
-                          transaction: t,
-                        });
-                        cart.totalAmount = 0;
-                        await cart.save({ transaction: t });
-                      }
+                      if (!cart) return;
+
+                      await CartItem.destroy({
+                        where: { cartId: cart.id },
+                        transaction: t,
+                      });
+                      cart.totalAmount = 0;
+                      await cart.save({ transaction: t });
+                    };
+
+                    if (o.userId) {
+                      await clearCartByQuery({ userId: o.userId });
+                    }
+                    if (o.sessionId) {
+                      await clearCartByQuery({ sessionId: o.sessionId });
                     }
 
                     // Update stock for each product in the order
@@ -268,7 +436,9 @@ const verifyPayment = async (req, res) => {
                   justPaid = true;
                 }
               } catch (txError) {
-                console.error("Error verifying payment transaction:", txError);
+                logger.error("Error verifying payment transaction", {
+                  error: txError.message,
+                });
               }
 
               // Fetch the full order including user for emails and response
@@ -311,32 +481,28 @@ const verifyPayment = async (req, res) => {
                     adminTemplate.html,
                   );
                 } catch (emailError) {
-                  console.error(
-                    "Error sending confirmation email:",
-                    emailError,
-                  );
+                  logger.error("Error sending payment confirmation emails", {
+                    error: emailError.message,
+                  });
                 }
 
                 return res.json({
                   success: true,
                   message: "Payment verified successfully",
-                  order: order,
-                  data: response.data,
+                  order: sanitizeOrderForClient(order),
                 });
               } else if (order && order.paymentStatus === "paid") {
                 // Order already paid, just return success
                 return res.json({
                   success: true,
                   message: "Payment already verified",
-                  order: order,
-                  data: response.data,
+                  order: sanitizeOrderForClient(order),
                 });
               } else {
                 return res.json({
                   success: false,
                   message: "Payment verification failed during database update",
-                  order: order,
-                  data: response.data,
+                  order: sanitizeOrderForClient(order),
                 });
               }
             }
@@ -345,10 +511,11 @@ const verifyPayment = async (req, res) => {
           res.json({
             success: false,
             message: response.message || "Payment verification failed",
-            data: response.data,
           });
         } catch (parseError) {
-          console.error("Parse error:", parseError);
+          logger.error("Error parsing Paystack verification response", {
+            error: parseError.message,
+          });
           res.status(500).json({
             success: false,
             message: "Error processing payment verification",
@@ -358,20 +525,19 @@ const verifyPayment = async (req, res) => {
     });
 
     paystackReq.on("error", (error) => {
-      console.error("Paystack verification error:", error);
+      logger.error("Paystack verify transport error", { error: error.message });
       res.status(500).json({
         success: false,
         message: "Payment verification failed",
-        error: error.message,
       });
     });
 
     paystackReq.end();
   } catch (error) {
+    logger.error("Verify payment error", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Payment verification failed",
-      error: error.message,
     });
   }
 };
@@ -380,14 +546,26 @@ const verifyPayment = async (req, res) => {
 // @route   POST /api/payment/webhook
 const paystackWebhook = async (req, res) => {
   try {
-    const crypto = require("crypto");
+    if (!PAYSTACK_SECRET || PAYSTACK_SECRET.includes("your_")) {
+      logger.warn("Webhook received while Paystack is not configured");
+      return res.sendStatus(503);
+    }
+
     const rawBody = req.rawBody || JSON.stringify(req.body);
     const hash = crypto
       .createHmac("sha512", PAYSTACK_SECRET)
       .update(rawBody)
       .digest("hex");
 
-    if (hash === req.headers["x-paystack-signature"]) {
+    const signature = String(req.headers["x-paystack-signature"] || "");
+    const hashBuffer = Buffer.from(hash, "hex");
+    const sigBuffer = Buffer.from(signature, "hex");
+
+    const isValidSignature =
+      hashBuffer.length === sigBuffer.length &&
+      crypto.timingSafeEqual(hashBuffer, sigBuffer);
+
+    if (isValidSignature) {
       const event = req.body;
 
       if (event.event === "charge.success") {
@@ -400,7 +578,9 @@ const paystackWebhook = async (req, res) => {
           try {
             metadata = JSON.parse(metadata);
           } catch (e) {
-            console.error("Failed to parse event metadata string:", e);
+            logger.warn("Failed to parse webhook metadata string", {
+              error: e.message,
+            });
             metadata = {};
           }
         }
@@ -412,14 +592,29 @@ const paystackWebhook = async (req, res) => {
           targetOrder = await Order.findByPk(metadata.order_id);
         }
 
+        if (targetOrder) {
+          const paidAmountMinorUnits = Number(event.data.amount);
+          const expectedAmountMinorUnits = toMinorCurrencyUnits(
+            targetOrder.totalAmount,
+          );
+
+          if (!isPaidAmountValidForOrder(targetOrder, paidAmountMinorUnits)) {
+            logger.warn("Webhook amount mismatch", {
+              reference,
+              orderId: targetOrder.id,
+              paidAmountMinorUnits,
+              expectedAmountMinorUnits,
+            });
+            return res.sendStatus(200);
+          }
+        }
+
         const orderId = targetOrder?.id;
 
-        console.log(
-          "Webhook Payment successful:",
+        logger.info("Webhook charge.success received", {
           reference,
-          "Order ID:",
           orderId,
-        );
+        });
 
         if (orderId) {
           const { sequelize } = require("../models");
@@ -442,9 +637,10 @@ const paystackWebhook = async (req, res) => {
                   transaction: t,
                 });
                 if (existingOrder && existingOrder.id !== order.id) {
-                  console.log(
-                    "Idempotency hit: reference already used by another paid order.",
-                  );
+                  logger.warn("Webhook idempotency hit on payment reference", {
+                    reference,
+                    existingOrderId: existingOrder.id,
+                  });
                   return;
                 }
 
@@ -491,28 +687,26 @@ const paystackWebhook = async (req, res) => {
                   }
                 }
 
-                console.log(
-                  "Order updated:",
-                  order.id,
-                  "- Stock updated for all items",
-                );
+                logger.info("Order updated from webhook", {
+                  orderId: order.id,
+                  paymentReference: reference,
+                });
               }
             });
           } catch (txError) {
-            console.error(
-              "Error updating order in webhook transaction:",
-              txError,
-            );
+            logger.error("Error updating order in webhook transaction", {
+              error: txError.message,
+            });
           }
         }
       }
     } else {
-      console.warn("Invalid webhook signature");
+      logger.warn("Invalid webhook signature");
     }
 
     res.sendStatus(200);
   } catch (error) {
-    console.error("Webhook error:", error);
+    logger.error("Webhook error", { error: error.message });
     res.sendStatus(500);
   }
 };

@@ -7,26 +7,35 @@ import toast from "react-hot-toast";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
+  const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormErrors({});
 
     if (!email) {
-      toast.error("Please enter your email address");
+      setFormErrors({ email: "Please enter your email address" });
       return;
     }
 
     setLoading(true);
+
     try {
       await api.post("/auth/forgot-password", { email });
       setSubmitted(true);
       toast.success("Reset link sent! Check your email.");
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to send reset email",
-      );
+      if (error.response?.status === 404 || error.response?.status === 400) {
+        setFormErrors({
+          email: error.response?.data?.message || "Invalid email",
+        });
+      } else {
+        toast.error(
+          error.response?.data?.message || "Failed to send reset email",
+        );
+      }
     } finally {
       setLoading(false);
     }

@@ -8,6 +8,7 @@ import { newsletterAPI } from "../../utils/api";
 
 const Newsletter = () => {
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
@@ -16,22 +17,23 @@ const Newsletter = () => {
     e.preventDefault();
 
     if (!email) {
-      toast.error("Please enter your email address");
+      setError("Please enter your email address");
       return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast.error("Please enter a valid email address");
+      setError("Please enter a valid email address");
       return;
     }
 
     if (!agreed) {
-      toast.error("Please agree to the terms and conditions");
+      setError("Please agree to the terms and conditions");
       return;
     }
 
+    setError("");
     setSubscribing(true);
     try {
       await newsletterAPI.subscribe(email);
@@ -40,7 +42,7 @@ const Newsletter = () => {
       setEmail("");
       setAgreed(false);
     } catch (error) {
-      toast.error(
+      setError(
         error.response?.data?.message ||
           "Failed to subscribe. Please try again.",
       );
@@ -208,7 +210,10 @@ const Newsletter = () => {
                         type="email"
                         id="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          setError("");
+                        }}
                         placeholder="Enter your email address"
                         disabled={subscribing}
                         style={{
@@ -226,6 +231,11 @@ const Newsletter = () => {
                         }}
                       />
                     </div>
+                    {error && (
+                      <p className="text-red-500 text-xs mt-1 text-left">
+                        {error}
+                      </p>
+                    )}
                   </div>
 
                   {/* Agreement Checkbox */}
@@ -235,7 +245,10 @@ const Newsletter = () => {
                         type="checkbox"
                         id="agree"
                         checked={agreed}
-                        onChange={(e) => setAgreed(e.target.checked)}
+                        onChange={(e) => {
+                          setAgreed(e.target.checked);
+                          setError("");
+                        }}
                         className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-secondary-700 dark:border-primary-600"
                         disabled={subscribing}
                       />

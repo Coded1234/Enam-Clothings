@@ -77,14 +77,9 @@ export const loadUser = createAsyncThunk(
   "auth/loadUser",
   async (_, { rejectWithValue }) => {
     try {
-      const hasUser = !!localStorage.getItem("user");
-      // Still attempt if hasUser is true, the cookie should handle auth
-      if (!hasUser) return null;
-
-      const { data } = await authAPI.getProfile();
+      const { data } = await authAPI.getProfile({ skipAuthRedirect: true });
       return data;
     } catch (error) {
-      localStorage.removeItem("token");
       localStorage.removeItem("user");
       return rejectWithValue(
         error.response?.data?.message || "Failed to load user",
@@ -115,7 +110,6 @@ const authSlice = createSlice({
       try {
         authAPI.logout().catch((err) => console.error(err));
       } catch (e) {}
-      localStorage.removeItem("token");
       localStorage.removeItem("user");
       state.user = null;
       state.isAuthenticated = false;
@@ -125,8 +119,9 @@ const authSlice = createSlice({
       state.error = null;
     },
     setCredentials: (state, action) => {
-      state.user = action.payload.user;
-      state.isAuthenticated = true;
+      const nextUser = action.payload?.user || action.payload || null;
+      state.user = nextUser;
+      state.isAuthenticated = !!nextUser;
       state.error = null;
     },
   },

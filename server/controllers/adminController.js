@@ -10,6 +10,8 @@ const {
 const { Op } = require("sequelize");
 const { cloudinary, isCloudinaryConfigured } = require("../config/cloudinary");
 const { sendEmail, sendBulkEmail, emailTemplates } = require("../config/email");
+const logger = require("../config/logger");
+const { invalidateProductCache } = require("./productController");
 
 // ============ DASHBOARD ============
 
@@ -31,16 +33,7 @@ const getDashboardStats = async (req, res) => {
     const totalOrders = await Order.count();
     const totalCustomers = await User.count({ where: { role: "customer" } });
 
-    // Sales: paid orders OR COD orders that are confirmed/shipped/delivered
-    const salesWhere = {
-      [Op.or]: [
-        { paymentStatus: "paid" },
-        {
-          paymentMethod: "cod",
-          status: { [Op.in]: ["confirmed", "shipped", "delivered"] },
-        },
-      ],
-    };
+    const salesWhere = { paymentStatus: "paid" };
 
     // Revenue
     const revenueResult = await Order.findAll({
@@ -160,16 +153,16 @@ const getDashboardStats = async (req, res) => {
 // @route   POST /api/admin/products
 const createProduct = async (req, res) => {
   try {
-    console.log("Create product request body:", req.body);
-    console.log("Create product files:", req.files);
-
     const {
       name,
       description,
       price,
+      comparePrice,
       originalPrice,
       brand,
+      category,
       categoryId,
+      subcategory,
       totalStock,
       featured,
       isActive,
@@ -181,9 +174,12 @@ const createProduct = async (req, res) => {
       name,
       description,
       price,
+      comparePrice,
       originalPrice,
       brand,
+      category,
       categoryId,
+      subcategory,
       totalStock,
       featured,
       isActive,
@@ -250,6 +246,9 @@ const createProduct = async (req, res) => {
     if (productData.comparePrice) {
       productData.comparePrice = parseFloat(productData.comparePrice);
     }
+    if (productData.originalPrice) {
+      productData.originalPrice = parseFloat(productData.originalPrice);
+    }
     if (productData.totalStock) {
       productData.totalStock = parseInt(productData.totalStock) || 0;
     }
@@ -275,6 +274,7 @@ const createProduct = async (req, res) => {
     }
 
     const product = await Product.create(productData);
+    invalidateProductCache();
 
     // Notify newsletter subscribers
     try {
@@ -291,12 +291,12 @@ const createProduct = async (req, res) => {
         sendBulkEmail(recipientEmails, template.subject, template.html);
       }
     } catch (emailError) {
-      console.error("Error sending newsletter:", emailError);
+      logger.error("Error sending newsletter", { error: emailError.message });
     }
 
     res.status(201).json(product);
   } catch (error) {
-    console.error("Create product error:", error);
+    logger.error("Create product error", { error: error.message });
     res
       .status(500)
       .json({ message: "Error creating product", error: error.message });
@@ -317,9 +317,12 @@ const updateProduct = async (req, res) => {
       name,
       description,
       price,
+      comparePrice,
       originalPrice,
       brand,
+      category,
       categoryId,
+      subcategory,
       totalStock,
       featured,
       isActive,
@@ -330,9 +333,12 @@ const updateProduct = async (req, res) => {
       name,
       description,
       price,
+      comparePrice,
       originalPrice,
       brand,
+      category,
       categoryId,
+      subcategory,
       totalStock,
       featured,
       isActive,
@@ -347,15 +353,35 @@ const updateProduct = async (req, res) => {
     // Handle existing images (kept from form)
     if (req.body.existingImages) {
       try {
-        const existing = JSON.parse(req.body.existingImages);
+        const existing =
+          typeof req.body.existingImages === "string"
+            ? JSON.parse(req.body.existingImages)
+            : req.body.existingImages;
         images = existing.map((img) => {
           if (typeof img === "string") {
             return { url: img, publicId: "" };
           }
-          return img;
+          if (img && typeof img === "object") {
+            const publicId = img.publicId || img.public_id || "";
+            const resolvedUrl =
+              img.url ||
+              img.path ||
+              img.secure_url ||
+              (!isCloudinaryConfigured && publicId
+                ? `/uploads/products/${publicId}`
+                : "");
+
+            return {
+              ...img,
+              url: resolvedUrl,
+              publicId,
+            };
+          }
+
+          return { url: "", publicId: "" };
         });
       } catch (e) {
-        console.error("Error parsing existingImages:", e);
+        logger.error("Error parsing existingImages", { error: e.message });
       }
     }
 
@@ -390,26 +416,39 @@ const updateProduct = async (req, res) => {
       } catch (e) {}
     }
 
+    if (updateData.price !== undefined) {
+      updateData.price = parseFloat(updateData.price);
+    }
+    if (
+      updateData.comparePrice !== undefined &&
+      updateData.comparePrice !== ""
+    ) {
+      updateData.comparePrice = parseFloat(updateData.comparePrice);
+    }
+    if (
+      updateData.originalPrice !== undefined &&
+      updateData.originalPrice !== ""
+    ) {
+      updateData.originalPrice = parseFloat(updateData.originalPrice);
+    }
+
     // Remove existingImages from updateData (it's not a model field)
     delete updateData.existingImages;
 
-    // Handle stock updates - admin edits the displayed stock (remainingStock)
-    // When admin updates stock, they're setting the new remainingStock directly
+    // Handle stock updates - admin edits absolute total stock.
+    // remainingStock is derived from totalStock minus already sold units.
     if (updateData.totalStock !== undefined) {
-      const newDisplayedStock = parseInt(updateData.totalStock);
+      const parsedTotalStock = parseInt(updateData.totalStock, 10);
       const currentSoldCount = product.soldCount || 0;
+      const newTotalStock = Number.isNaN(parsedTotalStock)
+        ? 0
+        : Math.max(0, parsedTotalStock);
 
-      // The value admin enters IS the new remainingStock
-      updateData.remainingStock = newDisplayedStock;
+      // Save exactly what admin entered as total stock.
+      updateData.totalStock = newTotalStock;
 
-      // Recalculate totalStock = remainingStock + soldCount
-      updateData.totalStock = newDisplayedStock + currentSoldCount;
-
-      // Ensure remainingStock is not negative
-      if (updateData.remainingStock < 0) {
-        updateData.remainingStock = 0;
-        updateData.totalStock = currentSoldCount;
-      }
+      // Remaining stock cannot be negative.
+      updateData.remainingStock = Math.max(0, newTotalStock - currentSoldCount);
     }
 
     // Enforce featured products limit of 4
@@ -430,10 +469,11 @@ const updateProduct = async (req, res) => {
 
     await product.update(updateData);
     await product.reload();
+    invalidateProductCache();
 
     res.json(product);
   } catch (error) {
-    console.error("Update product error:", error);
+    logger.error("Update product error", { error: error.message });
     res
       .status(500)
       .json({ message: "Error updating product", error: error.message });
@@ -453,15 +493,25 @@ const deleteProduct = async (req, res) => {
     // Delete images from cloudinary
     if (product.images && Array.isArray(product.images)) {
       for (const image of product.images) {
-        if (image.publicId) {
-          await cloudinary.uploader.destroy(image.publicId);
+        if (isCloudinaryConfigured && image.publicId) {
+          try {
+            await cloudinary.uploader.destroy(image.publicId);
+          } catch (imageError) {
+            logger.warn("Failed to remove product image from Cloudinary", {
+              productId: product.id,
+              publicId: image.publicId,
+              error: imageError.message,
+            });
+          }
         }
       }
     }
 
     await product.destroy();
+    invalidateProductCache();
     res.json({ message: "Product deleted successfully" });
   } catch (error) {
+    logger.error("Delete product error", { error: error.message });
     res
       .status(500)
       .json({ message: "Error deleting product", error: error.message });
@@ -500,6 +550,7 @@ const updateStock = async (req, res) => {
     product.totalStock = newRemainingStock + (product.soldCount || 0);
 
     await product.save();
+    invalidateProductCache();
 
     res.json(product);
   } catch (error) {
@@ -520,14 +571,25 @@ const deleteProductImage = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Delete from cloudinary
-    await cloudinary.uploader.destroy(publicId);
+    // Delete from cloudinary when enabled.
+    if (isCloudinaryConfigured) {
+      try {
+        await cloudinary.uploader.destroy(publicId);
+      } catch (imageError) {
+        logger.warn("Failed to remove product image from Cloudinary", {
+          productId: product.id,
+          publicId,
+          error: imageError.message,
+        });
+      }
+    }
 
     // Remove from product
     product.images = (product.images || []).filter(
       (img) => img.publicId !== publicId,
     );
     await product.save();
+    invalidateProductCache();
 
     res.json(product);
   } catch (error) {
@@ -618,6 +680,7 @@ const updateOrderStatus = async (req, res) => {
 
     const previousStatus = order.status;
     const stockDeductedStatuses = ["confirmed", "shipped", "delivered"];
+    let productsMutated = false;
 
     // Handle stock changes based on status transitions
     if (previousStatus !== status) {
@@ -652,9 +715,12 @@ const updateOrderStatus = async (req, res) => {
             product.remainingStock =
               (product.totalStock || 0) - product.soldCount;
             await product.save();
-            console.log(
-              `Updated soldCount for ${product.name}: +${item.quantity}, total: ${product.soldCount}`,
-            );
+            productsMutated = true;
+            logger.info("Updated soldCount after status transition", {
+              productId: product.id,
+              quantityDelta: item.quantity,
+              soldCount: product.soldCount,
+            });
           }
         }
       }
@@ -687,9 +753,12 @@ const updateOrderStatus = async (req, res) => {
             product.remainingStock =
               (product.totalStock || 0) - product.soldCount;
             await product.save();
-            console.log(
-              `Restored soldCount for ${product.name}: -${item.quantity}, total: ${product.soldCount}`,
-            );
+            productsMutated = true;
+            logger.info("Restored soldCount after status rollback", {
+              productId: product.id,
+              quantityDelta: -item.quantity,
+              soldCount: product.soldCount,
+            });
           }
         }
       }
@@ -712,6 +781,10 @@ const updateOrderStatus = async (req, res) => {
 
     await order.save();
 
+    if (productsMutated) {
+      invalidateProductCache();
+    }
+
     // Send status update email
     try {
       const { subject, html } = emailTemplates.orderStatusUpdate(
@@ -720,12 +793,12 @@ const updateOrderStatus = async (req, res) => {
       );
       await sendEmail(order.user.email, subject, html);
     } catch (emailError) {
-      console.error("Status update email failed:", emailError);
+      logger.error("Status update email failed", { error: emailError.message });
     }
 
     res.json(order);
   } catch (error) {
-    console.error("Error updating order status:", error);
+    logger.error("Error updating order status", { error: error.message });
     res
       .status(500)
       .json({ message: "Error updating order status", error: error.message });
@@ -798,13 +871,15 @@ const updateReturnApproval = async (req, res) => {
         );
         await sendEmail(order.user.email, subject, html);
       } catch (emailError) {
-        console.error("Return approval email failed:", emailError);
+        logger.error("Return approval email failed", {
+          error: emailError.message,
+        });
       }
     }
 
     res.json(order);
   } catch (error) {
-    console.error("Error updating return approval:", error);
+    logger.error("Error updating return approval", { error: error.message });
     res.status(500).json({
       message: "Error updating return approval",
       error: error.message,
@@ -1062,36 +1137,13 @@ const getSalesReport = async (req, res) => {
       }
     }
 
-    // Include paid orders OR COD orders that are confirmed/shipped/delivered
+    // Include paid orders only
     const orderWhere =
       Object.keys(dateWhere).length > 0
         ? {
-            [Op.and]: [
-              dateWhere,
-              {
-                [Op.or]: [
-                  { paymentStatus: "paid" },
-                  {
-                    paymentMethod: "cod",
-                    status: {
-                      [Op.in]: ["confirmed", "shipped", "delivered"],
-                    },
-                  },
-                ],
-              },
-            ],
+            [Op.and]: [dateWhere, { paymentStatus: "paid" }],
           }
-        : {
-            [Op.or]: [
-              { paymentStatus: "paid" },
-              {
-                paymentMethod: "cod",
-                status: {
-                  [Op.in]: ["confirmed", "shipped", "delivered"],
-                },
-              },
-            ],
-          };
+        : { paymentStatus: "paid" };
 
     // 1. Summary
     const summaryData = await Order.findOne({
@@ -1219,7 +1271,7 @@ const getSalesReport = async (req, res) => {
       ordersByStatus,
     });
   } catch (error) {
-    console.error("Report error:", error);
+    logger.error("Report error", { error: error.message });
     res
       .status(500)
       .json({ message: "Error generating report", error: error.message });

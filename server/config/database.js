@@ -17,6 +17,7 @@ const applyCompatibilityMigrations = async (sequelize) => {
     "ALTER TABLE orders ADD COLUMN IF NOT EXISTS guest_name VARCHAR(255);",
     "ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_details JSONB;",
     "ALTER TABLE orders ALTER COLUMN user_id DROP NOT NULL;",
+    "CREATE UNIQUE INDEX IF NOT EXISTS orders_payment_reference_unique_idx ON orders (payment_reference) WHERE payment_reference IS NOT NULL;",
   ];
 
   for (const sql of migrations) {

@@ -29,7 +29,7 @@ const getCsrfToken = async () => {
   return csrfTokenPromise;
 };
 
-// Request interceptor to add auth token
+// Request interceptor to add CSRF and guest session headers
 api.interceptors.request.use(
   async (config) => {
     // Add CSRF token for state-changing requests
@@ -40,14 +40,6 @@ api.interceptors.request.use(
       if (csrfToken) {
         config.headers["X-CSRF-Token"] = csrfToken;
       }
-    }
-
-    // Note: HttpOnly cookie will be automatically sent with requests
-    // We still keep Authorization header for backwards compatibility if a token exists in localStorage
-    // from an old session, but new sessions use cookies heavily.
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
     }
 
     // Add Guest Session ID
@@ -73,7 +65,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/login";
     }

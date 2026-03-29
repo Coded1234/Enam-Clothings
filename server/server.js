@@ -35,9 +35,22 @@ const xssMiddleware = require("./middleware/xss");
 
 const app = express();
 
-// Trust the first proxy hop (required on Vercel / any reverse-proxy host)
-// so express-rate-limit can read the real client IP from X-Forwarded-For
-app.set("trust proxy", 1);
+const isProduction = process.env.NODE_ENV === "production";
+
+const resolveTrustProxySetting = () => {
+  if (!isProduction) return false;
+
+  const configuredValue = process.env.TRUST_PROXY;
+  if (!configuredValue) return 1;
+
+  if (configuredValue === "false") return false;
+  if (configuredValue === "true") return 1;
+  if (/^\d+$/.test(configuredValue)) return Number(configuredValue);
+  return configuredValue;
+};
+
+// Only trust proxy headers in production and allow explicit override via TRUST_PROXY.
+app.set("trust proxy", resolveTrustProxySetting());
 
 // Enforce HTTPS in production
 if (process.env.NODE_ENV === "production" && process.env.VERCEL !== "1") {
@@ -124,15 +137,29 @@ if (process.env.VERCEL_URL) {
   allowedOrigins.add(`https://${process.env.VERCEL_URL}`);
 }
 
+const allowLocalhostCors = !isProduction;
+const allowPrivateNetworkCors =
+  process.env.ALLOW_PRIVATE_NETWORK_CORS === "true";
+
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow no-origin requests (server-to-server, curl, Postman)
       if (!origin) return callback(null, true);
+
+      const isLocalOrigin = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(
+        origin,
+      );
+      const isPrivateNetworkOrigin =
+        /^https?:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(
+          origin,
+        );
+
       // Allow exact predefined deployment domains
       if (
         allowedOrigins.has(origin) ||
-        /^http:\/\/localhost(:\d+)?$/.test(origin)
+        (allowLocalhostCors && isLocalOrigin) ||
+        (allowPrivateNetworkCors && isPrivateNetworkOrigin)
       ) {
         return callback(null, true);
       }
@@ -159,7 +186,7 @@ app.use(xssMiddleware());
 const hpp = require("hpp");
 app.use(hpp());
 
-const csrf = require("csurf");
+const csrf = require("@dr.pogodin/csurf");
 const csrfProtection = csrf({
   cookie: {
     httpOnly: true,
@@ -174,16 +201,12 @@ app.use((req, res, next) => {
     return next();
   }
 
-  // Allow Swagger API docs to bypass CSRF for testing purposes
-  if (req.headers.referer && req.headers.referer.includes("/api-docs")) {
-    return next();
-  }
-
   csrfProtection(req, res, next);
 });
 
 // Serve uploaded files statically
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Protect API docs with basic authentication
 const swaggerBasicAuth = (req, res, next) => {

@@ -103,10 +103,10 @@ const Wishlist = () => {
   };
 
   const moveAllToCart = async () => {
-    // Check for totalStock, remainingStock, or stock depending on backend response
+    // Prefer remaining stock (current available units), then fall back to total/legacy fields.
     const availableItems = wishlistItems.filter((item) => {
       const itemStock =
-        item.totalStock ?? item.remainingStock ?? item.stock ?? 1;
+        item.remainingStock ?? item.totalStock ?? item.stock ?? 1;
       return itemStock > 0;
     });
     if (availableItems.length === 0) {
@@ -179,7 +179,7 @@ const Wishlist = () => {
   };
 
   const getItemStock = (item) => {
-    return item.totalStock ?? item.remainingStock ?? item.stock ?? 1;
+    return item.remainingStock ?? item.totalStock ?? item.stock ?? 1;
   };
 
   // Loading State

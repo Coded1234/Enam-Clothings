@@ -13,11 +13,32 @@ const {
   normalizeEmail,
   validateAllowedSignupEmailDomain,
 } = require("../utils/inputValidation");
+const logger = require("../config/logger");
 
 const STRONG_PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 const STRONG_PASSWORD_MESSAGE =
   "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.";
+
+const AUTH_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
+
+const setAuthCookie = (res, userId) => {
+  const token = generateToken(userId);
+  res.cookie("token", token, AUTH_COOKIE_OPTIONS);
+};
+
+const clearAuthCookie = (res) => {
+  res.cookie("token", "", {
+    ...AUTH_COOKIE_OPTIONS,
+    maxAge: 0,
+    expires: new Date(0),
+  });
+};
 
 const isStrongPassword = (password) =>
   typeof password === "string" && STRONG_PASSWORD_REGEX.test(password);
@@ -73,16 +94,16 @@ const register = async (req, res) => {
       role: "customer",
     });
 
-// Generate token for email verification
-      const token = user.generateEmailVerificationToken();
-      await user.save();
+    // Generate token for email verification
+    const token = user.generateEmailVerificationToken();
+    await user.save();
 
-      // Send verification email with token
-      try {
-        const { subject, html } = emailTemplates.emailVerification(user, token);
+    // Send verification email with token
+    try {
+      const { subject, html } = emailTemplates.emailVerification(user, token);
       await sendEmail(user.email, subject, html);
     } catch (emailError) {
-      console.error("Verification email failed:", emailError);
+      logger.error("Verification email failed", { error: emailError.message });
     }
 
     res.status(201).json({
@@ -96,10 +117,8 @@ const register = async (req, res) => {
       emailVerified: user.emailVerified,
     });
   } catch (error) {
-    console.error("Registration error:", error);
-    res
-      .status(500)
-      .json({ message: "Registration failed", error: error.message });
+    logger.error("Registration error", { error: error.message });
+    res.status(500).json({ message: "Registration failed" });
   }
 };
 
@@ -117,12 +136,9 @@ const login = async (req, res) => {
     // Find user
     const user = await User.findOne({ where: { email: emailCheck.email } });
     if (!user) {
-      return res
-        .status(404)
-        .json({
-          message:
-            "We don't recognize this email. Please register to continue.",
-        });
+      return res.status(404).json({
+        message: "We don't recognize this email. Please register to continue.",
+      });
     }
 
     // Check password
@@ -145,6 +161,8 @@ const login = async (req, res) => {
       });
     }
 
+    setAuthCookie(res, user.id);
+
     res.json({
       _id: user.id,
       firstName: user.firstName,
@@ -153,20 +171,10 @@ const login = async (req, res) => {
       role: user.role,
       phone: user.phone,
       address: user.address,
-      token: (function () {
-        const t = generateToken(user.id);
-        res.cookie("token", t, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-        return t;
-      })(),
     });
   } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ message: "Login failed", error: error.message });
+    logger.error("Login error", { error: error.message });
+    res.status(500).json({ message: "Login failed" });
   }
 };
 
@@ -179,9 +187,7 @@ const getProfile = async (req, res) => {
     });
     res.json(user);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching profile", error: error.message });
+    res.status(500).json({ message: "Error fetching profile" });
   }
 };
 
@@ -216,9 +222,7 @@ const updateProfile = async (req, res) => {
       role: user.role,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error updating profile", error: error.message });
+    res.status(500).json({ message: "Error updating profile" });
   }
 };
 
@@ -249,9 +253,7 @@ const changePassword = async (req, res) => {
 
     res.json({ message: "Password updated successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error changing password", error: error.message });
+    res.status(500).json({ message: "Error changing password" });
   }
 };
 
@@ -280,9 +282,7 @@ const toggleWishlist = async (req, res) => {
 
     res.json({ wishlist: wishlist.map((w) => w.productId) });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error updating wishlist", error: error.message });
+    res.status(500).json({ message: "Error updating wishlist" });
   }
 };
 
@@ -296,9 +296,7 @@ const getWishlist = async (req, res) => {
     });
     res.json(wishlist.map((w) => w.product));
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching wishlist", error: error.message });
+    res.status(500).json({ message: "Error fetching wishlist" });
   }
 };
 
@@ -316,12 +314,6 @@ const uploadAvatar = async (req, res) => {
       "image/jpg",
       "image/png",
       "image/webp",
-      "image/gif",
-      "image/bmp",
-      "image/tiff",
-      "image/heic",
-      "image/heif",
-      "image/avif",
     ];
     if (!allowedMimeTypes.includes(req.file.mimetype)) {
       return res.status(400).json({
@@ -370,10 +362,8 @@ const uploadAvatar = async (req, res) => {
       avatar: avatarUrl,
     });
   } catch (error) {
-    console.error("Avatar upload error:", error);
-    res
-      .status(500)
-      .json({ message: "Error uploading avatar", error: error.message });
+    logger.error("Avatar upload error", { error: error.message });
+    res.status(500).json({ message: "Error uploading avatar" });
   }
 };
 
@@ -416,7 +406,9 @@ const forgotPassword = async (req, res) => {
       const { subject, html } = emailTemplates.passwordReset(user, resetUrl);
       await sendEmail(user.email, subject, html);
     } catch (emailError) {
-      console.error("Password reset email failed:", emailError);
+      logger.error("Password reset email failed", {
+        error: emailError.message,
+      });
       user.resetPasswordToken = null;
       user.resetPasswordExpires = null;
       await user.save();
@@ -430,10 +422,8 @@ const forgotPassword = async (req, res) => {
         "If an account with that email exists, a password reset link has been sent.",
     });
   } catch (error) {
-    console.error("Forgot password error:", error);
-    res
-      .status(500)
-      .json({ message: "Error processing request", error: error.message });
+    logger.error("Forgot password error", { error: error.message });
+    res.status(500).json({ message: "Error processing request" });
   }
 };
 
@@ -489,7 +479,9 @@ const resetPassword = async (req, res) => {
       const { subject, html } = emailTemplates.passwordChanged(user);
       await sendEmail(user.email, subject, html);
     } catch (emailError) {
-      console.error("Password changed confirmation email failed:", emailError);
+      logger.error("Password changed confirmation email failed", {
+        error: emailError.message,
+      });
     }
 
     res.json({
@@ -497,10 +489,8 @@ const resetPassword = async (req, res) => {
         "Password has been reset successfully. You can now login with your new password.",
     });
   } catch (error) {
-    console.error("Reset password error:", error);
-    res
-      .status(500)
-      .json({ message: "Error resetting password", error: error.message });
+    logger.error("Reset password error", { error: error.message });
+    res.status(500).json({ message: "Error resetting password" });
   }
 };
 
@@ -533,10 +523,8 @@ const deleteAvatar = async (req, res) => {
       message: "Avatar deleted successfully",
     });
   } catch (error) {
-    console.error("Avatar delete error:", error);
-    res
-      .status(500)
-      .json({ message: "Error deleting avatar", error: error.message });
+    logger.error("Avatar delete error", { error: error.message });
+    res.status(500).json({ message: "Error deleting avatar" });
   }
 };
 
@@ -590,15 +578,14 @@ const verifyEmail = async (req, res) => {
       const { subject, html } = emailTemplates.welcomeEmail(user);
       await sendEmail(user.email, subject, html);
     } catch (emailError) {
-      console.error("Welcome email failed:", emailError);
+      logger.error("Welcome email failed", { error: emailError.message });
     }
 
-    const authToken = generateToken(user.id);
+    setAuthCookie(res, user.id);
 
     res.json({
       message: "Email verified successfully! You are now logged in.",
       emailVerified: true,
-      token: authToken,
       user: {
         id: user.id,
         firstName: user.firstName,
@@ -608,10 +595,8 @@ const verifyEmail = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Email verification error:", error);
-    res
-      .status(500)
-      .json({ message: "Error verifying email", error: error.message });
+    logger.error("Email verification error", { error: error.message });
+    res.status(500).json({ message: "Error verifying email" });
   }
 };
 
@@ -653,18 +638,21 @@ const resendVerificationEmail = async (req, res) => {
       const { subject, html } = emailTemplates.emailVerification(user, token);
       await sendEmail(user.email, subject, html);
     } catch (emailError) {
-      console.error("Verification email failed:", emailError);
+      logger.error("Resend verification email failed", {
+        error: emailError.message,
+      });
       return res
         .status(500)
         .json({ message: "Failed to send verification email" });
     }
 
-    res.json({ message: "A new verification link has been sent to your email." });
+    res.json({
+      message: "A new verification link has been sent to your email.",
+    });
   } catch (error) {
-    console.error("Resend verification error:", error);
+    logger.error("Resend verification error", { error: error.message });
     res.status(500).json({
       message: "Error resending verification email",
-      error: error.message,
     });
   }
 };
@@ -724,6 +712,8 @@ const googleLogin = async (req, res) => {
       return res.status(401).json({ message: "Account has been deactivated" });
     }
 
+    setAuthCookie(res, user.id);
+
     res.json({
       _id: user.id,
       firstName: user.firstName,
@@ -732,22 +722,10 @@ const googleLogin = async (req, res) => {
       role: user.role,
       phone: user.phone,
       address: user.address,
-      token: (function () {
-        const t = generateToken(user.id);
-        res.cookie("token", t, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-        return t;
-      })(),
     });
   } catch (error) {
-    console.error("Google login error:", error);
-    res
-      .status(500)
-      .json({ message: "Google login failed", error: error.message });
+    logger.error("Google login error", { error: error.message });
+    res.status(500).json({ message: "Google login failed" });
   }
 };
 
@@ -799,6 +777,8 @@ const facebookLogin = async (req, res) => {
       return res.status(401).json({ message: "Account has been deactivated" });
     }
 
+    setAuthCookie(res, user.id);
+
     res.json({
       _id: user.id,
       firstName: user.firstName,
@@ -807,22 +787,10 @@ const facebookLogin = async (req, res) => {
       role: user.role,
       phone: user.phone,
       address: user.address,
-      token: (function () {
-        const t = generateToken(user.id);
-        res.cookie("token", t, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-        return t;
-      })(),
     });
   } catch (error) {
-    console.error("Facebook login error:", error);
-    res
-      .status(500)
-      .json({ message: "Facebook login failed", error: error.message });
+    logger.error("Facebook login error", { error: error.message });
+    res.status(500).json({ message: "Facebook login failed" });
   }
 };
 
@@ -863,10 +831,8 @@ const deleteAccount = async (req, res) => {
 
     res.json({ message: "Account deleted successfully" });
   } catch (error) {
-    console.error("Delete account error:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to delete account", error: error.message });
+    logger.error("Delete account error", { error: error.message });
+    res.status(500).json({ message: "Failed to delete account" });
   }
 };
 
@@ -928,10 +894,8 @@ const facebookDataDeletion = async (req, res) => {
       confirmation_code: confirmationCode,
     });
   } catch (error) {
-    console.error("Facebook data deletion error:", error);
-    res
-      .status(500)
-      .json({ message: "Data deletion request failed", error: error.message });
+    logger.error("Facebook data deletion error", { error: error.message });
+    res.status(500).json({ message: "Data deletion request failed" });
   }
 };
 
@@ -954,7 +918,7 @@ module.exports = {
   resendVerificationEmail,
   deleteAccount,
   logout: (req, res) => {
-    res.cookie("token", "", { httpOnly: true, expires: new Date(0) });
+    clearAuthCookie(res);
     res.json({ message: "Logged out successfully" });
   },
 };

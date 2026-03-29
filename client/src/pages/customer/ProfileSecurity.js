@@ -21,6 +21,7 @@ const PasswordField = ({
   onToggle,
   passwordData,
   onChange,
+  error,
 }) => (
   <div>
     <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">
@@ -37,7 +38,7 @@ const PasswordField = ({
         value={passwordData[name]}
         onChange={onChange}
         required
-        className="w-full pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900"
+        className={`w-full pl-9 pr-10 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 ${error ? "border-red-500 bg-red-50" : "border-gray-300"}`}
       />
       <button
         type="button"
@@ -47,7 +48,10 @@ const PasswordField = ({
         {show ? <FiEyeOff size={15} /> : <FiEye size={15} />}
       </button>
     </div>
-    {name === "newPassword" &&
+    {error ? (
+      <p className="mt-1 text-xs text-red-500">{error}</p>
+    ) : (
+      name === "newPassword" &&
       passwordData[name] &&
       !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(
         passwordData[name],
@@ -56,7 +60,8 @@ const PasswordField = ({
           Password must be at least 8 characters and include uppercase,
           lowercase, a number, and a special character.
         </p>
-      )}
+      )
+    )}
   </div>
 );
 
@@ -72,6 +77,7 @@ const ProfileSecurity = () => {
   const [deletePassword, setDeletePassword] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const [formErrors, setFormErrors] = useState({});
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -84,9 +90,11 @@ const ProfileSecurity = () => {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
+    setFormErrors({});
+    let errors = {};
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
+      errors.confirmPassword = "Passwords do not match";
     }
 
     if (
@@ -94,14 +102,15 @@ const ProfileSecurity = () => {
         passwordData.newPassword,
       )
     ) {
-      document.querySelector('input[name="newPassword"]')?.focus();
+      errors.newPassword =
+        "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
 
-    if (passwordData.newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
     try {
       await api.put("/auth/change-password", {
         currentPassword: passwordData.currentPassword,
@@ -121,9 +130,23 @@ const ProfileSecurity = () => {
         message ===
           "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character."
       ) {
-        document.querySelector('input[name="newPassword"]')?.focus();
+        setFormErrors({ newPassword: message });
       } else {
-        toast.error(message);
+        if (
+          message.toLowerCase().includes("incorrect password") ||
+          message.toLowerCase().includes("current password")
+        ) {
+          setFormErrors({ currentPassword: message });
+        } else {
+          if (
+            message.toLowerCase().includes("incorrect password") ||
+            message.toLowerCase().includes("current password")
+          ) {
+            setFormErrors({ currentPassword: message });
+          } else {
+            toast.error(message);
+          }
+        }
       }
     }
   };
@@ -171,6 +194,7 @@ const ProfileSecurity = () => {
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
             <PasswordField
               label="Current Password"
+              error={formErrors.currentPassword}
               name="currentPassword"
               show={showCurrentPassword}
               onToggle={() => setShowCurrentPassword(!showCurrentPassword)}
@@ -179,6 +203,7 @@ const ProfileSecurity = () => {
             />
             <PasswordField
               label="New Password"
+              error={formErrors.newPassword}
               name="newPassword"
               show={showNewPassword}
               onToggle={() => setShowNewPassword(!showNewPassword)}
@@ -187,6 +212,7 @@ const ProfileSecurity = () => {
             />
             <PasswordField
               label="Confirm New Password"
+              error={formErrors.confirmPassword}
               name="confirmPassword"
               show={showConfirmPassword}
               onToggle={() => setShowConfirmPassword(!showConfirmPassword)}

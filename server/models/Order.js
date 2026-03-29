@@ -1,4 +1,4 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes, Op } = require("sequelize");
 const { sequelize } = require("../config/database");
 const crypto = require("crypto");
 
@@ -130,6 +130,11 @@ const Order = sequelize.define(
       { fields: ["payment_status"] },
       { fields: ["created_at"] },
       { unique: true, fields: ["order_number"] },
+      {
+        unique: true,
+        fields: ["payment_reference"],
+        where: { payment_reference: { [Op.ne]: null } },
+      },
     ],
     hooks: {
       beforeCreate: (order) => {

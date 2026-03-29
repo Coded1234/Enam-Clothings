@@ -35,6 +35,8 @@ const Products = () => {
 
   const categories = ["men", "women", "perfumes"];
 
+  const getProductId = (product) => product?.id || product?._id || "";
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm.trim());
@@ -85,10 +87,18 @@ const Products = () => {
   const handleDelete = async () => {
     if (!productToDelete) return;
 
+    const productId = getProductId(productToDelete);
+    if (!productId) {
+      alert("Unable to delete this product because its ID is missing.");
+      return;
+    }
+
     try {
       setDeleting(true);
-      await adminAPI.deleteProduct(productToDelete.id);
-      setProducts(products.filter((p) => p.id !== productToDelete.id));
+      await adminAPI.deleteProduct(productId);
+      setProducts((prevProducts) =>
+        prevProducts.filter((p) => getProductId(p) !== productId),
+      );
       setShowDeleteModal(false);
       setProductToDelete(null);
     } catch (err) {
@@ -188,94 +198,103 @@ const Products = () => {
             {/* Mobile card list */}
             <div className="md:hidden divide-y divide-gray-100">
               {products.length > 0 ? (
-                products.map((product) => (
-                  <div
-                    key={product.id}
-                    className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
-                    onClick={() =>
-                      router.push(`/admin/products/${product.id}/edit`)
-                    }
-                  >
-                    {/* Image */}
-                    <div className="h-12 w-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                      {product.images?.[0]?.url || product.images?.[0] ? (
-                        <img
-                          src={getImageUrl(
-                            product.images[0]?.url || product.images[0],
-                          )}
-                          alt={product.name}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center">
-                          <FiImage className="text-gray-400" size={16} />
-                        </div>
-                      )}
-                    </div>
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {product.name}
-                      </p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs font-semibold text-gray-700">
-                          {formatCurrency(
-                            product.discountPrice ||
-                              product.comparePrice ||
-                              product.price,
-                          )}
-                        </span>
-                        <span
-                          className={`text-xs font-medium ${
-                            (product.remainingStock ??
-                              product.totalStock ??
-                              product.stock) > 10
-                              ? "text-green-600"
-                              : (product.remainingStock ??
-                                    product.totalStock ??
-                                    product.stock) > 0
-                                ? "text-yellow-600"
-                                : "text-red-600"
-                          }`}
-                        >
-                          Stock:{" "}
-                          {product.remainingStock ??
-                            product.totalStock ??
-                            product.stock ??
-                            0}
-                        </span>
-                        {product.isActive ? (
-                          <span className="text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">
-                            Active
-                          </span>
+                products.map((product) => {
+                  const productId = getProductId(product);
+
+                  return (
+                    <div
+                      key={productId || product.name}
+                      className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                      onClick={() =>
+                        productId &&
+                        router.push(`/admin/products/${productId}/edit`)
+                      }
+                    >
+                      {/* Image */}
+                      <div className="h-12 w-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                        {product.images?.[0]?.url || product.images?.[0] ? (
+                          <img
+                            src={getImageUrl(
+                              product.images[0]?.url || product.images[0],
+                            )}
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
-                          <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">
-                            Inactive
-                          </span>
+                          <div className="h-full w-full flex items-center justify-center">
+                            <FiImage className="text-gray-400" size={16} />
+                          </div>
                         )}
                       </div>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {product.name}
+                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-xs font-semibold text-gray-700">
+                            {formatCurrency(
+                              product.discountPrice ||
+                                product.comparePrice ||
+                                product.price,
+                            )}
+                          </span>
+                          <span
+                            className={`text-xs font-medium ${
+                              (product.remainingStock ??
+                                product.totalStock ??
+                                product.stock) > 10
+                                ? "text-green-600"
+                                : (product.remainingStock ??
+                                      product.totalStock ??
+                                      product.stock) > 0
+                                  ? "text-yellow-600"
+                                  : "text-red-600"
+                            }`}
+                          >
+                            Stock:{" "}
+                            {product.remainingStock ??
+                              product.totalStock ??
+                              product.stock ??
+                              0}
+                          </span>
+                          {product.isActive ? (
+                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">
+                              Active
+                            </span>
+                          ) : (
+                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">
+                              Inactive
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {/* Actions */}
+                      <div className="flex flex-col gap-1 flex-shrink-0">
+                        <Link
+                          href={
+                            productId
+                              ? `/admin/products/${productId}/edit`
+                              : "#"
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                          <FiEdit2 size={15} />
+                        </Link>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClick(product);
+                          }}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <FiTrash2 size={15} />
+                        </button>
+                      </div>
                     </div>
-                    {/* Actions */}
-                    <div className="flex flex-col gap-1 flex-shrink-0">
-                      <Link
-                        href={`/admin/products/${product.id}/edit`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      >
-                        <FiEdit2 size={15} />
-                      </Link>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteClick(product);
-                        }}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <FiTrash2 size={15} />
-                      </button>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <p className="text-center text-sm text-gray-400 py-12">
                   No products found
@@ -310,119 +329,129 @@ const Products = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {products.length > 0 ? (
-                    products.map((product) => (
-                      <tr
-                        key={product.id}
-                        className="hover:bg-gray-50 cursor-pointer"
-                        onClick={() =>
-                          router.push(`/admin/products/${product.id}/edit`)
-                        }
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="h-12 w-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                              {product.images?.[0]?.url ||
-                              product.images?.[0] ? (
-                                <img
-                                  src={getImageUrl(
-                                    product.images[0]?.url || product.images[0],
-                                  )}
-                                  alt={product.name}
-                                  className="h-full w-full object-cover"
-                                />
-                              ) : (
-                                <div className="h-full w-full flex items-center justify-center">
-                                  <FiImage
-                                    className="text-gray-400"
-                                    size={16}
+                    products.map((product) => {
+                      const productId = getProductId(product);
+
+                      return (
+                        <tr
+                          key={productId || product.name}
+                          className="hover:bg-gray-50 cursor-pointer"
+                          onClick={() =>
+                            productId &&
+                            router.push(`/admin/products/${productId}/edit`)
+                          }
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="h-12 w-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                                {product.images?.[0]?.url ||
+                                product.images?.[0] ? (
+                                  <img
+                                    src={getImageUrl(
+                                      product.images[0]?.url ||
+                                        product.images[0],
+                                    )}
+                                    alt={product.name}
+                                    className="h-full w-full object-cover"
                                   />
+                                ) : (
+                                  <div className="h-full w-full flex items-center justify-center">
+                                    <FiImage
+                                      className="text-gray-400"
+                                      size={16}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {product.name}
                                 </div>
+                                <div className="text-xs text-gray-500">
+                                  {product.brand}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm font-medium text-gray-800 capitalize">
+                              {product.category}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">
+                              {formatCurrency(
+                                product.discountPrice ||
+                                  product.comparePrice ||
+                                  product.price,
                               )}
                             </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
-                                {product.name}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {product.brand}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-800 capitalize">
-                            {product.category}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            {formatCurrency(
-                              product.discountPrice ||
-                                product.comparePrice ||
-                                product.price,
-                            )}
-                          </div>
-                          {(product.discountPrice || product.comparePrice) &&
-                            (product.discountPrice || product.comparePrice) <
-                              product.price && (
-                              <div className="text-xs text-gray-500 line-through">
-                                {formatCurrency(product.price)}
-                              </div>
-                            )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`text-sm font-medium ${
-                              (product.remainingStock ??
+                            {(product.discountPrice || product.comparePrice) &&
+                              (product.discountPrice || product.comparePrice) <
+                                product.price && (
+                                <div className="text-xs text-gray-500 line-through">
+                                  {formatCurrency(product.price)}
+                                </div>
+                              )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`text-sm font-medium ${
+                                (product.remainingStock ??
+                                  product.totalStock ??
+                                  product.stock) > 10
+                                  ? "text-green-600"
+                                  : (product.remainingStock ??
+                                        product.totalStock ??
+                                        product.stock) > 0
+                                    ? "text-yellow-600"
+                                    : "text-red-600"
+                              }`}
+                            >
+                              {product.remainingStock ??
                                 product.totalStock ??
-                                product.stock) > 10
-                                ? "text-green-600"
-                                : (product.remainingStock ??
-                                      product.totalStock ??
-                                      product.stock) > 0
-                                  ? "text-yellow-600"
-                                  : "text-red-600"
-                            }`}
-                          >
-                            {product.remainingStock ??
-                              product.totalStock ??
-                              product.stock ??
-                              0}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {product.isActive ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                              <FiEye size={12} /> Active
+                                product.stock ??
+                                0}
                             </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
-                              <FiEyeOff size={12} /> Inactive
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Link
-                              href={`/admin/products/${product.id}/edit`}
-                              onClick={(e) => e.stopPropagation()}
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            >
-                              <FiEdit2 size={16} />
-                            </Link>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteClick(product);
-                              }}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            >
-                              <FiTrash2 size={16} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {product.isActive ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                                <FiEye size={12} /> Active
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                                <FiEyeOff size={12} /> Inactive
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <Link
+                                href={
+                                  productId
+                                    ? `/admin/products/${productId}/edit`
+                                    : "#"
+                                }
+                                onClick={(e) => e.stopPropagation()}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              >
+                                <FiEdit2 size={16} />
+                              </Link>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteClick(product);
+                                }}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              >
+                                <FiTrash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
                       <td

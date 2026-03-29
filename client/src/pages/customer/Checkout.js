@@ -20,21 +20,11 @@ import {
 } from "react-icons/fi";
 
 const Checkout = () => {
-  const SAVED_COUPON_KEY = "savedCouponCode";
   const CHECKOUT_STATE_KEY = "checkoutState";
 
   const router = useRouter();
   const { items, totalAmount } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.auth);
-
-  // Get coupon data from Cart page if passed
-  const _checkoutState =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem(CHECKOUT_STATE_KEY) || "{}")
-      : {};
-  const passedCoupon = _checkoutState.coupon || null;
-  const passedDiscount = _checkoutState.couponDiscount || 0;
-
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [shippingInfo, setShippingInfo] = useState({
@@ -48,13 +38,6 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState("paystack");
   const [saveAddress, setSaveAddress] = useState(true);
 
-  // Coupon state - initialize with passed data from Cart
-  const [couponCode, setCouponCode] = useState(passedCoupon?.code || "");
-  const [appliedCoupon, setAppliedCoupon] = useState(passedCoupon);
-  const [couponDiscount, setCouponDiscount] = useState(passedDiscount);
-  const [couponLoading, setCouponLoading] = useState(false);
-  const [couponError, setCouponError] = useState("");
-
   // Shipping state for Yango integration
   const [shippingCost, setShippingCost] = useState(0);
   const [shippingLoading, setShippingLoading] = useState(false);
@@ -67,39 +50,8 @@ const Checkout = () => {
 
   // Cost calculation - ensure all values are numbers
   const subtotal = parseFloat(totalAmount) || 0;
-  const tax = (subtotal - couponDiscount) * 0.0; // Tax included in prices
-  const finalTotal = subtotal - couponDiscount + shippingCost + tax;
-
-  // Restore and validate persisted coupon code if checkout state payload is missing
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (appliedCoupon?.code || subtotal <= 0) return;
-
-    const savedCouponCode = localStorage.getItem(SAVED_COUPON_KEY);
-    if (!savedCouponCode) return;
-
-    const restoreCoupon = async () => {
-      try {
-        const response = await api.post("/coupons/validate", {
-          code: savedCouponCode,
-          subtotal,
-        });
-
-        if (response.data.success) {
-          setAppliedCoupon(response.data.coupon);
-          setCouponDiscount(response.data.discount);
-          setCouponCode(response.data.coupon.code);
-          localStorage.setItem(SAVED_COUPON_KEY, response.data.coupon.code);
-        }
-      } catch (error) {
-        setAppliedCoupon(null);
-        setCouponDiscount(0);
-        localStorage.removeItem(SAVED_COUPON_KEY);
-      }
-    };
-
-    restoreCoupon();
-  }, [appliedCoupon?.code, subtotal]);
+  const tax = subtotal * 0.0; // Tax included in prices
+  const finalTotal = subtotal + shippingCost + tax;
 
   // Auto-enable free shipping for orders >= GH₵1000
   React.useEffect(() => {
@@ -130,58 +82,6 @@ const Checkout = () => {
     if (e.target.name === "address" || e.target.name === "phone") {
       setShippingCalculated(false);
     }
-  };
-
-  // Coupon functions
-  const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) {
-      setCouponError("Please enter a coupon code");
-      return;
-    }
-
-    setCouponLoading(true);
-    setCouponError("");
-
-    try {
-      const response = await api.post("/coupons/validate", {
-        code: couponCode.trim(),
-        subtotal: subtotal,
-      });
-
-      if (response.data.success) {
-        setAppliedCoupon(response.data.coupon);
-        setCouponDiscount(response.data.discount);
-        if (typeof window !== "undefined") {
-          localStorage.setItem(SAVED_COUPON_KEY, response.data.coupon.code);
-          localStorage.setItem(
-            CHECKOUT_STATE_KEY,
-            JSON.stringify({
-              coupon: response.data.coupon,
-              couponDiscount: response.data.discount,
-            }),
-          );
-        }
-        toast.success(response.data.message);
-      }
-    } catch (error) {
-      const errorMsg = error.response?.data?.message || "Invalid coupon code";
-      setCouponError(errorMsg);
-      toast.error(errorMsg);
-    } finally {
-      setCouponLoading(false);
-    }
-  };
-
-  const handleRemoveCoupon = () => {
-    setAppliedCoupon(null);
-    setCouponDiscount(0);
-    setCouponCode("");
-    setCouponError("");
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(SAVED_COUPON_KEY);
-      localStorage.removeItem(CHECKOUT_STATE_KEY);
-    }
-    toast.success("Coupon removed");
   };
 
   const validateShipping = () => {
@@ -313,14 +213,10 @@ const Checkout = () => {
                 region,
                 postalCode,
               },
-              couponId: appliedCoupon?.id || null,
-              discount: couponDiscount,
               shippingDetails: shippingDetails,
             },
             items: items,
             totalAmount: totalAmount,
-            coupon: appliedCoupon,
-            couponDiscount: couponDiscount,
             shippingCost: shippingCost,
             shippingDetails: shippingDetails,
           };
@@ -348,14 +244,10 @@ const Checkout = () => {
           postalCode,
         },
         paymentMethod: paymentMethod,
-        couponId: appliedCoupon?.id || null,
-        discount: couponDiscount,
         shippingDetails: shippingDetails,
       },
       items: items,
       totalAmount: totalAmount,
-      coupon: appliedCoupon,
-      couponDiscount: couponDiscount,
       shippingCost: shippingCost,
       shippingDetails: shippingDetails,
     };

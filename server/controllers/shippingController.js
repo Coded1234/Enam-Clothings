@@ -1,5 +1,6 @@
 const axios = require("axios");
 const { validateGhanaPhone } = require("../utils/inputValidation");
+const logger = require("../config/logger");
 
 // Yango Delivery API Configuration
 const YANGO_API_URL =
@@ -18,60 +19,81 @@ const STORE_LOCATION = {
 // Accra's road network typically adds 40-60% to straight-line distance
 const ROAD_MULTIPLIER = parseFloat(process.env.ROAD_DISTANCE_MULTIPLIER) || 1.5;
 
+function createClientError(message, statusCode = 400) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  error.expose = true;
+  return error;
+}
+
+async function computeShippingQuote(input = {}) {
+  const { address, city, postalCode, phone } = input;
+
+  if (!address || !city) {
+    throw createClientError("Address and city are required", 400);
+  }
+
+  const phoneCheck = validateGhanaPhone(phone, { required: false });
+  if (!phoneCheck.ok) {
+    throw createClientError(phoneCheck.message, 400);
+  }
+
+  const destinationCoords = await geocodeAddress({
+    address,
+    city,
+    postalCode,
+  });
+
+  if (!destinationCoords) {
+    throw createClientError(
+      "Could not locate the provided address. Please enter a valid address in Ghana.",
+      400,
+    );
+  }
+
+  const shippingRate = await getYangoShippingRate(
+    STORE_LOCATION,
+    destinationCoords,
+    {
+      address,
+      city,
+      postalCode,
+      phone: phoneCheck.phone || phone,
+    },
+  );
+
+  return {
+    shippingFee: shippingRate.price,
+    estimatedDeliveryTime: shippingRate.estimatedTime,
+    distance: shippingRate.distance,
+    carrier: "Yango Delivery",
+    serviceType: shippingRate.serviceType,
+    destinationCoords,
+  };
+}
+
+exports.computeShippingQuote = computeShippingQuote;
+
 /**
  * Calculate shipping rate using Yango Delivery API
  */
 exports.calculateShippingRate = async (req, res) => {
   try {
-    const { address, city, postalCode, phone } = req.body;
-
-    if (!address || !city) {
-      return res.status(400).json({
-        success: false,
-        message: "Address and city are required",
-      });
-    }
-
-    const phoneCheck = validateGhanaPhone(phone, { required: false });
-    if (!phoneCheck.ok) {
-      return res.status(400).json({ success: false, message: phoneCheck.message });
-    }
-
-    // Geocode the destination address
-    const destinationCoords = await geocodeAddress({
-      address,
-      city,
-      postalCode,
-    });
-
-    if (!destinationCoords) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Could not locate the provided address. Please enter a valid address in Ghana.",
-      });
-    }
-
-    // Calculate shipping rate from Yango
-    const shippingRate = await getYangoShippingRate(
-      STORE_LOCATION,
-      destinationCoords,
-      { address, city, postalCode, phone: phoneCheck.phone || phone },
-    );
+    const quote = await computeShippingQuote(req.body || {});
 
     res.json({
       success: true,
-      data: {
-        shippingFee: shippingRate.price,
-        estimatedDeliveryTime: shippingRate.estimatedTime,
-        distance: shippingRate.distance,
-        carrier: "Yango Delivery",
-        serviceType: shippingRate.serviceType,
-        destinationCoords,
-      },
+      data: quote,
     });
   } catch (error) {
-    console.error("Shipping calculation error:", error);
+    if (error?.expose && error?.statusCode) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    logger.error("Shipping calculation error", { error: error.message });
 
     // Fallback to static rates if API fails
     const fallbackRate = calculateFallbackRate(req.body);
@@ -134,7 +156,7 @@ exports.getDeliveryOptions = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get delivery options error:", error);
+    logger.error("Get delivery options error", { error: error.message });
 
     // Return fallback options
     res.json({
@@ -199,7 +221,7 @@ async function geocodeAddress({ address, city, postalCode }) {
 
     return null;
   } catch (error) {
-    console.error("Geocoding error:", error.message);
+    logger.error("Geocoding error", { error: error.message });
     return null;
   }
 }
@@ -231,9 +253,10 @@ async function calculateRoadDistance(lat1, lon1, lat2, lon2) {
     // Use OSRM (Open Source Routing Machine) for road distance
     const url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=false`;
 
-    console.log(
-      `Calculating road distance from (${lat1},${lon1}) to (${lat2},${lon2})`,
-    );
+    logger.info("Calculating road distance", {
+      origin: { lat: lat1, lon: lon1 },
+      destination: { lat: lat2, lon: lon2 },
+    });
 
     const response = await axios.get(url, {
       timeout: 8000, // Increased timeout for Vercel
@@ -251,22 +274,26 @@ async function calculateRoadDistance(lat1, lon1, lat2, lon2) {
     ) {
       // Distance is in meters, convert to km
       const distanceKm = response.data.routes[0].distance / 1000;
-      console.log(`✓ Road distance calculated: ${distanceKm.toFixed(2)} km`);
+      logger.info("Road distance calculated", {
+        distanceKm: Number(distanceKm.toFixed(2)),
+      });
       return distanceKm;
     }
 
     // Fallback if no routes found
-    console.log("⚠ No routes found, using straight-line with multiplier");
+    logger.warn("No routes found; using straight-line fallback");
     const straightLine = calculateDistance(lat1, lon1, lat2, lon2);
     return straightLine * ROAD_MULTIPLIER;
   } catch (error) {
-    console.error("❌ Road distance calculation error:", error.message);
+    logger.error("Road distance calculation error", { error: error.message });
     // Fallback to straight-line distance with road multiplier
     const straightLine = calculateDistance(lat1, lon1, lat2, lon2);
     const estimated = straightLine * ROAD_MULTIPLIER;
-    console.log(
-      `Using fallback: ${straightLine.toFixed(2)} km * ${ROAD_MULTIPLIER} = ${estimated.toFixed(2)} km`,
-    );
+    logger.info("Using road distance fallback estimate", {
+      straightLineKm: Number(straightLine.toFixed(2)),
+      multiplier: ROAD_MULTIPLIER,
+      estimatedKm: Number(estimated.toFixed(2)),
+    });
     return estimated;
   }
 }
@@ -354,7 +381,7 @@ async function getYangoShippingRate(origin, destination, deliveryInfo) {
       serviceType: "standard",
     };
   } catch (error) {
-    console.error("Yango API error:", error.message);
+    logger.error("Yango API error", { error: error.message });
 
     // Fallback to distance-based calculation with road distance
     const distance = await calculateRoadDistance(
@@ -424,7 +451,7 @@ async function getYangoDeliveryOptions(origin, destination) {
 
     return options;
   } catch (error) {
-    console.error("Get delivery options error:", error);
+    logger.error("Get delivery options error", { error: error.message });
     throw error;
   }
 }

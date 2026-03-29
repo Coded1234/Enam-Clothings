@@ -1,5 +1,6 @@
 const { Category } = require("../models");
 const { Op } = require("sequelize");
+const logger = require("../config/logger");
 
 // @desc    Get all categories
 // @route   GET /api/categories
@@ -46,7 +47,7 @@ const getAllCategories = async (req, res) => {
 
     res.json({ success: true, categories });
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    logger.error("Error fetching categories", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to fetch categories", error: error.message });
@@ -76,7 +77,7 @@ const getCategoryById = async (req, res) => {
 
     res.json({ success: true, category });
   } catch (error) {
-    console.error("Error fetching category:", error);
+    logger.error("Error fetching category", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to fetch category", error: error.message });
@@ -136,7 +137,7 @@ const createCategory = async (req, res) => {
       category,
     });
   } catch (error) {
-    console.error("Error creating category:", error);
+    logger.error("Error creating category", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to create category", error: error.message });
@@ -205,7 +206,7 @@ const updateCategory = async (req, res) => {
       category,
     });
   } catch (error) {
-    console.error("Error updating category:", error);
+    logger.error("Error updating category", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to update category", error: error.message });
@@ -239,7 +240,7 @@ const deleteCategory = async (req, res) => {
       message: "Category deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting category:", error);
+    logger.error("Error deleting category", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to delete category", error: error.message });
@@ -260,9 +261,9 @@ const reorderCategories = async (req, res) => {
       orders.map((item) =>
         Category.update(
           { display_order: item.display_order },
-          { where: { id: item.id } }
-        )
-      )
+          { where: { id: item.id } },
+        ),
+      ),
     );
 
     res.json({
@@ -270,7 +271,7 @@ const reorderCategories = async (req, res) => {
       message: "Categories reordered successfully",
     });
   } catch (error) {
-    console.error("Error reordering categories:", error);
+    logger.error("Error reordering categories", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to reorder categories", error: error.message });

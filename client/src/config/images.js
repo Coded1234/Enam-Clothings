@@ -31,15 +31,9 @@ const IMAGES = {
     men: [
       "/images/men.jpg?w=500",
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500",
-      "https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=500",
     ],
-    women: [
-      "/images/women.jpg?w=500",
-      "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=500",
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500",
-    ],
+    women: ["/images/women.jpg?w=500", "/images/womens.jpg?w=500"],
     perfumes: [
-      "/images/bestsellers.jpg?w=500",
       "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500",
       "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=500",
     ],
@@ -47,20 +41,19 @@ const IMAGES = {
 
   // Trending section images
   trending: {
-    small: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=500",
-    large1:
-      "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800",
+    small: "/images/coupon.jpg?w=800",
+    large1: "/images/newarrivals.jpg?w=800",
     large2: "/images/bestsellers.jpg?w=800",
   },
 
   // Instagram feed images
   instagram: [
-    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300",
-    "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=300",
-    "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=300",
-    "https://images.unsplash.com/photo-1475180098004-ca77a66827be?w=300",
-    "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=300",
-    "/images/bestsellers.jpg?w=300",
+    "/images/insta1.jpg?w=300",
+    "/images/insta2.jpg?w=300",
+    "/images/insta3.jpg?w=300",
+    "/images/insta4.jpg?w=300",
+    "/images/insta5.jpg?w=300",
+    "/images/insta6.jpg?w=300",
   ],
 
   // ==========================================

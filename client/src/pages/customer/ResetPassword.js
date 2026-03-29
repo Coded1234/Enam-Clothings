@@ -4,11 +4,14 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { FiLock, FiEye, FiEyeOff, FiCheck, FiX } from "react-icons/fi";
 import api from "../../utils/api";
+import { useDispatch } from "react-redux";
+import { logout } from "../../redux/slices/authSlice";
 import toast from "react-hot-toast";
 
 const ResetPassword = () => {
   const { token } = useParams();
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -17,6 +20,7 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [formErrors, setFormErrors] = useState({});
 
   const STRONG_PASSWORD_REGEX =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
@@ -39,12 +43,15 @@ const ResetPassword = () => {
 
     if (!STRONG_PASSWORD_REGEX.test(password)) {
       // Focus field instead of toast
-      document.querySelector('input[type="password"]')?.focus();
+      setFormErrors({
+        password:
+          "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.",
+      });
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      setFormErrors({ confirmPassword: "Passwords do not match" });
       return;
     }
 
@@ -56,6 +63,9 @@ const ResetPassword = () => {
       setSuccess(true);
       toast.success("Password reset successfully!");
 
+      // Force logout to ensure they do not auto-redirect back to their previous session
+      dispatch(logout());
+
       // Redirect to login after 3 seconds
       setTimeout(() => {
         router.push("/login");
@@ -63,10 +73,13 @@ const ResetPassword = () => {
     } catch (err) {
       const message = err.response?.data?.message || "Failed to reset password";
       if (err.response?.status === 400 && message === STRONG_PASSWORD_MESSAGE) {
-        document.querySelector('input[type="password"]')?.focus();
+        setFormErrors({
+          password:
+            "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.",
+        });
       } else {
         setError(message);
-        toast.error(message);
+        setFormErrors({ password: message });
       }
     } finally {
       setLoading(false);

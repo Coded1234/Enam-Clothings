@@ -1,19 +1,13 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../models");
+const logger = require("../config/logger");
+
+const getTokenFromCookie = (req) => req.cookies?.token || null;
 
 // Protect routes - Authentication
 const protect = async (req, res, next) => {
   try {
-    let token;
-
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
-    } else if (req.cookies && req.cookies.token) {
-      token = req.cookies.token;
-    }
+    const token = getTokenFromCookie(req);
 
     if (!token) {
       return res.status(401).json({ message: "Not authorized, no token" });
@@ -39,7 +33,9 @@ const protect = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Auth middleware error:", error);
+    logger.warn("Auth middleware token verification failed", {
+      error: error.message,
+    });
     res.status(401).json({ message: "Not authorized, token failed" });
   }
 };
@@ -56,16 +52,7 @@ const adminOnly = (req, res, next) => {
 // Optional auth - doesn't require auth but attaches user if logged in
 const optionalAuth = async (req, res, next) => {
   try {
-    let token;
-
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
-    } else if (req.cookies && req.cookies.token) {
-      token = req.cookies.token;
-    }
+    const token = getTokenFromCookie(req);
 
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);

@@ -1,6 +1,8 @@
 "use client";
+/* eslint-env browser */
+/* eslint-disable no-unused-vars */
 import Link from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
 import { FiInstagram, FiMail, FiPhone, FiCheck } from "react-icons/fi";
 import { SiTiktok } from "react-icons/si";
 import { newsletterAPI } from "../../utils/api";
@@ -8,16 +10,18 @@ import toast from "react-hot-toast";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [subscribing, setSubscribing] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email) {
-      toast.error("Please enter your email");
+      setError("Please enter your email");
       return;
     }
 
+    setError("");
     setSubscribing(true);
     try {
       await newsletterAPI.subscribe(email);
@@ -25,7 +29,7 @@ const Footer = () => {
       setSubscribed(true);
       setEmail("");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to subscribe");
+      setError(error.response?.data?.message || "Failed to subscribe");
     } finally {
       setSubscribing(false);
     }
@@ -52,13 +56,16 @@ const Footer = () => {
           ) : (
             <form
               onSubmit={handleSubscribe}
-              className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+              className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto relative"
             >
               <input
                 type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError("");
+                }}
                 style={{
                   backgroundColor: "#ffffff",
                   color: "#000000",
@@ -70,6 +77,11 @@ const Footer = () => {
                   fontSize: "16px",
                 }}
               />
+              {error && (
+                <div className="text-red-200 text-sm text-center w-full mt-1 mb-2 absolute -bottom-7">
+                  {error}
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={subscribing}
@@ -93,8 +105,8 @@ const Footer = () => {
               className="h-16 w-auto object-contain mb-5 mx-auto sm:mx-0"
             />
             <p className="text-gray-300 mb-4">
-              Your one-stop destination for premium fashion and clothing.
-              Quality meets style.
+              Explore our latest collection of premium clothing and signature
+              fragrances curated for your modern lifestyle.
             </p>
             <div className="flex gap-4 justify-center sm:justify-start">
               <a

@@ -212,78 +212,6 @@ const emailTemplates = {
     };
   },
 
-  payOnDeliveryOrder: (order, user) => {
-    const customerFirstName = user
-      ? user.firstName
-      : order.shippingAddress?.firstName || "Customer";
-    const itemsHtml = order.items
-      ?.map(
-        (item) => `
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
-        <div>
-          <p style="margin: 0; font-weight: 600; color: #333;">${
-            item.productName || item.product?.name
-          }</p>
-          <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Size: ${
-            item.size || "N/A"
-          } | Qty: ${item.quantity}</p>
-        </div>
-        <div style="font-weight: 600; color: #FF5E62;">GH₵${Number(
-          item.price,
-        ).toLocaleString()}</div>
-      </div>
-    `,
-      )
-      .join("");
-
-    const content = `
-      <h2 style="color: #333; margin-top: 0; text-align: center;">Order Placed!</h2>
-      <p style="text-align: center; color: #666; font-size: 16px;">Hi ${
-        customerFirstName
-      }, thank you for choosing Pay on Delivery.</p>
-      
-      <div style="background-color: #fff0f0; border-left: 4px solid #FF5E62; border-radius: 4px; padding: 20px; margin: 30px 0;">
-        <h3 style="color: #FF5E62; margin-top: 0;">Payment Instruction</h3>
-        <p style="color: #666; margin-bottom: 0;">Please have the exact amount of <strong>GH₵${Number(
-          order.totalAmount,
-        ).toLocaleString()}</strong> ready upon delivery.</p>
-      </div>
-
-      <div style="background-color: #f9f9f9; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span style="color: #666;">Order ID:</span>
-          <span style="font-weight: 600; color: #333;">#${
-            order.orderNumber || order.id?.slice(-8).toUpperCase()
-          }</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span style="color: #666;">Total Amount:</span>
-          <span style="font-weight: 700; color: #FF5E62; font-size: 18px;">GH₵${Number(
-            order.totalAmount,
-          ).toLocaleString()}</span>
-        </div>
-      </div>
-
-      <h3 style="color: #333; font-size: 18px; margin-bottom: 15px;">Items Ordered</h3>
-      <div style="margin-bottom: 30px;">
-        ${itemsHtml || "<p>No items details available.</p>"}
-      </div>
-
-      <div style="text-align: center;">
-        <a href="${process.env.CLIENT_URL}/orders/${order.id}" 
-           style="background: linear-gradient(135deg, #FF9966 0%, #FF5E62 100%); color: white; padding: 14px 30px; text-decoration: none; border-radius: 30px; font-weight: 600; display: inline-block;">
-          View Order
-        </a>
-      </div>
-    `;
-    return {
-      subject: `Order Placed - #${
-        order.orderNumber || order.id?.slice(-8).toUpperCase()
-      }`,
-      html: getEmailLayout(content, "Order Placed"),
-    };
-  },
-
   orderStatusUpdate: (order, user) => {
     const customerFirstName = user
       ? user.firstName
@@ -693,7 +621,7 @@ const emailTemplates = {
           order.totalAmount,
         ).toLocaleString()}</p>
         <p style="margin: 5px 0;"><strong>Payment:</strong> ${
-          order.paymentMethod === "cod" ? "Pay on Delivery" : "Paystack"
+          order.paymentMethod === "paystack" ? "Paystack" : "Online Payment"
         }</p>
       </div>
 

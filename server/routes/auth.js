@@ -23,27 +23,97 @@ const {
 const { protect } = require("../middleware/auth");
 const { authLimiter } = require("../middleware/rateLimiter");
 const { avatarUpload } = require("../config/cloudinary");
+const {
+  validateBody,
+  validateParams,
+  validationSchemas,
+} = require("../middleware/validation");
 
 // Public routes
-router.post("/register", authLimiter, register);
-router.post("/login", authLimiter, login);
+router.post(
+  "/register",
+  authLimiter,
+  validateBody(validationSchemas.register),
+  register,
+);
+router.post(
+  "/login",
+  authLimiter,
+  validateBody(validationSchemas.login),
+  login,
+);
 router.post("/logout", logout);
-router.post("/google", authLimiter, googleLogin);
-router.post("/facebook", authLimiter, facebookLogin);
-router.post("/facebook/data-deletion", facebookDataDeletion);
-router.post("/forgot-password", authLimiter, forgotPassword);
-router.post("/reset-password/:token", authLimiter, resetPassword);
-router.post("/verify-email", authLimiter, verifyEmail);
-router.post("/resend-verification", authLimiter, resendVerificationEmail);
+router.post(
+  "/google",
+  authLimiter,
+  validateBody(validationSchemas.oauthLogin),
+  googleLogin,
+);
+router.post(
+  "/facebook",
+  authLimiter,
+  validateBody(validationSchemas.oauthLogin),
+  facebookLogin,
+);
+router.post(
+  "/facebook/data-deletion",
+  validateBody(validationSchemas.facebookDataDeletion),
+  facebookDataDeletion,
+);
+router.post(
+  "/forgot-password",
+  authLimiter,
+  validateBody(validationSchemas.forgotPassword),
+  forgotPassword,
+);
+router.post(
+  "/reset-password/:token",
+  authLimiter,
+  validateParams(validationSchemas.resetPasswordTokenParam),
+  validateBody(validationSchemas.resetPassword),
+  resetPassword,
+);
+router.post(
+  "/verify-email",
+  authLimiter,
+  validateBody(validationSchemas.verifyEmail),
+  verifyEmail,
+);
+router.post(
+  "/resend-verification",
+  authLimiter,
+  validateBody(validationSchemas.resendVerification),
+  resendVerificationEmail,
+);
 
 // Protected routes
 router.get("/profile", protect, getProfile);
-router.put("/profile", protect, updateProfile);
-router.put("/change-password", protect, changePassword);
-router.post("/wishlist/:productId", protect, toggleWishlist);
+router.put(
+  "/profile",
+  protect,
+  validateBody(validationSchemas.updateProfile),
+  updateProfile,
+);
+router.put(
+  "/change-password",
+  protect,
+  validateBody(validationSchemas.changePassword),
+  changePassword,
+);
+router.post(
+  "/wishlist/:productId",
+  protect,
+  validateParams(validationSchemas.uuidProductParam),
+  toggleWishlist,
+);
 router.get("/wishlist", protect, getWishlist);
 router.post("/avatar", protect, avatarUpload.single("avatar"), uploadAvatar);
 router.delete("/avatar", protect, deleteAvatar);
-router.delete("/account", protect, deleteAccount);
+router.delete(
+  "/account",
+  protect,
+  validateBody(validationSchemas.deleteAccount),
+  deleteAccount,
+);
 
 module.exports = router;

@@ -9,9 +9,16 @@ const {
 } = require("../controllers/orderController");
 const { protect, optionalAuth } = require("../middleware/auth");
 const { orderLimiter } = require("../middleware/rateLimiter");
+const { validateBody, validationSchemas } = require("../middleware/validation");
 
 // Create Order allows guests, others require auth
-router.post("/", optionalAuth, orderLimiter, createOrder);
+router.post(
+  "/",
+  optionalAuth,
+  orderLimiter,
+  validateBody(validationSchemas.createOrder),
+  createOrder,
+);
 
 // All other routes are protected
 router.use(protect);

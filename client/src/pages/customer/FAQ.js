@@ -125,7 +125,7 @@ const FAQ = () => {
       category: "payment",
       question: "What payment methods do you accept?",
       answer:
-        "We accept Pay on Delivery (cash or mobile money when your order arrives) and online payment via Paystack. With Paystack you can pay by card or mobile money (MTN MoMo, Vodafone Cash, AirtelTigo Money) at checkout. Choose your preferred option when placing your order.",
+        "We accept online payment via Paystack. You can pay by card or mobile money (MTN MoMo, Vodafone Cash, AirtelTigo Money) at checkout.",
     },
     {
       id: 14,
@@ -144,9 +144,9 @@ const FAQ = () => {
     {
       id: 16,
       category: "payment",
-      question: "Is Pay on Delivery available for all locations?",
+      question: "Can I pay at delivery?",
       answer:
-        "Pay on Delivery is only available for delivery addresses within the Greater Accra region. For orders outside Greater Accra, please pay online with Paystack (card or mobile money) at checkout. The available payment options are shown based on your delivery address.",
+        "We currently process payments online through Paystack only. Card and mobile money options are available during checkout.",
     },
 
     // Account & Profile
@@ -248,10 +248,10 @@ const FAQ = () => {
             <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
             <input
               type="text"
-              placeholder="Search for answers..."
+              placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none text-lg text-black placeholder-black bg-white"
+              className="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none text-base text-black placeholder:text-sm placeholder-black bg-white"
             />
           </div>
         </div>

@@ -1,5 +1,5 @@
 /**
- * Greater Accra region names/cities that qualify for Pay on Delivery.
+ * Greater Accra region names/cities helper for delivery logic.
  * Region names as returned by geocoding (e.g. Nominatim) may vary.
  */
 const GREATER_ACCRA_REGION_NAMES = [
@@ -8,11 +8,19 @@ const GREATER_ACCRA_REGION_NAMES = [
   "accra",
 ];
 
-const GREATER_ACCRA_CITIES = ["accra", "tema", "achiaman", "adenta", "madina", "dodowa", "weija", "gbawe"];
+const GREATER_ACCRA_CITIES = [
+  "accra",
+  "tema",
+  "achiaman",
+  "adenta",
+  "madina",
+  "dodowa",
+  "weija",
+  "gbawe",
+];
 
 /**
  * Returns true if the given address (region/city) is in Greater Accra.
- * Used to determine if Pay on Delivery is available.
  * @param {{ region?: string, city?: string }} address - shipping address with optional region and city
  * @returns {boolean}
  */
@@ -21,9 +29,15 @@ export function isGreaterAccra(address) {
   const region = (address.region || "").toLowerCase().trim();
   const city = (address.city || "").toLowerCase().trim();
 
-  if (region && GREATER_ACCRA_REGION_NAMES.some((name) => region.includes(name)))
+  if (
+    region &&
+    GREATER_ACCRA_REGION_NAMES.some((name) => region.includes(name))
+  )
     return true;
-  if (city && GREATER_ACCRA_CITIES.some((c) => city.includes(c) || c.includes(city)))
+  if (
+    city &&
+    GREATER_ACCRA_CITIES.some((c) => city.includes(c) || c.includes(city))
+  )
     return true;
 
   return false;

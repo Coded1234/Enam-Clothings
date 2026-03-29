@@ -6,6 +6,8 @@ const {
   ReviewHelpful,
   sequelize,
 } = require("../models");
+const { Op } = require("sequelize");
+const logger = require("../config/logger");
 
 // @desc    Create review
 // @route   POST /api/reviews
@@ -251,34 +253,53 @@ const markHelpful = async (req, res) => {
 // @route   GET /api/reviews/testimonials
 const getTestimonials = async (req, res) => {
   try {
-    const { limit = 3 } = req.query;
+    const parsedLimit = Number.parseInt(req.query.limit, 10);
+    const limit = Number.isFinite(parsedLimit)
+      ? Math.min(Math.max(parsedLimit, 1), 10)
+      : 3;
 
     // Get approved reviews with high ratings (4-5 stars)
-    const testimonials = await Review.findAll({
-      where: {
-        isApproved: true,
-        rating: { [require("sequelize").Op.gte]: 4 },
-      },
-      include: [
-        {
-          model: User,
-          as: "user",
-          attributes: ["id", "firstName", "lastName"],
+    let testimonials;
+    try {
+      testimonials = await Review.findAll({
+        where: {
+          isApproved: true,
+          rating: { [Op.gte]: 4 },
         },
-      ],
-      order: [
-        ["rating", "DESC"],
-        ["helpful", "DESC"],
-        ["createdAt", "DESC"],
-      ],
-      limit: Number(limit),
-    });
+        include: [
+          {
+            model: User,
+            as: "user",
+            attributes: ["id", "firstName", "lastName"],
+            required: false,
+          },
+        ],
+        order: [
+          ["rating", "DESC"],
+          ["helpful", "DESC"],
+          ["createdAt", "DESC"],
+        ],
+        limit,
+      });
+    } catch (queryError) {
+      logger.warn("Primary testimonials query failed, using fallback", {
+        error: queryError.message,
+      });
+
+      testimonials = await Review.findAll({
+        where: {
+          isApproved: true,
+          rating: { [Op.gte]: 4 },
+        },
+        order: [["createdAt", "DESC"]],
+        limit,
+      });
+    }
 
     res.json(testimonials);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching testimonials", error: error.message });
+    logger.error("Error fetching testimonials", { error: error.message });
+    res.status(200).json([]);
   }
 };
 

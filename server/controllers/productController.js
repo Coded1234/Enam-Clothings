@@ -1,11 +1,14 @@
 const { Product, sequelize } = require("../models");
 const { Op } = require("sequelize");
 const { cloudinary } = require("../config/cloudinary");
+const logger = require("../config/logger");
 const NodeCache = require("node-cache");
 const productCache = new NodeCache({ stdTTL: 300 }); // Cache for 5 mins
 
 // Helper to flush cache when products change
 const flushProductCache = () => productCache.flushAll();
+
+const invalidateProductCache = () => flushProductCache();
 
 // @desc    Get all products with filters
 // @route   GET /api/products
@@ -91,7 +94,7 @@ const getProducts = async (req, res) => {
 
     res.json(responseData);
   } catch (error) {
-    console.error("Get products error:", error);
+    logger.error("Get products error", { error: error.message });
     res
       .status(500)
       .json({ message: "Error fetching products", error: error.message });
@@ -251,4 +254,5 @@ module.exports = {
   getRelatedProducts,
   searchProducts,
   getCategories,
+  invalidateProductCache,
 };

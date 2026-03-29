@@ -1,6 +1,8 @@
 "use client";
+/* eslint-env browser */
+/* eslint-disable no-unused-vars */
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateProfile } from "../../redux/slices/authSlice";
 import api from "../../utils/api";
@@ -21,6 +23,7 @@ const ProfileInfo = () => {
   const { user, loading } = useSelector((state) => state.auth);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
   const [profileData, setProfileData] = useState({
     firstName: "",
     lastName: "",
@@ -45,9 +48,22 @@ const ProfileInfo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setPhoneError("");
+
+    // Strict pattern for Ghana phone networks
+    const phoneRegex = /^(02[0345678]|05[0345679])\d{7}$/;
+    const phoneStr = (profileData.phone || "").trim().replace(/\s+/g, "");
+
+    if (phoneStr && !phoneRegex.test(phoneStr)) {
+      setPhoneError("Invalid number format.");
+      return;
+    }
+
+    const payload = { ...profileData, phone: phoneStr };
+
     try {
-      await api.put("/auth/profile", profileData);
-      dispatch(updateProfile(profileData));
+      await api.put("/auth/profile", payload);
+      dispatch(updateProfile(payload));
       toast.success("Profile updated successfully!");
       setIsEditing(false);
     } catch (error) {
@@ -78,7 +94,16 @@ const ProfileInfo = () => {
             </button>
           ) : (
             <button
-              onClick={() => setIsEditing(false)}
+              onClick={() => {
+                setIsEditing(false);
+                setPhoneError("");
+                if (user) {
+                  setProfileData({
+                    ...profileData,
+                    phone: user.phone || "",
+                  });
+                }
+              }}
               className="ml-auto flex items-center gap-1.5 text-sm text-gray-500 font-medium"
             >
               <FiX size={14} /> Cancel
@@ -142,11 +167,9 @@ const ProfileInfo = () => {
                 type="email"
                 name="email"
                 value={profileData.email}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className={`w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 ${
-                  !isEditing ? "bg-gray-50 border-gray-200" : "border-gray-300"
-                }`}
+                disabled
+                className="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed outline-none"
+                title="Email cannot be changed"
               />
             </div>
           </div>
@@ -162,14 +185,27 @@ const ProfileInfo = () => {
               <input
                 type="tel"
                 name="phone"
+                maxLength={10}
                 value={profileData.phone}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+                  setProfileData({ ...profileData, phone: val });
+                  setPhoneError("");
+                }}
                 disabled={!isEditing}
                 className={`w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 ${
-                  !isEditing ? "bg-gray-50 border-gray-200" : "border-gray-300"
+                  !isEditing
+                    ? "bg-gray-50 border-gray-200"
+                    : phoneError
+                      ? "border-red-500 focus:ring-red-500"
+                      : "border-gray-300"
                 }`}
+                placeholder="e.g. 0540000000"
               />
             </div>
+            {phoneError && (
+              <p className="mt-1 text-xs text-red-500">{phoneError}</p>
+            )}
           </div>
           {isEditing && (
             <button

@@ -6,8 +6,18 @@ async function createAdmin() {
     await sequelize.authenticate();
     console.log("✅ Database connected successfully");
 
-    const adminEmail = "diamondauragallery@gmail.com";
-    const adminPassword = process.env.ADMIN_PASSWORD || "changeme_secure_pass";
+    const adminEmail =
+      process.env.ADMIN_EMAIL || "diamondauragallery@gmail.com";
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminPassword) {
+      throw new Error("ADMIN_PASSWORD environment variable is required");
+    }
+
+    if (adminPassword.length < 12) {
+      throw new Error("ADMIN_PASSWORD must be at least 12 characters long");
+    }
+
     const adminData = {
       firstName: "Admin",
       lastName: "User",
@@ -38,7 +48,7 @@ async function createAdmin() {
 
     console.log("================================");
     console.log(`Email: ${adminEmail}`);
-    console.log(`Password: ${adminPassword}`);
+    console.log("Password: [REDACTED]");
     console.log("================================\n");
 
     process.exit(0);

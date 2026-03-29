@@ -4,6 +4,46 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
+const logger = require("./logger");
+
+const ALLOWED_IMAGE_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+]);
+
+const ALLOWED_IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
+
+const isSafeOriginalName = (name) =>
+  typeof name === "string" && !name.includes("\0") && name.length <= 255;
+
+const imageFileFilter = (req, file, cb) => {
+  const mimeType = String(file.mimetype || "").toLowerCase();
+  const ext = path.extname(String(file.originalname || "")).toLowerCase();
+
+  if (!isSafeOriginalName(file.originalname)) {
+    return cb(new Error("Invalid filename"), false);
+  }
+
+  if (!ALLOWED_IMAGE_MIME_TYPES.has(mimeType)) {
+    return cb(
+      new Error("Invalid file type. Only JPEG, PNG and WebP are allowed."),
+      false,
+    );
+  }
+
+  if (!ALLOWED_IMAGE_EXTENSIONS.has(ext)) {
+    return cb(
+      new Error(
+        "Invalid file extension. Only .jpg, .jpeg, .png and .webp are allowed.",
+      ),
+      false,
+    );
+  }
+
+  return cb(null, true);
+};
 
 // Check if Cloudinary is configured
 const isCloudinaryConfigured =
@@ -29,38 +69,15 @@ if (isCloudinaryConfigured) {
     cloudinary: cloudinary,
     params: {
       folder: "clothing-store",
-      allowed_formats: [
-        "jpg",
-        "jpeg",
-        "png",
-        "webp",
-        "gif",
-        "bmp",
-        "tiff",
-        "heic",
-        "heif",
-        "avif",
-      ],
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
       transformation: [{ width: 800, height: 1000, crop: "limit" }],
     },
   });
 
-  const fileFilter = (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(
-        new Error("Invalid file type. Only JPEG, PNG and WebP are allowed."),
-        false,
-      );
-    }
-  };
-
   upload = multer({
     storage: storage,
-    fileFilter: fileFilter,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: imageFileFilter,
+    limits: { fileSize: 5 * 1024 * 1024, files: 5 }, // 5MB limit
   });
 
   // Avatar storage for Cloudinary
@@ -77,12 +94,12 @@ if (isCloudinaryConfigured) {
 
   avatarUpload = multer({
     storage: avatarStorage,
-    fileFilter: fileFilter,
-    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
+    fileFilter: imageFileFilter,
+    limits: { fileSize: 2 * 1024 * 1024, files: 1 }, // 2MB limit
   });
 } else {
   // Use local disk storage as fallback
-  console.log("⚠️ Cloudinary not configured - using local file storage");
+  logger.warn("Cloudinary not configured - using local file storage");
 
   // Ensure uploads directory exists
   const uploadsDir = path.join(__dirname, "../uploads/products");
@@ -121,28 +138,16 @@ if (isCloudinaryConfigured) {
     },
   });
 
-  const fileFilter = (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(
-        new Error("Invalid file type. Only JPEG, PNG and WebP are allowed."),
-        false,
-      );
-    }
-  };
-
   upload = multer({
     storage: storage,
-    fileFilter: fileFilter,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: imageFileFilter,
+    limits: { fileSize: 5 * 1024 * 1024, files: 5 }, // 5MB limit
   });
 
   avatarUpload = multer({
     storage: avatarStorage,
-    fileFilter: fileFilter,
-    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit for avatars
+    fileFilter: imageFileFilter,
+    limits: { fileSize: 2 * 1024 * 1024, files: 1 }, // 2MB limit for avatars
   });
 }
 

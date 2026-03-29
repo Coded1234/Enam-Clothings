@@ -3,6 +3,11 @@ const router = express.Router();
 const { upload } = require("../config/cloudinary");
 const { protect, adminOnly } = require("../middleware/auth");
 const {
+  validateBody,
+  validateParams,
+  validationSchemas,
+} = require("../middleware/validation");
+const {
   getDashboardStats,
   createProduct,
   updateProduct,
@@ -37,16 +42,50 @@ const optionalUpload = (req, res, next) => {
   }
 };
 
-router.post("/products", optionalUpload, createProduct);
-router.put("/products/:id", optionalUpload, updateProduct);
-router.delete("/products/:id", deleteProduct);
-router.put("/products/:id/stock", updateStock);
-router.delete("/products/:id/images/:publicId", deleteProductImage);
+router.post(
+  "/products",
+  optionalUpload,
+  validateBody(validationSchemas.createProduct),
+  createProduct,
+);
+router.put(
+  "/products/:id",
+  validateParams(validationSchemas.uuidIdParam),
+  optionalUpload,
+  validateBody(validationSchemas.updateProduct),
+  updateProduct,
+);
+router.delete(
+  "/products/:id",
+  validateParams(validationSchemas.uuidIdParam),
+  deleteProduct,
+);
+router.put(
+  "/products/:id/stock",
+  validateParams(validationSchemas.uuidIdParam),
+  validateBody(validationSchemas.updateProductStock),
+  updateStock,
+);
+router.delete(
+  "/products/:id/images/:publicId",
+  validateParams(validationSchemas.uuidIdParam),
+  deleteProductImage,
+);
 
 // Orders
 router.get("/orders", getAllOrders);
-router.put("/orders/:id/status", updateOrderStatus);
-router.put("/orders/:id/return-approval", updateReturnApproval);
+router.put(
+  "/orders/:id/status",
+  validateParams(validationSchemas.uuidIdParam),
+  validateBody(validationSchemas.updateOrderStatus),
+  updateOrderStatus,
+);
+router.put(
+  "/orders/:id/return-approval",
+  validateParams(validationSchemas.uuidIdParam),
+  validateBody(validationSchemas.updateReturnApproval),
+  updateReturnApproval,
+);
 
 // Users
 router.get("/users", getAllUsers);

@@ -1,6 +1,7 @@
 const { Coupon, CouponUsage, User, Order, Newsletter } = require("../models");
 const { Op } = require("sequelize");
 const { sendEmail, sendBulkEmail, emailTemplates } = require("../config/email");
+const logger = require("../config/logger");
 
 // @desc    Get all coupons (Admin)
 // @route   GET /api/coupons
@@ -42,7 +43,7 @@ const getAllCoupons = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching coupons:", error);
+    logger.error("Error fetching coupons", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to fetch coupons", error: error.message });
@@ -72,7 +73,7 @@ const getCouponById = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching coupon:", error);
+    logger.error("Error fetching coupon", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to fetch coupon", error: error.message });
@@ -139,7 +140,9 @@ const createCoupon = async (req, res) => {
         }
       }
     } catch (emailError) {
-      console.error("Error sending coupon newsletter:", emailError);
+      logger.error("Error sending coupon newsletter", {
+        error: emailError.message,
+      });
     }
 
     res.status(201).json({
@@ -148,7 +151,7 @@ const createCoupon = async (req, res) => {
       coupon,
     });
   } catch (error) {
-    console.error("Error creating coupon:", error);
+    logger.error("Error creating coupon", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to create coupon", error: error.message });
@@ -220,7 +223,7 @@ const updateCoupon = async (req, res) => {
       coupon,
     });
   } catch (error) {
-    console.error("Error updating coupon:", error);
+    logger.error("Error updating coupon", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to update coupon", error: error.message });
@@ -244,7 +247,7 @@ const deleteCoupon = async (req, res) => {
       message: "Coupon deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting coupon:", error);
+    logger.error("Error deleting coupon", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to delete coupon", error: error.message });
@@ -312,7 +315,7 @@ const validateCoupon = async (req, res) => {
       )}`,
     });
   } catch (error) {
-    console.error("Error validating coupon:", error);
+    logger.error("Error validating coupon", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to validate coupon", error: error.message });
@@ -340,7 +343,7 @@ const applyCouponToOrder = async (
 
     return true;
   } catch (error) {
-    console.error("Error applying coupon to order:", error);
+    logger.error("Error applying coupon to order", { error: error.message });
     return false;
   }
 };
@@ -371,7 +374,7 @@ const recordCouponUsage = async (req, res) => {
       res.status(500).json({ message: "Failed to record coupon usage" });
     }
   } catch (error) {
-    console.error("Error recording coupon usage:", error);
+    logger.error("Error recording coupon usage", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to record coupon usage", error: error.message });
@@ -383,7 +386,7 @@ const recordCouponUsage = async (req, res) => {
 const getActiveCoupons = async (req, res) => {
   try {
     const now = new Date();
-    const coupons = await Coupon.findAll({
+    const coupon = await Coupon.findOne({
       where: {
         is_active: true,
         [Op.or]: [
@@ -393,31 +396,41 @@ const getActiveCoupons = async (req, res) => {
           { start_date: null, end_date: { [Op.gte]: now } },
         ],
       },
+      attributes: [
+        "id",
+        "code",
+        "description",
+        "discount_type",
+        "discount_value",
+        "min_purchase",
+        "max_discount",
+        "usage_limit",
+        "used_count",
+        "usage_limit_per_user",
+        "start_date",
+        "end_date",
+        "is_active",
+        "applicable_categories",
+        "createdAt",
+        "updatedAt",
+      ],
       order: [["created_at", "DESC"]],
-      limit: 1,
     });
 
-    if (coupons.length > 0) {
-      const coupon = coupons[0];
-
-      // Generate AI message if not exists
-      if (!coupon.ai_message) {
-        coupon.ai_message = generateCouponMessage(coupon);
-        await coupon.save();
-      }
-
-      res.json({ success: true, coupon });
-    } else {
+    if (!coupon) {
       res.json({ success: true, coupon: null });
+      return;
     }
+
+    const couponData = coupon.toJSON();
+    // Keep GET side-effect free and always provide a promotional message.
+    couponData.ai_message = generateCouponMessage(couponData);
+
+    res.json({ success: true, coupon: couponData });
   } catch (error) {
-    console.error("Error fetching active coupons:", error);
-    res
-      .status(500)
-      .json({
-        message: "Failed to fetch active coupons",
-        error: error.message,
-      });
+    logger.error("Error fetching active coupons", { error: error.message });
+    // Do not block homepage rendering when coupon retrieval fails.
+    res.json({ success: true, coupon: null });
   }
 };
 

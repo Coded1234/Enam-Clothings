@@ -9,15 +9,46 @@ const {
   getTestimonials,
 } = require("../controllers/reviewController");
 const { protect, optionalAuth } = require("../middleware/auth");
+const {
+  validateBody,
+  validateParams,
+  validationSchemas,
+} = require("../middleware/validation");
 
 // Public routes
 router.get("/testimonials", getTestimonials);
-router.get("/product/:productId", optionalAuth, getProductReviews);
+router.get(
+  "/product/:productId",
+  validateParams(validationSchemas.uuidProductParam),
+  optionalAuth,
+  getProductReviews,
+);
 
 // Protected routes
-router.post("/", protect, createReview);
-router.put("/:id", protect, updateReview);
-router.delete("/:id", protect, deleteReview);
-router.post("/:id/helpful", protect, markHelpful);
+router.post(
+  "/",
+  protect,
+  validateBody(validationSchemas.createReview),
+  createReview,
+);
+router.put(
+  "/:id",
+  protect,
+  validateParams(validationSchemas.uuidIdParam),
+  validateBody(validationSchemas.updateReview),
+  updateReview,
+);
+router.delete(
+  "/:id",
+  protect,
+  validateParams(validationSchemas.uuidIdParam),
+  deleteReview,
+);
+router.post(
+  "/:id/helpful",
+  protect,
+  validateParams(validationSchemas.uuidIdParam),
+  markHelpful,
+);
 
 module.exports = router;

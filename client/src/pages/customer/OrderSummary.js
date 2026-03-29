@@ -1,11 +1,12 @@
 "use client";
+/* eslint-env browser */
+/* eslint-disable no-unused-vars */
+/* global sessionStorage, Intl */
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchCart } from "../../redux/slices/cartSlice";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { getImageUrl } from "../../utils/imageUrl";
 import api from "../../utils/api";
-import { isGreaterAccra } from "../../utils/deliveryRegion";
 import toast from "react-hot-toast";
 import {
   FiArrowLeft,
@@ -21,7 +22,6 @@ import {
 
 const OrderSummary = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
   const _oState =
     typeof window !== "undefined"
@@ -31,12 +31,19 @@ const OrderSummary = () => {
     orderData,
     items,
     totalAmount,
-    coupon,
-    couponDiscount,
+    coupon: initialCoupon,
+    couponDiscount: initialCouponDiscount,
     shippingCost: passedShippingCost,
     shippingDetails,
   } = _oState;
   const [loading, setLoading] = useState(false);
+  const [couponCodeInput, setCouponCodeInput] = useState("");
+  const [activeCoupon, setActiveCoupon] = useState(initialCoupon || null);
+  const [discount, setDiscount] = useState(
+    parseFloat(initialCouponDiscount) || 0,
+  );
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
 
   // Personal information state
   const [personalInfo, setPersonalInfo] = useState({
@@ -45,27 +52,18 @@ const OrderSummary = () => {
     email: orderData?.shippingAddress?.email || "",
     phone: orderData?.shippingAddress?.phone || "",
   });
+  const [formErrors, setFormErrors] = useState({});
 
-  // Pay on Delivery only available in Greater Accra
-  const codAvailable = isGreaterAccra(orderData?.shippingAddress);
+  const paymentMethod = "paystack";
 
-  // Payment method state (default paystack if COD not available)
-  const [paymentMethod, setPaymentMethod] = useState(() => {
-    const preferred = orderData?.paymentMethod || "paystack";
-    if (preferred === "cod" && !codAvailable) return "paystack";
-    return preferred;
-  });
-
-  // If COD not available and user had cod selected, keep paystack
-  React.useEffect(() => {
-    if (!codAvailable && paymentMethod === "cod") {
-      setPaymentMethod("paystack");
+  // Redirect only on the client after mount when summary state is missing.
+  useEffect(() => {
+    if (!orderData || !items) {
+      router.replace("/checkout");
     }
-  }, [codAvailable, paymentMethod]);
+  }, [orderData, items, router]);
 
-  // If no data, redirect back to checkout
   if (!orderData || !items) {
-    router.push("/checkout");
     return null;
   }
 
@@ -76,50 +74,151 @@ const OrderSummary = () => {
     }).format(price);
   };
 
+  const isPerfumeItem = (item) => {
+    const category =
+      item?.product?.category || item?.productCategory || item?.category;
+    const normalizedCategory = String(category || "").toLowerCase();
+    return (
+      normalizedCategory === "perfume" || normalizedCategory === "perfumes"
+    );
+  };
+
+  const hasDisplaySize = (item) => {
+    const size = String(item?.size || "")
+      .trim()
+      .toLowerCase();
+    return size && size !== "n/a" && size !== "na" && size !== "none";
+  };
+
   const subtotal = parseFloat(totalAmount) || 0;
-  const discount = parseFloat(couponDiscount) || 0;
+
   // Enforce free shipping in UI for subtotal >= GH₵1000
   const shippingCost =
     subtotal >= 1000 ? 0 : parseFloat(passedShippingCost) || 0;
   const tax = (subtotal - discount) * 0.0; // Tax included in prices
   const finalTotal = subtotal - discount + shippingCost + tax;
 
-  const handleConfirmOrder = async () => {
-    // Validate personal information with specific per-field messages
-    if (!personalInfo.firstName || personalInfo.firstName.trim() === "") {
-      toast.error("Please enter your first name");
+  const handleApplyCoupon = async () => {
+    if (!couponCodeInput.trim()) {
+      setCouponError("Please enter a coupon code");
       return;
+    }
+
+    if (!isAuthenticated) {
+      toast.error("Please login to apply coupon");
+      return;
+    }
+
+    setCouponLoading(true);
+    setCouponError("");
+
+    try {
+      const response = await api.post("/coupons/validate", {
+        code: couponCodeInput.trim(),
+        subtotal: subtotal,
+      });
+
+      if (response.data.success) {
+        setActiveCoupon(response.data.coupon);
+        setDiscount(parseFloat(response.data.discount));
+        // Update session storage to persist across reloads
+        const currentState = JSON.parse(
+          sessionStorage.getItem("orderSummaryState") || "{}",
+        );
+        currentState.coupon = response.data.coupon;
+        currentState.couponDiscount = response.data.discount;
+        sessionStorage.setItem(
+          "orderSummaryState",
+          JSON.stringify(currentState),
+        );
+        toast.success(response.data.message);
+      }
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Invalid coupon code";
+      setCouponError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setActiveCoupon(null);
+    setDiscount(0);
+    // Update session storage
+    const currentState = JSON.parse(
+      sessionStorage.getItem("orderSummaryState") || "{}",
+    );
+    delete currentState.coupon;
+    delete currentState.couponDiscount;
+    sessionStorage.setItem("orderSummaryState", JSON.stringify(currentState));
+    setCouponCodeInput("");
+    setCouponError("");
+    toast.success("Coupon removed");
+  };
+
+  const handleConfirmOrder = async () => {
+    setFormErrors({});
+    let errors = {};
+
+    if (!personalInfo.firstName || personalInfo.firstName.trim() === "") {
+      errors.firstName = "Please enter your first name";
     }
     if (!personalInfo.lastName || personalInfo.lastName.trim() === "") {
-      toast.error("Please enter your last name");
-      return;
+      errors.lastName = "Please enter your last name";
     }
-    if (isAuthenticated) {
-      if (!personalInfo.email || personalInfo.email.trim() === "") {
-        toast.error("Please enter your email address");
-        return;
-      }
-      if (!/^\S+@\S+\.\S+$/.test(personalInfo.email)) {
-        toast.error("Please enter a valid email address");
-        return;
-      }
-    }
-    if (!personalInfo.phone || personalInfo.phone.trim() === "") {
-      toast.error("Please enter your phone number");
-      return;
+    if (!personalInfo.email || personalInfo.email.trim() === "") {
+      errors.email = "Please enter your email address";
+    } else if (!/^\S+@\S+\.\S+$/.test(personalInfo.email)) {
+      errors.email = "Please enter a valid email address";
     }
 
-    // Strict pattern for Ghana phone networks (10 digits starting with specific prefixes)
-    // MTN (024, 025, 053, 054, 055, 059)
-    // Vodafone/Telecel (020, 050)
-    // AT (027, 057, 026, 056)
-    // Glo (023)
-    const phoneRegex = /^(02[0345678]|05[0345679])\d{7}$/;
     const phoneStr = personalInfo.phone.trim().replace(/\s+/g, "");
+    const phoneRegex = /^(02[0345678]|05[0345679])\d{7}$/;
 
-    if (!phoneRegex.test(phoneStr)) {
-      toast.error("Invalid number format");
+    if (!personalInfo.phone || personalInfo.phone.trim() === "") {
+      errors.phone = "Please enter your phone number";
+    } else if (!phoneRegex.test(phoneStr)) {
+      errors.phone = "Invalid number format. e.g. 0540000000";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
+    }
+
+    const baseShippingAddress = orderData?.shippingAddress || {};
+    const shippingAddress = {
+      ...baseShippingAddress,
+      firstName: personalInfo.firstName.trim(),
+      lastName: personalInfo.lastName.trim(),
+      email: (personalInfo.email || "").trim(),
+      phone: phoneStr,
+      address: String(baseShippingAddress.address || "").trim(),
+      city: String(baseShippingAddress.city || "").trim(),
+      region: String(baseShippingAddress.region || "").trim(),
+      country: String(baseShippingAddress.country || "Ghana").trim(),
+      postalCode: String(baseShippingAddress.postalCode || "").trim(),
+    };
+
+    if (!shippingAddress.address || shippingAddress.address.length < 2) {
+      toast.error("Please go back and provide a valid delivery address");
+      return;
+    }
+
+    if (!shippingAddress.city) {
+      toast.error("Please go back and provide your city");
+      return;
+    }
+
+    const storedSessionId =
+      typeof window !== "undefined" ? localStorage.getItem("sessionId") : null;
+    let effectiveSessionId = storedSessionId;
+    if (!effectiveSessionId && typeof window !== "undefined") {
+      effectiveSessionId =
+        window.crypto?.randomUUID?.() ||
+        `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+      localStorage.setItem("sessionId", effectiveSessionId);
     }
 
     setLoading(true);
@@ -127,21 +226,28 @@ const OrderSummary = () => {
     try {
       // Prepare order data with proper structure
       const finalOrderData = {
-        shippingAddress: {
-          ...orderData.shippingAddress,
-          firstName: personalInfo.firstName,
-          lastName: personalInfo.lastName,
-          email: personalInfo.email,
-          phone: personalInfo.phone,
-        },
-        paymentMethod: paymentMethod,
-        shippingDetails: shippingDetails || orderData.shippingDetails,
-        couponId: coupon?.id || null,
+        shippingAddress,
+        paymentMethod,
+        couponId: activeCoupon?.id ? String(activeCoupon.id) : null,
         discount: discount,
+        sessionId: effectiveSessionId || null,
+        guestEmail: isAuthenticated ? null : shippingAddress.email || null,
+        guestName: isAuthenticated
+          ? null
+          : `${shippingAddress.firstName} ${shippingAddress.lastName}`.trim(),
       };
 
+      const finalShippingDetails = shippingDetails || orderData.shippingDetails;
+      if (finalShippingDetails) {
+        finalOrderData.shippingDetails = finalShippingDetails;
+      }
+
       // Create order
-      const response = await api.post("/orders", finalOrderData);
+      const response = await api.post("/orders", finalOrderData, {
+        headers: effectiveSessionId
+          ? { "x-session-id": effectiveSessionId }
+          : undefined,
+      });
       const order = response.data;
 
       if (!order || !order.id) {
@@ -149,10 +255,10 @@ const OrderSummary = () => {
       }
 
       // Record coupon usage if coupon was applied
-      if (coupon) {
+      if (activeCoupon) {
         try {
           await api.post("/coupons/record-usage", {
-            coupon_id: coupon.id,
+            coupon_id: activeCoupon.id,
             order_id: order.id,
           });
         } catch (couponError) {
@@ -161,54 +267,63 @@ const OrderSummary = () => {
         }
       }
 
-      // Handle payment based on method
-      if (paymentMethod === "paystack") {
-        // Initialize Paystack payment
-        const guestEmail = `guest-${Date.now()}@yoursite.com`;
-        const paymentResponse = await api.post("/payment/initialize", {
-          email: isAuthenticated ? personalInfo.email : guestEmail,
-          amount: finalTotal,
-          metadata: {
-            order_id: order.id,
-            customer_name: `${personalInfo.firstName} ${personalInfo.lastName}`,
-            customer_phone: personalInfo.phone,
-          },
-        });
+      // Initialize Paystack payment using server-authoritative order totals.
+      const paymentEmail =
+        order?.user?.email ||
+        order?.guestEmail ||
+        shippingAddress.email ||
+        (personalInfo.email || "").trim();
 
-        if (paymentResponse.data.status && paymentResponse.data.data) {
-          // Redirect to Paystack payment page
-          const authUrl = paymentResponse.data.data.authorization_url;
-          if (authUrl && authUrl.startsWith("https://")) {
-            window.location.href = authUrl;
-          } else {
-            throw new Error("Invalid payment URL received");
-          }
+      if (!paymentEmail) {
+        throw new Error("A valid email is required to continue payment");
+      }
+
+      const paymentResponse = await api.post("/payment/initialize", {
+        email: paymentEmail,
+        metadata: {
+          order_id: order.id,
+          customer_name: `${personalInfo.firstName} ${personalInfo.lastName}`,
+          customer_phone: personalInfo.phone,
+        },
+      });
+
+      if (paymentResponse.data.status && paymentResponse.data.data) {
+        // Redirect to Paystack payment page
+        const authUrl = paymentResponse.data.data.authorization_url;
+        if (authUrl && authUrl.startsWith("https://")) {
+          window.location.href = authUrl;
         } else {
-          throw new Error("Payment initialization failed");
+          throw new Error("Invalid payment URL received");
         }
       } else {
-        // For COD and Bank Transfer, just refresh cart and redirect
-        await dispatch(fetchCart());
-        toast.success("Order confirmed successfully!");
-        if (order.id) {
-          const itemsCount =
-            items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-          router.push(
-            `/payment/verify?method=cod&order_id=${order.id}&order_number=${order.orderNumber || ""}&amount=${finalTotal}&items_count=${itemsCount}`,
-          );
-        } else {
-          router.push("/");
-        }
+        throw new Error("Payment initialization failed");
       }
     } catch (error) {
       console.error("Order error:", error);
       console.error("Error response:", error.response?.data);
       console.error("Error status:", error.response?.status);
       console.error("Error message:", error.message);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Order creation failed";
+      const backendMessage =
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message;
+      const validationDetail = Array.isArray(error.response?.data?.errors)
+        ? error.response.data.errors[0]?.message
+        : null;
+
+      let errorMessage =
+        backendMessage || error.message || "Order creation failed";
+      // Prefer specific validation detail from Joi over generic validation messages
+      if (
+        (backendMessage === "Validation error" ||
+          backendMessage === "Validation failed") &&
+        validationDetail
+      ) {
+        errorMessage = validationDetail;
+      } else if (validationDetail && !backendMessage) {
+        errorMessage = validationDetail;
+      }
+
       toast.error(errorMessage);
       setLoading(false);
     }
@@ -259,11 +374,16 @@ const OrderSummary = () => {
                           firstName: e.target.value,
                         });
                       }}
-                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                      className={`w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white ${formErrors.firstName ? "border-red-500" : "border-gray-300"}`}
                       placeholder="Enter First Name"
                       required
                     />
                   </div>
+                  {formErrors.firstName && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {formErrors.firstName}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gold mb-2">
@@ -279,10 +399,15 @@ const OrderSummary = () => {
                         lastName: e.target.value,
                       });
                     }}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white ${formErrors.lastName ? "border-red-500" : "border-gray-300"}`}
                     placeholder="Enter Last Name"
                     required
                   />
+                  {formErrors.lastName && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {formErrors.lastName}
+                    </p>
+                  )}
                 </div>
                 {isAuthenticated && (
                   <div>
@@ -301,11 +426,16 @@ const OrderSummary = () => {
                             email: e.target.value,
                           });
                         }}
-                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                        className={`w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white ${formErrors.email ? "border-red-500" : "border-gray-300"}`}
                         placeholder="john@example.com"
                         required={isAuthenticated}
                       />
                     </div>
+                    {formErrors.email && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {formErrors.email}
+                      </p>
+                    )}
                   </div>
                 )}
                 <div>
@@ -318,17 +448,26 @@ const OrderSummary = () => {
                       type="tel"
                       name="phone"
                       value={personalInfo.phone}
+                      maxLength={10}
                       onChange={(e) => {
+                        const val = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 10);
                         setPersonalInfo({
                           ...personalInfo,
-                          phone: e.target.value,
+                          phone: val,
                         });
                       }}
-                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
-                      placeholder="Enter a valid phone number"
+                      className={`w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white ${formErrors.phone ? "border-red-500" : "border-gray-300"}`}
+                      placeholder="e.g., 0540000000"
                       required
                     />
                   </div>
+                  {formErrors.phone && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {formErrors.phone}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -368,22 +507,7 @@ const OrderSummary = () => {
                 </h2>
               </div>
               <div className="space-y-4">
-                {/* Paystack */}
-                <label
-                  className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                    paymentMethod === "paystack"
-                      ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-                      : "border-gray-300 hover:border-gray-400"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="paystack"
-                    checked={paymentMethod === "paystack"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-5 h-5 text-primary-500"
-                  />
+                <div className="flex items-center gap-4 p-4 border-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20 rounded-xl">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-blue-500 rounded">
@@ -393,48 +517,14 @@ const OrderSummary = () => {
                         <p className="font-semibold text-gray-900 dark:text-gold-light">
                           Pay with Paystack
                         </p>
-                        MTN,Telecel,AirtelTigo
+                        <p className="text-sm text-gray-500">
+                          Card and mobile money payments
+                        </p>
                       </div>
                     </div>
                   </div>
                   <FiShield className="text-green-500" size={24} />
-                </label>
-
-                {/* Pay on Delivery — only for Greater Accra */}
-                {codAvailable ? (
-                  <label
-                    className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                      paymentMethod === "cod"
-                        ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="cod"
-                      checked={paymentMethod === "cod"}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-5 h-5 text-primary-500"
-                    />
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900 dark:text-gold-light">
-                        Pay on Delivery
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Pay when you receive your order (Greater Accra only)
-                      </p>
-                    </div>
-                  </label>
-                ) : (
-                  <div className="p-4 border-2 border-gray-200 rounded-xl bg-gray-50 dark:bg-surface">
-                    <p className="text-sm text-gray-600 dark:text-primary-300">
-                      Pay on Delivery is only available for addresses in Greater
-                      Accra. For your location we accept Paystack (card or
-                      mobile money) above.
-                    </p>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
 
@@ -492,28 +582,24 @@ const OrderSummary = () => {
                           {item.product?.name}
                         </h3>
                         <div className="mt-1 space-y-1">
-                          {String(
-                            item.product?.category || "",
-                          ).toLowerCase() !== "perfumes" && (
-                            <>
-                              <p className="text-sm text-gray-500">
-                                Size: {item.size}
-                              </p>
-                              {getColorName() && (
-                                <p className="text-sm text-gray-500 flex items-center gap-2">
-                                  Color:
-                                  {getColorCode() && (
-                                    <span
-                                      className="w-4 h-4 rounded-full border border-gray-300"
-                                      style={{
-                                        backgroundColor: getColorCode(),
-                                      }}
-                                    ></span>
-                                  )}
-                                  {getColorName()}
-                                </p>
+                          {!isPerfumeItem(item) && hasDisplaySize(item) && (
+                            <p className="text-sm text-gray-500">
+                              Size: {item.size}
+                            </p>
+                          )}
+                          {getColorName() && (
+                            <p className="text-sm text-gray-500 flex items-center gap-2">
+                              Color:
+                              {getColorCode() && (
+                                <span
+                                  className="w-4 h-4 rounded-full border border-gray-300"
+                                  style={{
+                                    backgroundColor: getColorCode(),
+                                  }}
+                                ></span>
                               )}
-                            </>
+                              {getColorName()}
+                            </p>
                           )}
                           <p className="text-sm text-gray-500">
                             Quantity: {item.quantity}
@@ -542,6 +628,51 @@ const OrderSummary = () => {
                 </h2>
               </div>
 
+              {/* Coupon Code */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Promo Code
+                </label>
+                {activeCoupon ? (
+                  <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                    <span className="text-green-700 font-medium text-sm min-w-0 break-words">
+                      {activeCoupon.code} applied
+                    </span>
+                    <button
+                      onClick={handleRemoveCoupon}
+                      className="text-red-500 hover:text-red-600 text-sm font-medium"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col sm:flex-row gap-2 min-w-0">
+                    <input
+                      type="text"
+                      value={couponCodeInput}
+                      onChange={(e) =>
+                        setCouponCodeInput(e.target.value.toUpperCase())
+                      }
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && handleApplyCoupon()
+                      }
+                      placeholder="Enter coupon code"
+                      className="w-full sm:flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                    <button
+                      onClick={handleApplyCoupon}
+                      disabled={couponLoading}
+                      className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 whitespace-nowrap"
+                    >
+                      {couponLoading ? "..." : "Apply"}
+                    </button>
+                  </div>
+                )}
+                {couponError && (
+                  <p className="mt-1 text-red-500 text-xs">{couponError}</p>
+                )}
+              </div>
+
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600 dark:text-primary-300">
                   <span>Subtotal</span>
@@ -550,7 +681,7 @@ const OrderSummary = () => {
                 {discount > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span className="flex items-center gap-1">
-                      Coupon ({coupon?.code})
+                      Coupon ({activeCoupon?.code})
                     </span>
                     <span>-{formatPrice(discount)}</span>
                   </div>
@@ -587,9 +718,7 @@ const OrderSummary = () => {
                 ) : (
                   <>
                     <FiCheckCircle className="w-5 h-5" />
-                    <span>
-                      {paymentMethod === "paystack" ? "Pay Now" : "Place Order"}
-                    </span>
+                    <span>Pay Now</span>
                   </>
                 )}
               </button>
@@ -597,15 +726,8 @@ const OrderSummary = () => {
               {/* Payment Method Info */}
               <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <p className="text-xs text-gray-600 text-center">
-                  {paymentMethod === "paystack" && (
-                    <>
-                      You will be redirected to Paystack secure payment gateway
-                      to complete your payment.
-                    </>
-                  )}
-                  {paymentMethod === "cod" && (
-                    <>Please have exact cash ready when your order arrives.</>
-                  )}
+                  You will be redirected to Paystack secure payment gateway to
+                  complete your payment.
                 </p>
               </div>
 

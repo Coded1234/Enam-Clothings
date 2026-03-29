@@ -24,6 +24,7 @@ const Login = () => {
   const [formError, setFormError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Pre-fill email if previously remembered
@@ -105,9 +106,14 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormErrors({});
 
-    if (!formData.email || !formData.password) {
-      toast.error("Please fill in all fields");
+    let errors = {};
+    if (!formData.email) errors.email = "Please enter your email";
+    if (!formData.password) errors.password = "Please enter your password";
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
 
@@ -227,22 +233,23 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Enter your email"
-                  className={`w-full pl-12 pr-4 py-4 border ${
-                    formError &&
-                    formError.includes("We don't recognize this email")
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:ring-primary-500"
-                  } rounded-xl placeholder-black focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+                  className={`w-full pl-12 pr-4 py-4 border ${formErrors.email || (formError && formError.includes("We don't recognize this email")) ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-primary-500"} rounded-xl placeholder-black focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
                   style={{ backgroundColor: "white", color: "black" }}
                   required
                 />
               </div>
-              {formError &&
+              {formErrors.email ? (
+                <p className="mt-2 text-sm text-red-500 font-medium">
+                  {formErrors.email}
+                </p>
+              ) : (
+                formError &&
                 formError.includes("We don't recognize this email") && (
                   <p className="mt-2 text-sm text-red-500 font-medium">
                     {formError}
                   </p>
-                )}
+                )
+              )}
             </div>
 
             {/* Password */}
@@ -261,14 +268,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Enter your password"
-                  className={`w-full pl-12 pr-12 py-4 border ${
-                    formError &&
-                    formError
-                      .toLowerCase()
-                      .includes("invalid email or password")
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:ring-primary-500"
-                  } rounded-xl placeholder-black focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+                  className={`w-full pl-12 pr-12 py-4 border ${formErrors.password || (formError && formError.toLowerCase().includes("invalid email or password")) ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-primary-500"} rounded-xl placeholder-black focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
                   style={{ backgroundColor: "white", color: "black" }}
                   required
                 />
@@ -280,6 +280,16 @@ const Login = () => {
                   {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                 </button>
               </div>
+              {formErrors.password && (
+                <p className="mt-1 text-sm text-red-500">
+                  {formErrors.password}
+                </p>
+              )}
+              {formErrors.password && (
+                <p className="mt-1 text-sm text-red-500">
+                  {formErrors.password}
+                </p>
+              )}
               {formError &&
                 formError
                   .toLowerCase()
@@ -373,6 +383,12 @@ const Login = () => {
               <span className="font-medium text-gray-700">Google</span>
             </button>
           </div>
+          {formErrors.password && (
+            <p className="mt-1 text-sm text-red-500">{formErrors.password}</p>
+          )}
+          {formErrors.password && (
+            <p className="mt-1 text-sm text-red-500">{formErrors.password}</p>
+          )}
         </div>
       </div>
 

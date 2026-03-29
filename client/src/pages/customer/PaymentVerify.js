@@ -26,26 +26,8 @@ const PaymentVerify = () => {
 
   const reference = searchParams.get("reference");
   const trxref = searchParams.get("trxref");
-  const method = searchParams.get("method");
-  const urlOrderId = searchParams.get("order_id");
-  const urlOrderNumber = searchParams.get("order_number");
-  const urlAmount = searchParams.get("amount");
-  const urlItemsCount = searchParams.get("items_count");
 
   useEffect(() => {
-    if (method === "cod") {
-      setStatus("success");
-      setOrder({
-        id: urlOrderId,
-        totalAmount: urlAmount,
-        orderNumber: urlOrderNumber || urlOrderId,
-        itemsCount: urlItemsCount || 0,
-      });
-      setMessage("Order Confirmed");
-      dispatch(clearCart());
-      return;
-    }
-
     const verifyPayment = async () => {
       const paymentRef = reference || trxref;
 
@@ -78,16 +60,7 @@ const PaymentVerify = () => {
     };
 
     verifyPayment();
-  }, [
-    reference,
-    trxref,
-    method,
-    urlOrderId,
-    urlOrderNumber,
-    urlAmount,
-    urlItemsCount,
-    dispatch,
-  ]);
+  }, [reference, trxref, dispatch]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("en-GH", {
@@ -131,7 +104,7 @@ const PaymentVerify = () => {
               <FiCheckCircle className="text-green-500" size={48} />
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              {method === "cod" ? "Order Confirmed!" : "Payment Successful!"}
+              Payment Successful!
             </h1>
             <p className="text-gray-600">
               Thank you for your purchase. Your order has been confirmed.

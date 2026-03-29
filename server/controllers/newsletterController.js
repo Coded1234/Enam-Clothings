@@ -1,6 +1,7 @@
 const { Newsletter } = require("../models");
 const { sendEmail, emailTemplates } = require("../config/email");
 const { validateEmail } = require("../utils/inputValidation");
+const logger = require("../config/logger");
 
 // @desc    Subscribe to newsletter
 // @route   POST /api/newsletter/subscribe
@@ -55,12 +56,14 @@ const subscribe = async (req, res) => {
         adminTemplate.html,
       );
     } catch (emailError) {
-      console.error("Newsletter welcome email failed:", emailError);
+      logger.error("Newsletter welcome email failed", {
+        error: emailError.message,
+      });
     }
 
     res.status(201).json({ message: "Successfully subscribed to newsletter!" });
   } catch (error) {
-    console.error("Newsletter subscribe error:", error);
+    logger.error("Newsletter subscribe error", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to subscribe", error: error.message });

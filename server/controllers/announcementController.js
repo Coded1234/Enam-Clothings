@@ -1,4 +1,5 @@
 const { Announcement } = require("../models");
+const logger = require("../config/logger");
 
 // @desc    Get all active announcements (public)
 // @route   GET /api/announcements/active
@@ -10,7 +11,7 @@ const getActiveAnnouncements = async (req, res) => {
     });
     res.json({ success: true, announcements });
   } catch (error) {
-    console.error("Error fetching announcements:", error);
+    logger.error("Error fetching announcements", { error: error.message });
     res.status(500).json({ message: "Failed to fetch announcements" });
   }
 };
@@ -24,7 +25,7 @@ const getAllAnnouncements = async (req, res) => {
     });
     res.json({ success: true, announcements });
   } catch (error) {
-    console.error("Error fetching announcements:", error);
+    logger.error("Error fetching announcements", { error: error.message });
     res.status(500).json({ message: "Failed to fetch announcements" });
   }
 };
@@ -46,7 +47,7 @@ const createAnnouncement = async (req, res) => {
     });
     res.status(201).json({ success: true, announcement });
   } catch (error) {
-    console.error("Error creating announcement:", error);
+    logger.error("Error creating announcement", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to create announcement", error: error.message });
@@ -68,7 +69,7 @@ const updateAnnouncement = async (req, res) => {
     await announcement.save();
     res.json({ success: true, announcement });
   } catch (error) {
-    console.error("Error updating announcement:", error);
+    logger.error("Error updating announcement", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to update announcement", error: error.message });
@@ -86,7 +87,7 @@ const deleteAnnouncement = async (req, res) => {
     await announcement.destroy();
     res.json({ success: true, message: "Announcement deleted" });
   } catch (error) {
-    console.error("Error deleting announcement:", error);
+    logger.error("Error deleting announcement", { error: error.message });
     res.status(500).json({ message: "Failed to delete announcement" });
   }
 };

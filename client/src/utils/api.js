@@ -42,7 +42,7 @@ const getCsrfToken = async () => {
   return csrfTokenPromise;
 };
 
-// Request interceptor to add auth token
+// Request interceptor to add CSRF and guest session headers
 api.interceptors.request.use(
   async (config) => {
     if (
@@ -57,11 +57,6 @@ api.interceptors.request.use(
       if (csrfToken) {
         config.headers["X-CSRF-Token"] = csrfToken;
       }
-    }
-
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
     }
 
     // Add Guest Session ID
@@ -104,8 +99,15 @@ api.interceptors.response.use(
       const isLoginCall = reqUrl.includes("/auth/login");
       const isDeleteAccount = reqUrl.includes("/auth/account");
       const isChangePassword = reqUrl.includes("/auth/change-password");
-      if (!isLoginCall && !isDeleteAccount && !isChangePassword) {
-        localStorage.removeItem("token");
+      const skipAuthRedirect = !!error?.config?.skipAuthRedirect;
+      const isProfileBootstrap = reqUrl.includes("/auth/profile");
+      if (
+        !isLoginCall &&
+        !isDeleteAccount &&
+        !isChangePassword &&
+        !skipAuthRedirect &&
+        !isProfileBootstrap
+      ) {
         localStorage.removeItem("user");
         window.location.href = "/login";
       }
@@ -118,9 +120,10 @@ api.interceptors.response.use(
 export const authAPI = {
   register: (data) => api.post("/auth/register", data),
   login: (data) => api.post("/auth/login", data),
+  logout: () => api.post("/auth/logout"),
   googleLogin: (token) => api.post("/auth/google", { token }),
   facebookLogin: (token) => api.post("/auth/facebook", { token }),
-  getProfile: () => api.get("/auth/profile"),
+  getProfile: (config = {}) => api.get("/auth/profile", config),
   updateProfile: (data) => api.put("/auth/profile", data),
   changePassword: (data) => api.put("/auth/change-password", data),
   toggleWishlist: (productId) => api.post(`/auth/wishlist/${productId}`),

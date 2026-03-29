@@ -111,8 +111,8 @@ const Home = () => {
               <span className="block text-amber-200">Perfect Style</span>
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-white/80 mb-7 leading-relaxed max-w-xl">
-              Explore our latest collection of premium clothing curated for
-              modern everyday wear.
+              Explore our latest collection of premium clothing and signature
+              fragrances curated for your modern lifestyle.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Link
@@ -169,7 +169,7 @@ const Home = () => {
             </h2>{" "}
             <p className="text-gray-600 dark:text-gold max-w-2xl mx-auto">
               {" "}
-              Browse our wide selection of clothing for men and women{" "}
+              Browse our wide selection of fashion and perfumes{" "}
             </p>{" "}
           </div>{" "}
           <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-4xl mx-auto motion-safe-stagger">

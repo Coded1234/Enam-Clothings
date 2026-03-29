@@ -13,7 +13,6 @@ const VerifyEmail = () => {
   const token = searchParams.get("token");
   const emailFromQuery = searchParams.get("email") || "";
 
-
   const router = useRouter();
   const dispatch = useDispatch();
   const verifiedOnce = useRef(false);
@@ -40,13 +39,13 @@ const VerifyEmail = () => {
           email: emailFromQuery,
           token,
         });
-        
+
         setStatus("success");
         toast.success("Email verified successfully!");
 
-        if (data.token && data.user) {
+        if (data.user) {
           localStorage.setItem("user", JSON.stringify(data.user));
-          dispatch(setCredentials({ user: data.user, token: data.token }));
+          dispatch(setCredentials(data.user));
           setTimeout(() => router.push("/"), 2000);
         }
       } catch (error) {
@@ -64,9 +63,12 @@ const VerifyEmail = () => {
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center flex flex-col items-center">
           <FiMail className="text-primary-600 mb-4" size={64} />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Check your email</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Check your email
+          </h2>
           <p className="text-gray-500 mb-6">
-            We've sent a verification link to <strong>{emailFromQuery}</strong>. Please check your inbox and click the link to activate your account.
+            We've sent a verification link to <strong>{emailFromQuery}</strong>.
+            Please check your inbox and click the link to activate your account.
           </p>
           <Link
             href="/resend-verification"
@@ -84,8 +86,12 @@ const VerifyEmail = () => {
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center flex flex-col items-center">
           <FiLoader className="text-primary-600 animate-spin mb-4" size={48} />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Verifying Email...</h2>
-          <p className="text-gray-500">Please wait while we verify your email address.</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Verifying Email...
+          </h2>
+          <p className="text-gray-500">
+            Please wait while we verify your email address.
+          </p>
         </div>
       </div>
     );
@@ -96,8 +102,12 @@ const VerifyEmail = () => {
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
           <FiCheckCircle className="mx-auto text-green-500 mb-4" size={64} />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Email Verified!</h2>
-          <p className="text-gray-500 mb-6">Your account is now active. You are being redirected...</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Email Verified!
+          </h2>
+          <p className="text-gray-500 mb-6">
+            Your account is now active. You are being redirected...
+          </p>
           <Link
             href="/"
             className="inline-block px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium hover:from-primary-700 hover:to-primary-800 transition-colors"
@@ -106,17 +116,19 @@ const VerifyEmail = () => {
           </Link>
         </div>
       </div>
-     );
+    );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
         <FiXCircle className="mx-auto text-red-500 mb-4" size={64} />
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Verification Failed</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          Verification Failed
+        </h2>
         <p className="text-gray-500 mb-6">
-          {status === "invalid_link" 
-            ? "missing or invalid verification link. Please check your email and click the link from there, or request a new one." 
+          {status === "invalid_link"
+            ? "missing or invalid verification link. Please check your email and click the link from there, or request a new one."
             : errorMessage}
         </p>
         <Link

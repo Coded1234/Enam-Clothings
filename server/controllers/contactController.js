@@ -4,6 +4,7 @@ const {
   validateEmail,
   validateGhanaPhone,
 } = require("../utils/inputValidation");
+const logger = require("../config/logger");
 
 // @desc    Submit contact form
 // @route   POST /api/contact
@@ -104,7 +105,9 @@ const submitContact = async (req, res) => {
           }
         }
       } catch (returnCheckError) {
-        console.error("Return request pre-check failed:", returnCheckError);
+        logger.error("Return request pre-check failed", {
+          error: returnCheckError.message,
+        });
         // Don't block general contact form if the check fails.
       }
     }
@@ -147,15 +150,16 @@ const submitContact = async (req, res) => {
             order.returnApprovalStatus = "pending";
             await order.save();
           } else {
-            console.warn(
-              "Return request ignored: email mismatch for order",
+            logger.warn("Return request ignored due to email mismatch", {
               orderId,
-            );
+            });
           }
         }
       }
     } catch (returnUpdateError) {
-      console.error("Return request marking failed:", returnUpdateError);
+      logger.error("Return request marking failed", {
+        error: returnUpdateError.message,
+      });
     }
 
     // Send confirmation email to user
@@ -164,7 +168,9 @@ const submitContact = async (req, res) => {
         emailTemplates.contactConfirmation(contact);
       await sendEmail(emailCheck.email, emailSubject, html);
     } catch (emailError) {
-      console.error("Contact confirmation email failed:", emailError);
+      logger.error("Contact confirmation email failed", {
+        error: emailError.message,
+      });
     }
 
     // Optionally send notification to admin
@@ -196,7 +202,9 @@ const submitContact = async (req, res) => {
         attachments.length > 0 ? { attachments } : undefined,
       );
     } catch (emailError) {
-      console.error("Admin notification email failed:", emailError);
+      logger.error("Admin notification email failed", {
+        error: emailError.message,
+      });
     }
 
     res.status(201).json({
@@ -205,7 +213,7 @@ const submitContact = async (req, res) => {
       id: contact.id,
     });
   } catch (error) {
-    console.error("Contact form error:", error);
+    logger.error("Contact form error", { error: error.message });
     res
       .status(500)
       .json({ message: "Failed to send message", error: error.message });
@@ -286,7 +294,7 @@ const updateMessage = async (req, res) => {
           `,
         );
       } catch (emailError) {
-        console.error("Reply email failed:", emailError);
+        logger.error("Reply email failed", { error: emailError.message });
       }
     }
 

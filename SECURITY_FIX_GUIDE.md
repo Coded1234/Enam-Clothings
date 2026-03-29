@@ -416,7 +416,7 @@ const schemas = {
       postalCode: Joi.string().required().max(10),
       country: Joi.string().required().max(50)
     }).required(),
-    paymentMethod: Joi.string().valid('paystack', 'cod').required(),
+    paymentMethod: Joi.string().valid('paystack').required(),
     couponId: Joi.string().optional()
   })
 };

@@ -1,7 +1,9 @@
 "use client";
+/* eslint-env browser */
+/* eslint-disable no-unused-vars */
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchCart,
@@ -11,7 +13,6 @@ import {
 } from "../../redux/slices/cartSlice";
 import { getProductImage } from "../../utils/imageUrl";
 import { getValidRecentlyViewed } from "../../utils/recentlyViewed";
-import api from "../../utils/api";
 import toast from "react-hot-toast";
 import {
   FiTrash2,
@@ -19,27 +20,31 @@ import {
   FiPlus,
   FiShoppingBag,
   FiArrowLeft,
-  FiTag,
-  FiCheck,
 } from "react-icons/fi";
 
 const Cart = () => {
-  const SAVED_COUPON_KEY = "savedCouponCode";
-  const CHECKOUT_STATE_KEY = "checkoutState";
-
   const dispatch = useDispatch();
   const router = useRouter();
 
   const { items, totalAmount, loading } = useSelector((state) => state.cart);
-  const { isAuthenticated } = useSelector((state) => state.auth);
 
-  // Coupon state
-  const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState(null);
-  const [couponDiscount, setCouponDiscount] = useState(0);
+  const isPerfumeItem = (item) => {
+    const category =
+      item?.product?.category || item?.productCategory || item?.category;
+    const normalizedCategory = String(category || "").toLowerCase();
+    return (
+      normalizedCategory === "perfume" || normalizedCategory === "perfumes"
+    );
+  };
+
+  const hasDisplaySize = (item) => {
+    const size = String(item?.size || "")
+      .trim()
+      .toLowerCase();
+    return size && size !== "n/a" && size !== "na" && size !== "none";
+  };
+
   const [recentlyViewed, setRecentlyViewed] = useState([]);
-  const [couponLoading, setCouponLoading] = useState(false);
-  const [couponError, setCouponError] = useState("");
   const [editingQuantity, setEditingQuantity] = useState({});
   const prunedInvalidItemsRef = useRef(new Set());
 
@@ -78,38 +83,6 @@ const Cart = () => {
 
   // Calculate summary - ensure all values are numbers
   const subtotal = parseFloat(totalAmount) || 0;
-
-  // Auto-validate and sync coupon when cart subtotal changes (or on initial load)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const savedCoupon = localStorage.getItem(SAVED_COUPON_KEY);
-    const codeToValidate = appliedCoupon?.code || savedCoupon;
-
-    if (codeToValidate && subtotal > 0) {
-      const validateAutomatically = async () => {
-        try {
-          const response = await api.post("/coupons/validate", {
-            code: codeToValidate,
-            subtotal: subtotal,
-          });
-          if (response.data.success) {
-            setAppliedCoupon(response.data.coupon);
-            setCouponDiscount(response.data.discount);
-            setCouponCode(response.data.coupon.code);
-            localStorage.setItem(SAVED_COUPON_KEY, response.data.coupon.code);
-          }
-        } catch (error) {
-          // If the coupon becomes invalid (e.g. minimum spend not met anymore)
-          setAppliedCoupon(null);
-          setCouponDiscount(0);
-          setCouponCode("");
-          localStorage.removeItem(SAVED_COUPON_KEY);
-        }
-      };
-      validateAutomatically();
-    }
-  }, [subtotal, appliedCoupon?.code]);
 
   // Load recently viewed products
   useEffect(() => {
@@ -195,71 +168,12 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
-    // Preserve coupon state before navigating to checkout.
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem(
-        CHECKOUT_STATE_KEY,
-        JSON.stringify({
-          coupon: appliedCoupon,
-          couponDiscount: couponDiscount,
-        }),
-      );
-    }
     router.push("/checkout");
-  };
-
-  // Coupon handlers
-  const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) {
-      setCouponError("Please enter a coupon code");
-      return;
-    }
-
-    if (!isAuthenticated) {
-      toast.error("Please login to apply coupon");
-      return;
-    }
-
-    setCouponLoading(true);
-    setCouponError("");
-
-    try {
-      const response = await api.post("/coupons/validate", {
-        code: couponCode.trim(),
-        subtotal: subtotal,
-      });
-
-      if (response.data.success) {
-        setAppliedCoupon(response.data.coupon);
-        setCouponDiscount(response.data.discount);
-        localStorage.setItem(SAVED_COUPON_KEY, response.data.coupon.code);
-        toast.success(response.data.message);
-      }
-    } catch (error) {
-      const errorMsg = error.response?.data?.message || "Invalid coupon code";
-      setCouponError(errorMsg);
-      toast.error(errorMsg);
-    } finally {
-      setCouponLoading(false);
-    }
-  };
-
-  const handleRemoveCoupon = () => {
-    setAppliedCoupon(null);
-    setCouponDiscount(0);
-    setCouponCode("");
-    setCouponError("");
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(SAVED_COUPON_KEY);
-      localStorage.removeItem(CHECKOUT_STATE_KEY);
-    }
-    toast.success("Coupon removed");
   };
 
   // Calculate summary
   const shippingFee = 0; // Will be calculated at checkout with Yango
-  const total = subtotal - couponDiscount + shippingFee;
+  const total = subtotal + shippingFee;
 
   // Empty cart state
   if (items.length === 0) {
@@ -348,10 +262,12 @@ const Cart = () => {
                         {item.product?.name || "Unavailable product"}
                       </Link>
                       <div className="mt-1 text-sm text-gray-500 space-y-1">
-                        <p>
-                          Size:{" "}
-                          <span className="text-gray-700">{item.size}</span>
-                        </p>
+                        {!isPerfumeItem(item) && hasDisplaySize(item) && (
+                          <p>
+                            Size:{" "}
+                            <span className="text-gray-700">{item.size}</span>
+                          </p>
+                        )}
                         {item.color && (
                           <p className="flex items-center gap-2">
                             Color:
@@ -464,53 +380,6 @@ const Cart = () => {
             <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24 space-y-6 overflow-hidden">
               <h2 className="text-lg font-bold text-gray-800">Order Summary</h2>
 
-              {/* Coupon Code */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FiTag className="inline mr-1" />
-                  Promo Code
-                </label>
-                {appliedCoupon ? (
-                  <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                    <span className="text-green-700 font-medium text-sm min-w-0 break-words">
-                      <FiCheck className="inline mr-1" />
-                      {appliedCoupon.code} applied
-                    </span>
-                    <button
-                      onClick={handleRemoveCoupon}
-                      className="text-red-500 hover:text-red-600 text-sm font-medium"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col sm:flex-row gap-2 min-w-0">
-                    <input
-                      type="text"
-                      value={couponCode}
-                      onChange={(e) =>
-                        setCouponCode(e.target.value.toUpperCase())
-                      }
-                      onKeyDown={(e) =>
-                        e.key === "Enter" && handleApplyCoupon()
-                      }
-                      placeholder="Enter coupon code"
-                      className="w-full sm:flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    />
-                    <button
-                      onClick={handleApplyCoupon}
-                      disabled={couponLoading}
-                      className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 whitespace-nowrap"
-                    >
-                      {couponLoading ? "..." : "Apply"}
-                    </button>
-                  </div>
-                )}
-                {couponError && (
-                  <p className="mt-1 text-red-500 text-xs">{couponError}</p>
-                )}
-              </div>
-
               {/* Totals */}
               <div className="space-y-3 text-sm">
                 <div className="flex items-start justify-between gap-3 text-gray-600">
@@ -519,16 +388,6 @@ const Cart = () => {
                     GH₵{Math.round(subtotal).toLocaleString()}
                   </span>
                 </div>
-                {couponDiscount > 0 && (
-                  <div className="flex items-start justify-between gap-3 text-green-600">
-                    <span className="flex-1 min-w-0 break-words">
-                      Discount ({appliedCoupon?.code})
-                    </span>
-                    <span className="flex-1 text-right min-w-0 break-words">
-                      -GH₵{Math.round(couponDiscount).toLocaleString()}
-                    </span>
-                  </div>
-                )}
                 <div className="flex items-start justify-between gap-3 text-gray-600">
                   <span className="flex-1">Shipping</span>
                   <span className="flex-1 text-right min-w-0 break-words text-green-600">

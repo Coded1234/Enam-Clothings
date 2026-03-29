@@ -3,6 +3,7 @@ import { useRouter, useParams } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
 import { FiUpload, FiX, FiSave, FiArrowLeft, FiImage } from "react-icons/fi";
 import { productsAPI, adminAPI } from "../../utils/api";
+import { getImageUrl } from "../../utils/imageUrl";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const ProductForm = () => {
@@ -27,6 +28,7 @@ const ProductForm = () => {
     images: [],
     isActive: true,
     featured: false,
+    soldCount: 0,
   });
 
   const [imageFiles, setImageFiles] = useState([]);
@@ -37,6 +39,12 @@ const ProductForm = () => {
   const [newColor, setNewColor] = useState({ name: "", code: "#000000" });
 
   const isPerfumesCategory = formData.category === "perfumes";
+  const enteredTotalStock = Number.parseInt(formData.totalStock, 10);
+  const safeTotalStock = Number.isNaN(enteredTotalStock)
+    ? 0
+    : Math.max(0, enteredTotalStock);
+  const soldCount = Number(formData.soldCount) || 0;
+  const computedRemainingStock = Math.max(0, safeTotalStock - soldCount);
 
   // If switching to perfumes, strip out variant fields.
   useEffect(() => {
@@ -87,6 +95,29 @@ const ProductForm = () => {
     }
   }, [id]);
 
+  const normalizeImage = (img) => {
+    if (typeof img === "string") {
+      return { url: img, publicId: "" };
+    }
+
+    if (img && typeof img === "object") {
+      const rawPublicId = img.publicId || img.public_id || "";
+      const synthesizedLocalPath =
+        rawPublicId && !String(rawPublicId).includes("/")
+          ? `/uploads/products/${rawPublicId}`
+          : "";
+      const resolvedUrl =
+        img.url || img.path || img.secure_url || synthesizedLocalPath || "";
+      return {
+        ...img,
+        url: resolvedUrl,
+        publicId: rawPublicId,
+      };
+    }
+
+    return null;
+  };
+
   const fetchProduct = async () => {
     try {
       setLoading(true);
@@ -97,21 +128,19 @@ const ProductForm = () => {
         price: data.price || "",
         comparePrice: data.comparePrice || "",
         category: data.category || "",
-        // Treat the "Total Stock" field as current/remaining stock for editing
-        totalStock: data.remainingStock ?? data.totalStock ?? "",
+        totalStock: data.totalStock ?? data.remainingStock ?? "",
         sizes: data.sizes || [],
         colors: data.colors || [],
         images: data.images || [],
         isActive: data.isActive !== false,
         featured: data.featured || false,
+        soldCount: data.soldCount || 0,
       });
       // Set existing images for editing
       if (data.images?.length > 0) {
-        setExistingImages(
-          data.images.map((img) =>
-            typeof img === "string" ? { url: img, publicId: "" } : img,
-          ),
-        );
+        setExistingImages(data.images.map(normalizeImage).filter(Boolean));
+      } else {
+        setExistingImages([]);
       }
     } catch (err) {
       setError("Failed to load product");
@@ -225,7 +254,12 @@ const ProductForm = () => {
     setError(null);
 
     // Validation
-    if (!formData.name || !formData.price || !formData.category) {
+    if (
+      !formData.name ||
+      !formData.description?.trim() ||
+      !formData.price ||
+      !formData.category
+    ) {
       setError("Please fill in all required fields");
       return;
     }
@@ -277,7 +311,11 @@ const ProductForm = () => {
 
       router.push("/admin/products");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to save product");
+      const backendMessage = err.response?.data?.message;
+      const validationDetail = Array.isArray(err.response?.data?.errors)
+        ? err.response.data.errors[0]?.message
+        : null;
+      setError(validationDetail || backendMessage || "Failed to save product");
     } finally {
       setSaving(false);
     }
@@ -334,7 +372,7 @@ const ProductForm = () => {
 
             <div className="md:col-span-2">
               <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">
-                Description
+                Description <span className="text-red-500">*</span>
               </label>
               <textarea
                 name="description"
@@ -342,6 +380,7 @@ const ProductForm = () => {
                 onChange={handleChange}
                 rows={4}
                 className="w-full px-3 md:px-4 py-1.5 md:py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                required
               />
             </div>
 
@@ -416,6 +455,10 @@ const ProductForm = () => {
                 min="0"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
               />
+              <p className="mt-1 text-xs text-gray-500">
+                Sold count: {soldCount}. Available stock after update will be{" "}
+                {computedRemainingStock}.
+              </p>
             </div>
           </div>
         </div>
@@ -580,7 +623,7 @@ const ProductForm = () => {
               <div key={`existing-${index}`} className="relative group">
                 <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                   <img
-                    src={img.url}
+                    src={getImageUrl(img?.url || img)}
                     alt={`Product ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
