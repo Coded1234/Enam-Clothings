@@ -542,6 +542,8 @@ const shippingRequestSchema = Joi.object({
   city: Joi.string().trim().min(1).max(120).required(),
   postalCode: Joi.string().trim().max(40).allow("", null),
   phone: Joi.string().trim().max(40).allow("", null),
+  latitude: Joi.number().min(-90).max(90).allow(null),
+  longitude: Joi.number().min(-180).max(180).allow(null),
 }).unknown(true);
 
 const formatValidationError = (error) =>

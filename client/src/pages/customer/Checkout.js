@@ -164,6 +164,8 @@ const Checkout = () => {
         city: city,
         postalCode: postalCode,
         phone: shippingInfo.phone,
+        latitude: selectedLocation?.latitude,
+        longitude: selectedLocation?.longitude,
       });
 
       if (response.data.success) {

@@ -27,7 +27,7 @@ function createClientError(message, statusCode = 400) {
 }
 
 async function computeShippingQuote(input = {}) {
-  const { address, city, postalCode, phone } = input;
+  const { address, city, postalCode, phone, latitude, longitude } = input;
 
   if (!address || !city) {
     throw createClientError("Address and city are required", 400);
@@ -38,11 +38,26 @@ async function computeShippingQuote(input = {}) {
     throw createClientError(phoneCheck.message, 400);
   }
 
-  const destinationCoords = await geocodeAddress({
-    address,
-    city,
-    postalCode,
-  });
+  let destinationCoords = null;
+  const parsedLat = Number(latitude);
+  const parsedLng = Number(longitude);
+  const hasProvidedCoords =
+    Number.isFinite(parsedLat) && Number.isFinite(parsedLng);
+
+  if (hasProvidedCoords) {
+    destinationCoords = {
+      latitude: parsedLat,
+      longitude: parsedLng,
+      formattedAddress: `${address}, ${city}, Ghana`,
+      source: "map-pin",
+    };
+  } else {
+    destinationCoords = await geocodeAddress({
+      address,
+      city,
+      postalCode,
+    });
+  }
 
   if (!destinationCoords) {
     throw createClientError(
@@ -119,7 +134,7 @@ exports.calculateShippingRate = async (req, res) => {
  */
 exports.getDeliveryOptions = async (req, res) => {
   try {
-    const { address, city, postalCode } = req.body;
+    const { address, city, postalCode, latitude, longitude } = req.body;
 
     if (!address || !city) {
       return res.status(400).json({
@@ -128,12 +143,23 @@ exports.getDeliveryOptions = async (req, res) => {
       });
     }
 
-    // Geocode destination
-    const destinationCoords = await geocodeAddress({
-      address,
-      city,
-      postalCode,
-    });
+    const parsedLat = Number(latitude);
+    const parsedLng = Number(longitude);
+    const hasProvidedCoords =
+      Number.isFinite(parsedLat) && Number.isFinite(parsedLng);
+
+    const destinationCoords = hasProvidedCoords
+      ? {
+          latitude: parsedLat,
+          longitude: parsedLng,
+          formattedAddress: `${address}, ${city}, Ghana`,
+          source: "map-pin",
+        }
+      : await geocodeAddress({
+          address,
+          city,
+          postalCode,
+        });
 
     if (!destinationCoords) {
       return res.status(400).json({
@@ -254,9 +280,8 @@ async function calculateRoadDistance(lat1, lon1, lat2, lon2) {
 
     // 1. Try OpenRouteService
     if (orsApiKey && orsApiKey !== "your_openrouteservice_key_here") {
-      // Using cycling-electric as OpenRouteService's free tier doesn't have a dedicated "motorcycle" profile,
-      // and cycling-electric is the closest mapping for 2-wheel vehicles avoiding major highways.
-      const url = `https://api.openrouteservice.org/v2/directions/cycling-electric?api_key=${orsApiKey}&start=${lon1},${lat1}&end=${lon2},${lat2}`;
+      // Use driving profile for more realistic delivery distance on roads.
+      const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${orsApiKey}&start=${lon1},${lat1}&end=${lon2},${lat2}`;
 
       logger.info("Calculating road distance via OpenRouteService", {
         origin: { lat: lat1, lon: lon1 },
@@ -292,9 +317,8 @@ async function calculateRoadDistance(lat1, lon1, lat2, lon2) {
       }
     }
 
-    // 2. Fallback to OSRM (Open Source Routing Machine) without API key
-    // Using 'bike' profile as public OSRM only supports driving, bike, and foot.
-    const url = `https://router.project-osrm.org/route/v1/bike/${lon1},${lat1};${lon2},${lat2}?overview=false`;
+    // 2. Fallback to OSRM (Open Source Routing Machine) without API key.
+    const url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=false`;
 
     logger.info("Calculating road distance via OSRM", {
       origin: { lat: lat1, lon: lon1 },
@@ -330,6 +354,7 @@ async function calculateRoadDistance(lat1, lon1, lat2, lon2) {
   } catch (error) {
     logger.error("Road distance calculation error", { error: error.message });
     // 4. Final Fallback to straight-line distance with road multiplier
+    const straightLine = calculateDistance(lat1, lon1, lat2, lon2);
     const estimated = straightLine * ROAD_MULTIPLIER;
     logger.info("Using road distance fallback estimate", {
       straightLineKm: Number(straightLine.toFixed(2)),
@@ -499,31 +524,19 @@ async function getYangoDeliveryOptions(origin, destination) {
 }
 
 /**
- * Calculate shipping price based on distance (in GHS).
- * First 3 km are free; fee is calculated on (distance - 3) km.
+ * Calibrated fallback shipping price (in GHS).
+ * Tuned against observed Yango samples to reduce overpricing drift.
  */
 function calculatePriceByDistance(distanceKm) {
-  const effectiveKm = Math.max(0, distanceKm - 3); // Deduct 3 km before calculating fee
-  const basePrice = 15; // GHS
-  const pricePerKm = 2; // GHS per km
-
-  let totalFee;
-
-  if (effectiveKm <= 5) {
-    totalFee = basePrice;
-  } else if (effectiveKm <= 20) {
-    totalFee = basePrice + effectiveKm * pricePerKm;
-  } else if (effectiveKm <= 50) {
-    totalFee = basePrice + effectiveKm * 1.8;
-  } else {
-    totalFee = basePrice + effectiveKm * 1.5;
+  const distance = Number(distanceKm);
+  if (!Number.isFinite(distance) || distance < 0) {
+    return 5;
   }
 
-  // Subtract 5 GHS discount from the calculated total fee
-  // Ensure the fee doesn't drop below a minimum threshold (e.g. 5 GHS minimum)
-  const finalFee = Math.max(5, totalFee - 7);
-
-  return Math.round(finalFee);
+  // Best-fit model from sampled website-vs-Yango routes:
+  // fee ~= 3.5 + (1.1 * distanceKm)
+  const rawFee = 3.5 + 1.1 * distance;
+  return Math.round(Math.max(5, rawFee));
 }
 
 /**
