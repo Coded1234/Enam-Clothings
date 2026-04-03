@@ -4,6 +4,9 @@ module.exports = {
   content: ["./app/**/*.{js,jsx,ts,tsx}", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-poppins)", "system-ui", "sans-serif"],
+      },
       colors: {
         primary: {
           50: "#faf8f3",

@@ -97,6 +97,8 @@ const Home = () => {
           <img
             src={IMAGES.hero.main}
             alt="Hero"
+            width="1920"
+            height="1080"
             className="w-full h-full object-cover opacity-30"
             fetchPriority="high"
           />
@@ -146,9 +148,9 @@ const Home = () => {
                 <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-full bg-amber-200/10 border border-amber-200/30 flex items-center justify-center mb-3">
                   <feature.icon className="text-amber-200" size={18} />
                 </div>
-                <h4 className="font-semibold text-[13px] sm:text-base text-white leading-tight">
+                <h2 className="font-semibold text-[13px] sm:text-base text-white leading-tight">
                   {feature.title}
-                </h4>
+                </h2>
                 <p className="text-[10px] sm:text-sm text-white/65 mt-1">
                   {feature.desc}
                 </p>
@@ -193,6 +195,9 @@ const Home = () => {
                         key={`${category.name}-${index}`}
                         src={image}
                         alt={category.name}
+                        width={500}
+                        height={500}
+                        loading="lazy"
                         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out group-hover:scale-110 ${
                           isActive ? "opacity-100" : "opacity-0"
                         }`}
@@ -372,6 +377,9 @@ const Home = () => {
                     <img
                       src={IMAGES.trending.small}
                       alt="Promotion"
+                      width={400}
+                      height={400}
+                      loading="lazy"
                       className="w-full h-72 object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent"></div>
@@ -402,6 +410,9 @@ const Home = () => {
               <img
                 src={IMAGES.trending.large1}
                 alt="New Arrivals"
+                width={800}
+                height={800}
+                loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
@@ -427,6 +438,9 @@ const Home = () => {
               <img
                 src={IMAGES.trending.large2}
                 alt="Best Sellers"
+                width={800}
+                height={800}
+                loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>

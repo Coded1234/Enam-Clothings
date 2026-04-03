@@ -40,9 +40,9 @@ const Footer = () => {
       {/* Newsletter - Hidden on mobile, visible on desktop */}
       <div className="hidden md:block bg-gradient-to-r from-primary-500 to-secondary-500 py-12">
         <div className="container mx-auto px-4 text-center">
-          <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-2">
             Subscribe to our Newsletter
-          </h3>
+          </h2>
           <p className="text-white/80 mb-6">
             Get updates on new arrivals and exclusive offers
           </p>
@@ -132,9 +132,9 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div className="text-center sm:text-left">
-            <h4 className="text-base sm:text-lg font-semibold mb-4">
+            <h3 className="text-base sm:text-lg font-semibold mb-4">
               Quick Links
-            </h4>
+            </h3>
             <ul className="space-y-3">
               <li>
                 <Link
@@ -173,7 +173,7 @@ const Footer = () => {
 
           {/* Customer Service */}
           <div className="text-center sm:text-left">
-            <h4 className="text-lg font-semibold mb-4">Customer Service</h4>
+            <h3 className="text-lg font-semibold mb-4">Customer Service</h3>
             <ul className="space-y-3">
               <li>
                 <Link
@@ -220,7 +220,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div className="text-center sm:text-left">
-            <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
+            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-gray-300 justify-center sm:justify-start">
                 <FiPhone className="text-primary-500" />

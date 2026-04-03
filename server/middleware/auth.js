@@ -40,6 +40,30 @@ const protect = async (req, res, next) => {
   }
 };
 
+// Soft protection for checking session silently
+const softProtect = async (req, res, next) => {
+  try {
+    const token = getTokenFromCookie(req);
+
+    if (!token) {
+      return res.status(200).json(null);
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findByPk(decoded.id, {
+      attributes: { exclude: ["password"] },
+    });
+
+    if (!req.user || !req.user.isActive) {
+      return res.status(200).json(null);
+    }
+
+    next();
+  } catch (error) {
+    return res.status(200).json(null);
+  }
+};
+
 // Admin only middleware
 const adminOnly = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
@@ -75,4 +99,10 @@ const generateToken = (id) => {
   });
 };
 
-module.exports = { protect, adminOnly, optionalAuth, generateToken };
+module.exports = {
+  protect,
+  softProtect,
+  adminOnly,
+  optionalAuth,
+  generateToken,
+};

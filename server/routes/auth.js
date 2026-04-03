@@ -20,7 +20,7 @@ const {
   resendVerificationEmail,
   logout,
 } = require("../controllers/authController");
-const { protect } = require("../middleware/auth");
+const { protect, softProtect } = require("../middleware/auth");
 const { authLimiter } = require("../middleware/rateLimiter");
 const { avatarUpload } = require("../config/cloudinary");
 const {
@@ -87,7 +87,7 @@ router.post(
 );
 
 // Protected routes
-router.get("/profile", protect, getProfile);
+router.get("/profile", softProtect, getProfile);
 router.put(
   "/profile",
   protect,

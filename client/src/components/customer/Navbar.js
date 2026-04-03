@@ -270,6 +270,7 @@ const Navbar = () => {
               onClick={() => setSearchOpen(!searchOpen)}
               className="p-2 hover:bg-gray-100 dark:hover:bg-opacity-10 rounded-full transition-colors"
               aria-label="Toggle search"
+              title="Toggle Search"
             >
               <FiSearch size={20} />
             </button>
@@ -284,6 +285,7 @@ const Navbar = () => {
                     onClick={() => setBellOpen(!bellOpen)}
                     className="p-2 hover:bg-gray-100 dark:hover:bg-opacity-10 rounded-full transition-colors relative"
                     aria-label="Announcements"
+                    title="Announcements"
                   >
                     <FiBell size={20} />
                     {unreadCount > 0 && (
@@ -307,6 +309,7 @@ const Navbar = () => {
                               setBellOpen(false);
                             }}
                             className="text-xs text-primary-500 hover:text-primary-700 font-medium"
+                            aria-label="Mark all as read"
                           >
                             Clear all
                           </button>
@@ -375,10 +378,11 @@ const Navbar = () => {
             <Link
               href="/cart"
               className="p-2 hover:bg-gray-100 dark:hover:bg-opacity-10 rounded-full transition-colors relative"
-              aria-label={`Shopping cart with ${items.length} items`}
+              aria-label={`Shopping cart with ${items?.length || 0} items`}
+              title="Shopping Cart"
             >
               <FiShoppingCart size={20} />
-              {mounted && items.length > 0 && (
+              {mounted && items?.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-primary-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                   {items.length}
                 </span>
@@ -395,6 +399,7 @@ const Navbar = () => {
                   className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-opacity-10 rounded-full"
                   aria-label="User menu"
                   aria-expanded={dropdownOpen}
+                  title="User Menu"
                 >
                   <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white font-medium">
                     {user?.firstName?.[0]}
@@ -542,6 +547,8 @@ const Navbar = () => {
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="p-2 hover:bg-white/20 rounded-full text-white transition-colors"
+              aria-label="Close menu"
+              title="Close Menu"
             >
               <FiX size={24} />
             </button>

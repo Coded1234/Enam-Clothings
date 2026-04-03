@@ -1,7 +1,15 @@
 import { Toaster } from "react-hot-toast";
 import Script from "next/script";
+import { Poppins } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
+
+const poppins = Poppins({
+  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-poppins",
+});
 
 export const metadata = {
   metadataBase: new URL(
@@ -42,18 +50,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={poppins.variable}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
         <Script id="theme-matcher" strategy="beforeInteractive">
           {`(function(){try{const t=localStorage.getItem('theme');const theme=(t==='dark'||t==='light')?t:'light';document.documentElement.classList.remove('light','dark');document.documentElement.classList.add(theme);}catch(e){document.documentElement.classList.add('light');}})();`}
         </Script>

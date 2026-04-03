@@ -111,6 +111,9 @@ const ProductCard = ({
           <img
             src={getProductImage(product)}
             alt={product.name}
+            width={400}
+            height={500}
+            loading="lazy"
             className="w-full h-full object-cover dark:mix-blend-normal mix-blend-multiply group-hover:scale-105 transition-transform duration-500 ease-out"
           />
         </Link>
