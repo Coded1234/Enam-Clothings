@@ -201,7 +201,7 @@ const Orders = () => {
                 placeholder="Search by order ID, order number, or product name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-black dark:text-white placeholder-black dark:placeholder:text-white/70 bg-white dark:bg-white/[0.03]"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-black dark:text-white placeholder-black dark:placeholder-black bg-white dark:bg-white/[0.03]"
               />
             </div>
 

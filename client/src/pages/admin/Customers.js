@@ -117,7 +117,7 @@ const Customers = () => {
                 filteredCustomers.map((customer) => (
                   <div
                     key={customer.id}
-                    className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors"
                     onClick={() => setSelectedCustomer(customer)}
                   >
                     <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -221,7 +221,7 @@ const Customers = () => {
                     filteredCustomers.map((customer) => (
                       <tr
                         key={customer.id}
-                        className="hover:bg-gray-50 cursor-pointer"
+                        className="hover:bg-gray-50 dark:hover:bg-white/[0.03] cursor-pointer"
                         onClick={() => setSelectedCustomer(customer)}
                       >
                         <td className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap">

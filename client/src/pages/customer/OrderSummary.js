@@ -374,7 +374,7 @@ const OrderSummary = () => {
                           firstName: e.target.value,
                         });
                       }}
-                      className={`w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white ${formErrors.firstName ? "border-red-500" : "border-gray-300"}`}
+                      className={`w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-black ${formErrors.firstName ? "border-red-500" : "border-gray-300"}`}
                       placeholder="Enter First Name"
                       required
                     />
@@ -399,7 +399,7 @@ const OrderSummary = () => {
                         lastName: e.target.value,
                       });
                     }}
-                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white ${formErrors.lastName ? "border-red-500" : "border-gray-300"}`}
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-black ${formErrors.lastName ? "border-red-500" : "border-gray-300"}`}
                     placeholder="Enter Last Name"
                     required
                   />
@@ -426,7 +426,7 @@ const OrderSummary = () => {
                             email: e.target.value,
                           });
                         }}
-                        className={`w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white ${formErrors.email ? "border-red-500" : "border-gray-300"}`}
+                        className={`w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-black ${formErrors.email ? "border-red-500" : "border-gray-300"}`}
                         placeholder="john@example.com"
                         required={isAuthenticated}
                       />
@@ -458,7 +458,7 @@ const OrderSummary = () => {
                           phone: val,
                         });
                       }}
-                      className={`w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white ${formErrors.phone ? "border-red-500" : "border-gray-300"}`}
+                      className={`w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-black ${formErrors.phone ? "border-red-500" : "border-gray-300"}`}
                       placeholder="e.g., 0540000000"
                       required
                     />
@@ -657,7 +657,7 @@ const OrderSummary = () => {
                         e.key === "Enter" && handleApplyCoupon()
                       }
                       placeholder="Enter coupon code"
-                      className="w-full sm:flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full sm:flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg text-sm text-black placeholder-black focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     <button
                       onClick={handleApplyCoupon}

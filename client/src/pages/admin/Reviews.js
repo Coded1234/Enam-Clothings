@@ -167,7 +167,7 @@ const Reviews = () => {
                 filteredReviews.map((review) => (
                   <div
                     key={review.id}
-                    className="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors"
                     onClick={() => setSelectedReview(review)}
                   >
                     <div className="flex-1 min-w-0">
@@ -264,7 +264,7 @@ const Reviews = () => {
                     filteredReviews.map((review) => (
                       <tr
                         key={review.id}
-                        className="hover:bg-gray-50 cursor-pointer"
+                        className="hover:bg-gray-50 dark:hover:bg-white/[0.03] cursor-pointer"
                         onClick={() => setSelectedReview(review)}
                       >
                         <td className="px-2 md:px-6 py-2 md:py-4 hidden lg:table-cell">

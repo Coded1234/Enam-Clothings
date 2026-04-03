@@ -10,10 +10,10 @@ export const ThemeProvider = ({ children }) => {
   // Read real theme from localStorage after mount (avoids hydration mismatch)
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
+    if (savedTheme === "light" || savedTheme === "dark") {
       setTheme(savedTheme);
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("dark");
+    } else {
+      setTheme("light");
     }
     setMounted(true);
   }, []);

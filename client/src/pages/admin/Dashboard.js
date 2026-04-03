@@ -116,14 +116,22 @@ const Dashboard = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: "bg-yellow-100 text-yellow-800",
-      confirmed: "bg-blue-100 text-blue-800",
-      processing: "bg-indigo-100 text-indigo-800",
-      shipped: "bg-purple-100 text-purple-800",
-      delivered: "bg-green-100 text-green-800",
-      cancelled: "bg-red-100 text-red-800",
+      pending:
+        "bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-300",
+      confirmed:
+        "bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300",
+      processing:
+        "bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-300",
+      shipped:
+        "bg-purple-100 text-purple-800 dark:bg-purple-500/15 dark:text-purple-300",
+      delivered:
+        "bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300",
+      cancelled: "bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300",
     };
-    return colors[status] || "bg-gray-100 text-gray-800";
+    return (
+      colors[status] ||
+      "bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-gray-200"
+    );
   };
 
   if (loading) {
@@ -137,7 +145,7 @@ const Dashboard = () => {
   return (
     <div className="space-y-4 md:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-1 mb-2">
-        <p className="text-xs text-gray-400 font-medium">
+        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
           {new Date().toLocaleDateString("en-GH", {
             weekday: "long",
             year: "numeric",
@@ -148,7 +156,7 @@ const Dashboard = () => {
       </div>
 
       {error && (
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
+        <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-400/20 text-yellow-800 dark:text-yellow-200 px-4 py-3 rounded-lg text-sm">
           {error} (showing demo data)
         </div>
       )}
@@ -159,7 +167,7 @@ const Dashboard = () => {
           {statCards.map((stat, index) => (
             <div
               key={index}
-              className="w-40 md:w-auto bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col gap-3 flex-shrink-0"
+              className="w-40 md:w-auto bg-white dark:bg-[#111a26] rounded-xl p-4 shadow-sm dark:shadow-none border border-gray-200 dark:border-white/10 flex flex-col gap-3 flex-shrink-0"
             >
               <div className="flex items-center justify-between">
                 <div
@@ -179,10 +187,10 @@ const Dashboard = () => {
                 </span>
               </div>
               <div>
-                <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide mb-0.5">
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide mb-0.5">
                   {stat.title}
                 </p>
-                <p className="text-sm font-bold text-gray-800 leading-tight truncate">
+                <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight truncate">
                   {stat.format === "currency"
                     ? formatCurrency(stat.value)
                     : stat.value.toLocaleString()}
@@ -196,14 +204,14 @@ const Dashboard = () => {
       {/* Orders by Status + Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
         {/* Orders by Status */}
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <div className="bg-white dark:bg-[#111a26] rounded-xl p-4 shadow-sm dark:shadow-none border border-gray-200 dark:border-white/10">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-gray-800">
+            <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100">
               Orders by Status
             </h2>
             <Link
               href="/admin/orders"
-              className="text-xs text-primary-600 font-medium"
+              className="text-xs text-primary-600 dark:text-primary-300 font-medium"
             >
               View All
             </Link>
@@ -213,14 +221,14 @@ const Dashboard = () => {
               Object.entries(stats.ordersByStatus).map(([status, count]) => (
                 <div
                   key={status}
-                  className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-gray-50"
+                  className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-gray-50 dark:bg-white/[0.03]"
                 >
                   <span
                     className={`text-xs font-semibold px-2 py-0.5 rounded-full ${getStatusColor(status)}`}
                   >
                     {status.charAt(0).toUpperCase() + status.slice(1)}
                   </span>
-                  <span className="text-sm font-bold text-gray-800">
+                  <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
                     {count}
                   </span>
                 </div>
@@ -229,8 +237,8 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-          <h2 className="text-sm font-bold text-gray-800 mb-3">
+        <div className="bg-white dark:bg-[#111a26] rounded-xl p-4 shadow-sm dark:shadow-none border border-gray-200 dark:border-white/10">
+          <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
             Quick Actions
           </h2>
           <div className="grid grid-cols-2 gap-2">
@@ -239,43 +247,43 @@ const Dashboard = () => {
                 href: "/admin/products/new",
                 icon: FiPackage,
                 label: "Add Product",
-                bg: "bg-violet-50",
-                text: "text-violet-700",
-                border: "border-violet-100",
-                iconBg: "bg-violet-500",
+                bg: "bg-violet-50 dark:bg-white/[0.03]",
+                text: "text-violet-700 dark:text-gray-100",
+                border: "border-violet-100 dark:border-white/10",
+                iconBg: "bg-violet-500 dark:bg-violet-500/90",
               },
               {
                 href: "/admin/orders",
                 icon: FiShoppingBag,
                 label: "View Orders",
-                bg: "bg-blue-50",
-                text: "text-blue-700",
-                border: "border-blue-100",
-                iconBg: "bg-blue-500",
+                bg: "bg-blue-50 dark:bg-white/[0.03]",
+                text: "text-blue-700 dark:text-gray-100",
+                border: "border-blue-100 dark:border-white/10",
+                iconBg: "bg-blue-500 dark:bg-blue-500/90",
               },
               {
                 href: "/admin/customers",
                 icon: FiUsers,
                 label: "Customers",
-                bg: "bg-emerald-50",
-                text: "text-emerald-700",
-                border: "border-emerald-100",
-                iconBg: "bg-emerald-500",
+                bg: "bg-emerald-50 dark:bg-white/[0.03]",
+                text: "text-emerald-700 dark:text-gray-100",
+                border: "border-emerald-100 dark:border-white/10",
+                iconBg: "bg-emerald-500 dark:bg-emerald-500/90",
               },
               {
                 href: "/admin/reviews",
                 icon: FiTrendingUp,
                 label: "Reviews",
-                bg: "bg-amber-50",
-                text: "text-amber-700",
-                border: "border-amber-100",
-                iconBg: "bg-amber-500",
+                bg: "bg-amber-50 dark:bg-white/[0.03]",
+                text: "text-amber-700 dark:text-gray-100",
+                border: "border-amber-100 dark:border-white/10",
+                iconBg: "bg-amber-500 dark:bg-amber-500/90",
               },
             ].map(({ href, icon: Icon, label, bg, text, border, iconBg }) => (
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-2 p-3 rounded-xl border ${bg} ${border} hover:opacity-80 transition-opacity`}
+                className={`flex items-center gap-2 p-3 rounded-xl border ${bg} ${border} hover:opacity-95 dark:hover:bg-white/[0.06] transition-colors`}
               >
                 <div
                   className={`w-8 h-8 rounded-lg ${iconBg} text-white flex items-center justify-center flex-shrink-0`}
@@ -290,19 +298,21 @@ const Dashboard = () => {
       </div>
 
       {/* Recent Orders — cards on mobile, table on desktop */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-          <h2 className="text-sm font-bold text-gray-800">Recent Orders</h2>
+      <div className="bg-white dark:bg-[#111a26] rounded-xl shadow-sm dark:shadow-none border border-gray-200 dark:border-white/10 overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
+          <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+            Recent Orders
+          </h2>
           <Link
             href="/admin/orders"
-            className="text-xs text-primary-600 font-medium"
+            className="text-xs text-primary-600 dark:text-primary-300 font-medium"
           >
             View All
           </Link>
         </div>
 
         {/* Mobile card list */}
-        <div className="md:hidden divide-y divide-gray-100">
+        <div className="md:hidden divide-y divide-gray-200 dark:divide-white/10">
           {stats?.recentOrders?.length > 0 ? (
             stats.recentOrders.map((order) => (
               <div
@@ -310,10 +320,10 @@ const Dashboard = () => {
                 className="flex items-center justify-between px-4 py-3"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-gray-800 truncate">
+                  <p className="text-xs font-semibold text-gray-900 dark:text-gray-100 truncate">
                     #{order.orderNumber}
                   </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {order.shippingAddress?.firstName
                       ? `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`
                       : order.guestName ||
@@ -328,12 +338,12 @@ const Dashboard = () => {
                   >
                     {order.status}
                   </span>
-                  <p className="text-xs font-bold text-gray-800 w-16 text-right">
+                  <p className="text-xs font-bold text-gray-900 dark:text-gray-100 w-16 text-right">
                     {formatCurrency(order.totalAmount)}
                   </p>
                   <Link
                     href={`/admin/orders/${order.id}`}
-                    className="text-primary-600 ml-1"
+                    className="text-primary-600 dark:text-primary-300 ml-1"
                   >
                     <FiEye size={15} />
                   </Link>
@@ -341,7 +351,7 @@ const Dashboard = () => {
               </div>
             ))
           ) : (
-            <p className="text-center text-xs text-gray-400 py-8">
+            <p className="text-center text-xs text-gray-500 dark:text-gray-400 py-8">
               No recent orders
             </p>
           )}
@@ -350,13 +360,13 @@ const Dashboard = () => {
         {/* Desktop table */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-white/[0.03]">
               <tr>
                 {["Order ID", "Customer", "Amount", "Status", "Date", ""].map(
                   (h) => (
                     <th
                       key={h}
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                     >
                       {h}
                     </th>
@@ -364,14 +374,17 @@ const Dashboard = () => {
                 )}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
+            <tbody className="bg-white dark:bg-transparent divide-y divide-gray-200 dark:divide-white/10">
               {stats?.recentOrders?.length > 0 ? (
                 stats.recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                  <tr
+                    key={order.id}
+                    className="hover:bg-gray-50 dark:hover:bg-white/[0.03]"
+                  >
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                       #{order.orderNumber}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                       {order.shippingAddress?.firstName
                         ? `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`
                         : order.guestName ||
@@ -379,7 +392,7 @@ const Dashboard = () => {
                             ? `${order.user.firstName} ${order.user.lastName}`
                             : "Guest")}
                     </td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                       {formatCurrency(order.totalAmount)}
                     </td>
                     <td className="px-6 py-4">
@@ -389,13 +402,13 @@ const Dashboard = () => {
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <Link
                         href={`/admin/orders/${order.id}`}
-                        className="text-primary-600 hover:text-primary-900"
+                        className="text-primary-600 dark:text-primary-300 hover:text-primary-900 dark:hover:text-primary-200"
                       >
                         <FiEye size={18} />
                       </Link>
@@ -406,7 +419,7 @@ const Dashboard = () => {
                 <tr>
                   <td
                     colSpan="6"
-                    className="px-6 py-8 text-center text-sm text-gray-400"
+                    className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
                   >
                     No recent orders
                   </td>

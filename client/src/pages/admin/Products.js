@@ -204,7 +204,7 @@ const Products = () => {
                   return (
                     <div
                       key={productId || product.name}
-                      className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors"
                       onClick={() =>
                         productId &&
                         router.push(`/admin/products/${productId}/edit`)
@@ -335,7 +335,7 @@ const Products = () => {
                       return (
                         <tr
                           key={productId || product.name}
-                          className="hover:bg-gray-50 cursor-pointer"
+                          className="hover:bg-gray-50 dark:hover:bg-white/[0.03] cursor-pointer"
                           onClick={() =>
                             productId &&
                             router.push(`/admin/products/${productId}/edit`)

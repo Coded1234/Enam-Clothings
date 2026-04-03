@@ -18,13 +18,19 @@ body {
 
 /* Color variables for light/dark modes */
 :root {
-  --bg: #f9fafb; /* page background */
-  --surface: #ffffff; /* cards, panels */
-  --text: #0f1724; /* primary text */
-  --muted: #6b7280; /* secondary text */
-  --muted-2: #9ca3af; /* tertiary text */
-  --border: #e5e7eb; /* borders */
-  --card-shadow: 0 10px 20px rgba(2,6,23,0.04);
+  --bg: #f9fafb;
+  /* page background */
+  --surface: #ffffff;
+  /* cards, panels */
+  --text: #0f1724;
+  /* primary text */
+  --muted: #6b7280;
+  /* secondary text */
+  --muted-2: #9ca3af;
+  /* tertiary text */
+  --border: #e5e7eb;
+  /* borders */
+  --card-shadow: 0 10px 20px rgba(2, 6, 23, 0.04);
 }
 
 .dark {
@@ -34,7 +40,18 @@ body {
   --muted: #c9ad65;
   --muted-2: #b69142;
   --border: #2a2a2a;
-  --card-shadow: 0 10px 20px rgba(0,0,0,0.6);
+  --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Admin pages use a cleaner neutral dark palette instead of gold-tinted grays */
+.dark .admin-shell {
+  --bg: #0b1118;
+  --surface: #111a26;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --muted-2: #6b7280;
+  --border: #2a3445;
+  --card-shadow: 0 10px 24px rgba(2, 6, 23, 0.35);
 }
 
 /* Apply variables */
@@ -44,20 +61,45 @@ body {
 }
 
 /* Surface backgrounds */
-.bg-white { background-color: var(--surface) !important; }
-.bg-gray-50 { background-color: var(--bg) !important; }
-.bg-gray-100 { background-color: rgba(255,255,255,0.03) !important; }
+.bg-white {
+  background-color: var(--surface) !important;
+}
+
+.bg-gray-50 {
+  background-color: var(--bg) !important;
+}
+
+.bg-gray-100 {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
 
 /* Text colors */
-.text-gray-900, .text-gray-800, .text-gray-700 { color: var(--text) !important; }
-.text-gray-600, .text-gray-500 { color: var(--muted) !important; }
-.text-gray-400, .text-gray-300 { color: var(--muted-2) !important; }
+.text-gray-900,
+.text-gray-800,
+.text-gray-700 {
+  color: var(--text) !important;
+}
+
+.text-gray-600,
+.text-gray-500 {
+  color: var(--muted) !important;
+}
+
+.text-gray-400,
+.text-gray-300 {
+  color: var(--muted-2) !important;
+}
 
 /* Borders */
-.border-gray-200, .border-gray-300 { border-color: var(--border) !important; }
+.border-gray-200,
+.border-gray-300 {
+  border-color: var(--border) !important;
+}
 
 /* Shadows */
-.shadow-sm { box-shadow: var(--card-shadow) !important; }
+.shadow-sm {
+  box-shadow: var(--card-shadow) !important;
+}
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
@@ -88,8 +130,13 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Gradient text */
@@ -154,17 +201,26 @@ body {
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* Utility: hide native scrollbars while still allowing scrolling */
 .hide-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
+
 .hide-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 /* Make placeholder text clearly visible (black) across light/dark modes */
@@ -180,4 +236,22 @@ select::placeholder {
 .dark select::placeholder {
   color: #000 !important;
   opacity: 1 !important;
+}
+
+/* Keep form fields white with black text in dark mode for consistency */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="file"]):not([type="color"]),
+.dark textarea,
+.dark select {
+  background-color: #fff !important;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  caret-color: #000 !important;
+}
+
+.dark input:-webkit-autofill,
+.dark textarea:-webkit-autofill,
+.dark select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+  box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #000 !important;
 }

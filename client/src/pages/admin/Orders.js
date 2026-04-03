@@ -190,7 +190,7 @@ const Orders = () => {
                 filteredOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="px-4 py-3 space-y-1.5 cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="px-4 py-3 space-y-1.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors"
                     onClick={() => router.push(`/admin/orders/${order.id}`)}
                   >
                     <div className="flex items-center justify-between">
@@ -311,7 +311,7 @@ const Orders = () => {
                     filteredOrders.map((order) => (
                       <tr
                         key={order.id}
-                        className="hover:bg-gray-50 cursor-pointer"
+                        className="hover:bg-gray-50 dark:hover:bg-white/[0.03] cursor-pointer"
                         onClick={() => router.push(`/admin/orders/${order.id}`)}
                       >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">

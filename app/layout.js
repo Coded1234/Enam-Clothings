@@ -55,7 +55,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
         <Script id="theme-matcher" strategy="beforeInteractive">
-          {`(function(){const t=localStorage.getItem('theme');const theme=t||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.classList.add(theme);})();`}
+          {`(function(){try{const t=localStorage.getItem('theme');const theme=(t==='dark'||t==='light')?t:'light';document.documentElement.classList.remove('light','dark');document.documentElement.classList.add(theme);}catch(e){document.documentElement.classList.add('light');}})();`}
         </Script>
 
         {/* Google Analytics 4 */}

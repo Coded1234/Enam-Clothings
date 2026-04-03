@@ -329,7 +329,7 @@ const Shop = () => {
                         placeholder="Min"
                         value={tempMinPrice}
                         onChange={handleMinPriceChange}
-                        className="w-full pl-7 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-colors bg-gray-50 hover:bg-white text-gray-900 placeholder-gray-400"
+                        className="w-full pl-7 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-colors bg-gray-50 hover:bg-white text-gray-900 placeholder-black"
                       />
                     </div>
                     <span className="text-gray-400 font-medium">-</span>
@@ -342,7 +342,7 @@ const Shop = () => {
                         placeholder="Max"
                         value={tempMaxPrice}
                         onChange={handleMaxPriceChange}
-                        className="w-full pl-7 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-colors bg-gray-50 hover:bg-white text-gray-900 placeholder-gray-400"
+                        className="w-full pl-7 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-colors bg-gray-50 hover:bg-white text-gray-900 placeholder-black"
                       />
                     </div>
                   </div>

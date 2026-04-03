@@ -352,7 +352,10 @@ const Coupons = () => {
                 {coupons.map((coupon) => {
                   const status = getCouponStatus(coupon);
                   return (
-                    <tr key={coupon.id} className="hover:bg-gray-50">
+                    <tr
+                      key={coupon.id}
+                      className="hover:bg-gray-50 dark:hover:bg-white/[0.03]"
+                    >
                       <td className="px-4 md:px-6 py-2 md:py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2 md:gap-3">
                           <div className="p-1.5 md:p-2 bg-primary-100 rounded-lg">
