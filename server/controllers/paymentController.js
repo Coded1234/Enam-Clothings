@@ -60,6 +60,16 @@ const sanitizeOrderForClient = (order) => {
     order.shippingAddress?.email ||
     null;
 
+  const sanitizedItems = Array.isArray(order.items)
+    ? order.items.map((item) => ({
+        item_id: item.productId || item.id,
+        item_name: item.productName || "Product",
+        price: Number.parseFloat(item.price) || 0,
+        quantity: Number(item.quantity) || 1,
+        item_variant: item.size || undefined,
+      }))
+    : [];
+
   return {
     id: order.id,
     orderNumber: order.orderNumber,
@@ -68,6 +78,7 @@ const sanitizeOrderForClient = (order) => {
       order.totalItems || (Array.isArray(order.items) ? order.items.length : 0),
     status: order.status,
     paymentStatus: order.paymentStatus,
+    items: sanitizedItems,
     shippingAddress: {
       email: fallbackEmail,
     },

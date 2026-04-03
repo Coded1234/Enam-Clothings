@@ -24,6 +24,52 @@ const PaymentVerify = () => {
   const [order, setOrder] = useState(null);
   const [message, setMessage] = useState("");
 
+  const sendGaPurchaseEvent = (verifiedOrder) => {
+    if (typeof window === "undefined" || !verifiedOrder) return;
+
+    const transactionId = String(
+      verifiedOrder.orderNumber || verifiedOrder.id || "",
+    ).trim();
+    if (!transactionId) return;
+
+    // Prevent duplicate purchase events on refresh/revisit.
+    const dedupeKey = `ga4_purchase_tracked_${transactionId}`;
+    if (localStorage.getItem(dedupeKey) === "1") return;
+
+    const items = Array.isArray(verifiedOrder.items)
+      ? verifiedOrder.items.map((item, index) => ({
+          item_id: String(item.item_id || item.productId || index + 1),
+          item_name: item.item_name || item.productName || "Product",
+          item_variant: item.item_variant || item.size || undefined,
+          price: Number(item.price) || 0,
+          quantity: Number(item.quantity) || 1,
+        }))
+      : [];
+
+    const eventPayload = {
+      transaction_id: transactionId,
+      value: Number(
+        verifiedOrder.totalAmount || verifiedOrder.total_amount || 0,
+      ),
+      currency: "GHS",
+      items,
+    };
+
+    const dispatchEvent = (attempt = 0) => {
+      if (typeof window.gtag === "function") {
+        window.gtag("event", "purchase", eventPayload);
+        localStorage.setItem(dedupeKey, "1");
+        return;
+      }
+
+      if (attempt < 10) {
+        setTimeout(() => dispatchEvent(attempt + 1), 300);
+      }
+    };
+
+    dispatchEvent();
+  };
+
   const reference = searchParams.get("reference");
   const trxref = searchParams.get("trxref");
 
@@ -45,6 +91,7 @@ const PaymentVerify = () => {
           setOrder(data.order);
           setMessage(data.message || "Payment successful!");
           dispatch(clearCart());
+          sendGaPurchaseEvent(data.order);
         } else {
           setStatus("failed");
           setMessage(data.message || "Payment verification failed");
