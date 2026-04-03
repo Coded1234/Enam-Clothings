@@ -106,7 +106,7 @@ const Home = () => {
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent"></div>
         <div className="relative container mx-auto px-4 py-12 sm:py-16 min-h-[440px] sm:min-h-[620px] flex items-center">
-          <div className="max-w-2xl text-white opacity-0 animate-fade-in-up">
+          <div className="max-w-2xl text-white animate-reveal">
             <span className="inline-flex items-center rounded-full border border-amber-300/35 bg-amber-200/10 px-3 py-1 text-[11px] sm:text-xs font-semibold tracking-[0.14em] uppercase text-amber-200 mb-4">
               New Collection 2026
             </span>
